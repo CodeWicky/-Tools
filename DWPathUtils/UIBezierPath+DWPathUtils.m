@@ -96,9 +96,13 @@
 {
     CGFloat centerX = 0.5 * secondP.x - 0.5 * firstP.x;
     CGFloat centerY = 0.5 * firstP.y - 0.5 * secondP.y;
-    
+    centerX = round6f(centerX);
+    centerY = round6f(centerY);
+    radius = round6f(radius);
     ///获取相似三角形相似比例
     CGFloat scale = sqrt((pow(radius, 2) - (pow(centerX, 2) + pow(centerY, 2))) / (pow(centerX, 2) + pow(centerY, 2)));
+    scale = round6f(scale);
+    
     if (clockwise) {
         return CGPointMake(centerX + centerY * scale + firstP.x, centerY - centerX * scale + firstP.y);
     }
@@ -108,6 +112,11 @@
     }
 }
 
+///保留6位小数
+CGFloat round6f(CGFloat x){
+    return roundf(x * 1000000) / 1000000.0;
+}
+
 ///获取二点相对一点的角度
 -(CGFloat)getAngleFromFirstPoint:(CGPoint)firstP
                          secondP:(CGPoint)secondP
@@ -115,6 +124,8 @@
 {
     CGFloat deltaX = secondP.x - firstP.x;
     CGFloat deltaY = secondP.y - firstP.y;
+    deltaX = round6f(deltaX);
+    deltaY = round6f(deltaY);
     if (deltaY > 0) {
         return acos(deltaX / deltaY);
     }
