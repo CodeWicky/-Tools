@@ -34,10 +34,10 @@
     };
 }
 
--(DWPathMaker *(^)(CGFloat, CGFloat, CGFloat, CGFloat, CGFloat, BOOL))AddArcWithPoint
+-(DWPathMaker *(^)(CGFloat, CGFloat, CGFloat, CGFloat, CGFloat, BOOL,BOOL))AddArcWithPoint
 {
-    return ^(CGFloat startX,CGFloat startY,CGFloat endX,CGFloat endY,CGFloat radius,BOOL clockwise){
-        [self.path addArcWithStartPoint:CGPointMake(startX, startY) endPoint:CGPointMake(endX, endY) radius:radius clockwise:clockwise];
+    return ^(CGFloat startX,CGFloat startY,CGFloat endX,CGFloat endY,CGFloat radius,BOOL clockwise,BOOL moreThanHalf){
+        [self.path addArcWithStartPoint:CGPointMake(startX, startY) endPoint:CGPointMake(endX, endY) radius:radius clockwise:clockwise moreThanHalf:moreThanHalf];
         return self;
     };
 }
@@ -80,11 +80,11 @@
     return path;
 }
 
--(void)addArcWithStartPoint:(CGPoint)startP endPoint:(CGPoint)endP radius:(CGFloat)radius clockwise:(BOOL)clockwise
+-(void)addArcWithStartPoint:(CGPoint)startP endPoint:(CGPoint)endP radius:(CGFloat)radius clockwise:(BOOL)clockwise moreThanHalf:(BOOL)moreThanHalf
 {
-    CGPoint center = [self getCenterFromFirstPoint:startP secondPoint:endP radius:radius clockwise:clockwise];
-    CGFloat startA = [self getAngleFromFirstPoint:center secondP:startP clockwise:clockwise];
-    CGFloat endA = [self getAngleFromFirstPoint:center secondP:endP clockwise:clockwise];
+    CGPoint center = [self getCenterFromFirstPoint:startP secondPoint:endP radius:radius clockwise:clockwise moreThanhalf:moreThanHalf];
+    CGFloat startA = [self getAngleFromFirstPoint:center secondP:startP clockwise:clockwise moreThanHalf:moreThanHalf];
+    CGFloat endA = [self getAngleFromFirstPoint:center secondP:endP clockwise:clockwise moreThanHalf:moreThanHalf];
     [self addArcWithCenter:center radius:radius startAngle:startA endAngle:endA clockwise:clockwise];
 }
 
@@ -93,6 +93,7 @@
                       secondPoint:(CGPoint)secondP
                            radius:(CGFloat)radius
                         clockwise:(BOOL)clockwise
+                     moreThanhalf:(BOOL)moreThanHalf
 {
     CGFloat centerX = 0.5 * secondP.x - 0.5 * firstP.x;
     CGFloat centerY = 0.5 * firstP.y - 0.5 * secondP.y;
@@ -102,14 +103,13 @@
     ///获取相似三角形相似比例
     CGFloat scale = sqrt((pow(radius, 2) - (pow(centerX, 2) + pow(centerY, 2))) / (pow(centerX, 2) + pow(centerY, 2)));
     scale = round6f(scale);
-    
-    if (clockwise) {
-        return CGPointMake(centerX + centerY * scale + firstP.x, centerY - centerX * scale + firstP.y);
-    }
-    else
-    {
-        return CGPointMake(centerX - centerY * scale + firstP.x, centerY + centerX * scale + firstP.y);
-    }
+        if (clockwise != moreThanHalf) {
+            return CGPointMake(centerX + centerY * scale + firstP.x, - centerY + centerX * scale + firstP.y);
+        }
+        else
+        {
+            return CGPointMake(centerX - centerY * scale + firstP.x, - centerY - centerX * scale + firstP.y);
+        }
 }
 
 ///保留6位小数
@@ -121,6 +121,7 @@ CGFloat round6f(CGFloat x){
 -(CGFloat)getAngleFromFirstPoint:(CGPoint)firstP
                          secondP:(CGPoint)secondP
                        clockwise:(BOOL)clockwise
+                    moreThanHalf:(BOOL)moreThanHalf
 {
     CGFloat deltaX = secondP.x - firstP.x;
     CGFloat deltaY = secondP.y - firstP.y;
@@ -140,7 +141,7 @@ CGFloat round6f(CGFloat x){
     }
     else
     {
-        return acos(deltaX / deltaY) + (clockwise?M_PI:0);
+        return acos(deltaX / deltaY) + ((clockwise != moreThanHalf)?M_PI:0);
     }
 }
 

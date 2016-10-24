@@ -14,6 +14,9 @@
  version 1.0.0
  添加以两点绘制圆弧api
  添加以block形式生成曲线api
+ 
+ version 1.0.1
+ 引入大于半月弧概念，修复无法绘制大于半圆弧的问题
  */
 
 #import <UIKit/UIKit.h>
@@ -43,14 +46,15 @@
 
 ///以起始终止坐标添加圆弧
 /*
- startX     圆弧起始点x坐标
- startY     圆弧起始点y坐标
- endX       圆弧终止点x坐标
- endY       圆弧终止点y坐标
- radius     圆弧半径
- clockwise  顺逆时针
+ startX         圆弧起始点x坐标
+ startY         圆弧起始点y坐标
+ endX           圆弧终止点x坐标
+ endY           圆弧终止点y坐标
+ radius         圆弧半径
+ clockwise      顺逆时针
+ moreThanHalf   大于半圆弧
  */
-@property (nonatomic ,copy) DWPathMaker *(^AddArcWithPoint)(CGFloat startX,CGFloat startY,CGFloat endX,CGFloat endY,CGFloat radius,BOOL clockwise);
+@property (nonatomic ,copy) DWPathMaker *(^AddArcWithPoint)(CGFloat startX,CGFloat startY,CGFloat endX,CGFloat endY,CGFloat radius,BOOL clockwise ,BOOL moreThanHalf);
 
 ///添加一次贝塞尔曲线
 /*
@@ -81,6 +85,13 @@
 +(instancetype)bezierPathWithPathMaker:(void(^)(DWPathMaker * maker))pathMaker;
 
 ///以起始终止坐标添加圆弧
--(void)addArcWithStartPoint:(CGPoint)startP endPoint:(CGPoint)endP radius:(CGFloat)radius clockwise:(BOOL)clockwise;
+/**
+ startP:        圆弧起点
+ endP:          圆弧终点
+ radius:        圆弧半径
+ clockwise:     顺逆时针
+ moreThanHalf:  大于半圆弧
+ */
+-(void)addArcWithStartPoint:(CGPoint)startP endPoint:(CGPoint)endP radius:(CGFloat)radius clockwise:(BOOL)clockwise moreThanHalf:(BOOL)moreThanHalf;
 
 @end
