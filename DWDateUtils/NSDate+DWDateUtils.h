@@ -27,48 +27,52 @@
 /**
  返回当前日期天数
  */
-@property (nonatomic ,assign) NSInteger day;
+@property (nonatomic ,assign ,readonly) NSInteger day;
 /**
  返回当前日期月份
  */
-@property (nonatomic ,assign) NSInteger month;
+@property (nonatomic ,assign ,readonly) NSInteger month;
 /**
  返回当前日期年份
  */
-@property (nonatomic ,assign) NSInteger year;
+@property (nonatomic ,assign ,readonly) NSInteger year;
 /**
  返回当前日期为周几
  注：1为周日，2为周一，依次排列
  */
-@property (nonatomic ,assign) NSInteger weekDay;
+@property (nonatomic ,assign ,readonly) NSInteger weekDay;
 /**
  返回当前日期小时数
  */
-@property (nonatomic ,assign) NSInteger hour;
+@property (nonatomic ,assign ,readonly) NSInteger hour;
 /**
  返回当前日期分钟数
  */
-@property (nonatomic ,assign) NSInteger minute;
+@property (nonatomic ,assign ,readonly) NSInteger minute;
 /**
  返回当前日期秒数
  */
-@property (nonatomic ,assign) NSInteger second;
+@property (nonatomic ,assign ,readonly) NSInteger second;
+/**
+ 返回当前时区数
+ */
+@property (nonatomic ,assign ,readonly) NSInteger GMTNum;
 /**
  返回当前月份总天数
  */
-@property (nonatomic ,assign) NSInteger dayCountOfCurrentMonth;
+@property (nonatomic ,assign ,readonly) NSInteger dayCountOfCurrentMonth;
 /**
  返回当前日期为当月第几周
  */
-@property (nonatomic ,assign) NSInteger weekOfCurrentMonth;
+@property (nonatomic ,assign ,readonly) NSInteger weekOfCurrentMonth;
 /**
  返回当前日期为当年第几周
  */
-@property (nonatomic ,assign) NSInteger weekOfCurrentYear;
+@property (nonatomic ,assign ,readonly) NSInteger weekOfCurrentYear;
 /**
  返回当前日期为当年第几天
  */
-@property (nonatomic ,assign) NSInteger dayOfCurrentYear;
+@property (nonatomic ,assign ,readonly) NSInteger dayOfCurrentYear;
 /**
  返回当前是否为闰年
  */

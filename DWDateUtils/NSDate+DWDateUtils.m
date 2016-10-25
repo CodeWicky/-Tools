@@ -7,11 +7,18 @@
 //
 
 #import "NSDate+DWDateUtils.h"
-
+#import <objc/runtime.h>
 #define Calendar [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian]
 #define DateTo(x) [Calendar component:x fromDate:self]
+
+@interface NSDate ()
+
+@property (nonatomic ,assign) NSInteger GMT;
+
+@end
+
 @implementation NSDate (DWDateUtils)
-@dynamic day,month,year,weekDay,hour,minute,second,weekOfCurrentMonth,weekOfCurrentYear,dayCountOfCurrentMonth,dayOfCurrentYear;
+
 -(NSInteger)day
 {
     return DateTo(NSCalendarUnitDay);
@@ -40,6 +47,21 @@
 -(NSInteger)second
 {
     return DateTo(NSCalendarUnitSecond);
+}
+
+-(NSInteger)GMTNum
+{
+    return self.GMT;
+}
+
+-(void)setGMT:(NSInteger)GMT
+{
+    objc_setAssociatedObject(self, @selector(GMT), @(GMT), OBJC_ASSOCIATION_RETAIN);
+}
+
+-(NSInteger)GMT
+{
+    return [objc_getAssociatedObject(self, _cmd) integerValue];
 }
 
 -(NSInteger)weekDay
@@ -103,7 +125,9 @@
 
 -(NSDate *)translateToGMT:(NSInteger)GMTNum
 {
-    return [NSDate dateWithTimeInterval:(GMTNum * 3600) sinceDate:self];
+    NSDate * date = [NSDate dateWithTimeInterval:(GMTNum * 3600) sinceDate:self];
+    date.GMT = GMTNum;
+    return date;
 }
 
 -(NSDate *)translateToChina
@@ -115,7 +139,10 @@
 {
     NSTimeZone * zone = [NSTimeZone systemTimeZone];
     NSInteger interval = [zone secondsFromGMTForDate:self];
-    return [self dateByAddingTimeInterval:interval];
+    NSInteger GMTNum = interval / 3600;
+    NSDate * date = [self dateByAddingTimeInterval:interval];
+    date.GMT = GMTNum;
+    return date;
 }
 
 +(NSDate *)dateWithNumber:(NSInteger)number GMT:(NSInteger)GMTNum
@@ -141,7 +168,7 @@
                  minute:(NSInteger)minute second:(NSInteger)second GMT:(NSInteger)GMTNum
 {
     NSDateComponents * comp = [[NSDateComponents alloc] init];
-    NSTimeZone * timeZone = [NSTimeZone timeZoneForSecondsFromGMT:GMTNum];
+    NSTimeZone * timeZone = [NSTimeZone timeZoneForSecondsFromGMT:GMTNum * 3600];
     comp.timeZone = timeZone;
     [comp setYear:year];
     [comp setMonth:month];
@@ -149,7 +176,9 @@
     [comp setHour:hour];
     [comp setMinute:minute];
     [comp setSecond:second];
-    return [Calendar dateFromComponents:comp];
+    NSDate * date =  [Calendar dateFromComponents:comp];
+    date.GMT = GMTNum;
+    return date;
 }
 
 -(NSString *)distantStringSinceTimeStamp:(NSInteger)timeStamp
