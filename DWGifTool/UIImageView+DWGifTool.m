@@ -15,31 +15,36 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        NSURL * url = [self urlFromString:path];
-        NSMutableArray * delayTimeArr = [NSMutableArray array];
-        CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
-        size_t count = CGImageSourceGetCount(imageSource);
-        for (size_t i = 0; i < count; i ++) {
-            CGImageRef image = CGImageSourceCreateImageAtIndex(imageSource, i, NULL);
-            [self.gifArray addObject:CFBridgingRelease(image)];
-            NSDictionary *dic = (NSDictionary*)CFBridgingRelease(CGImageSourceCopyPropertiesAtIndex(imageSource, i, NULL));
-            [delayTimeArr addObject:[[dic valueForKey:(NSString *)kCGImagePropertyGIFDictionary] valueForKey:@"DelayTime"]];
-        }
-        CGFloat totalTime = [self getTotalTimeFromDelayTimeArray:delayTimeArr];
-        self.gifDuration = totalTime;
-        NSMutableArray * keyTimes = [self getKeyTimesFromDelayTimeArray:delayTimeArr totalTime:totalTime];
-        CAKeyframeAnimation * animation = [CAKeyframeAnimation animationWithKeyPath:@"contents"];
-        animation.duration = totalTime;
-        animation.values = self.gifArray;
-        animation.keyTimes = keyTimes;
-        animation.repeatCount = repeatCount;
-        animation.fillMode = kCAFillModeForwards;
-        animation.removedOnCompletion = NO;
-        animation.delegate = self;
-        self.clipsToBounds = YES;
-        [self.layer addAnimation:animation forKey:@"gifAnimation"];
+        [self startGifWithPath:path repeatCount:repeatCount];
     }
     return self;
+}
+
+-(void)startGifWithPath:(NSString *)path repeatCount:(NSInteger)repeatCount
+{
+    NSURL * url = [self urlFromString:path];
+    NSMutableArray * delayTimeArr = [NSMutableArray array];
+    CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
+    size_t count = CGImageSourceGetCount(imageSource);
+    for (size_t i = 0; i < count; i ++) {
+        CGImageRef image = CGImageSourceCreateImageAtIndex(imageSource, i, NULL);
+        [self.gifArray addObject:CFBridgingRelease(image)];
+        NSDictionary *dic = (NSDictionary*)CFBridgingRelease(CGImageSourceCopyPropertiesAtIndex(imageSource, i, NULL));
+        [delayTimeArr addObject:[[dic valueForKey:(NSString *)kCGImagePropertyGIFDictionary] valueForKey:@"DelayTime"]];
+    }
+    CGFloat totalTime = [self getTotalTimeFromDelayTimeArray:delayTimeArr];
+    self.gifDuration = totalTime;
+    NSMutableArray * keyTimes = [self getKeyTimesFromDelayTimeArray:delayTimeArr totalTime:totalTime];
+    CAKeyframeAnimation * animation = [CAKeyframeAnimation animationWithKeyPath:@"contents"];
+    animation.duration = totalTime;
+    animation.values = self.gifArray;
+    animation.keyTimes = keyTimes;
+    animation.repeatCount = repeatCount;
+    animation.fillMode = kCAFillModeForwards;
+    animation.removedOnCompletion = NO;
+    animation.delegate = self;
+    self.clipsToBounds = YES;
+    [self.layer addAnimation:animation forKey:@"gifAnimation"];
 }
 
 -(instancetype)initWithGifPathString:(NSString *)path repeatCount:(CGFloat)repeatCount
