@@ -55,8 +55,9 @@ CGFloat lengthFromCosinesLaw(CGFloat a,CGFloat b,CGFloat alpha){
 CGFloat angleFromTwoPoint(CGFloat x1,CGFloat y1,CGFloat x2,CGFloat y2){
     CGFloat deltaX = x2 - x1;
     CGFloat deltaY = y2 - y1;
+    CGFloat length = sqrtf(powX2(deltaX) + powX2(deltaY));
     if (deltaY > 0) {
-        return acosf(deltaX / deltaY);
+        return acosf(deltaX / length);
     }
     else if (deltaY == 0)
     {
@@ -70,7 +71,7 @@ CGFloat angleFromTwoPoint(CGFloat x1,CGFloat y1,CGFloat x2,CGFloat y2){
     }
     else
     {
-        return M_PI + acosf(deltaX / deltaY);
+        return M_PI + acosf(deltaX / length);
     }
 }
 @end
