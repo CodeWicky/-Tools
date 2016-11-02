@@ -20,6 +20,7 @@
 @property (nonatomic ,assign) CGPoint topRightPoint;
 @property (nonatomic ,assign) CGPoint bottomLeftPoint;
 @property (nonatomic ,assign) CGPoint bottomRightPoint;
+@property (nonatomic ,assign ,readonly) CGPoint centerOfSelf;
 -(void)setOrigin:(CGPoint)origin;
 -(void)setSize:(CGSize)size;
 @end

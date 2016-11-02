@@ -121,4 +121,9 @@
     [self setOrigin:origin];
 }
 
+-(CGPoint)centerOfSelf
+{
+    return CGPointMake(self.width / 2.0,self.height / 2.0);
+}
+
 @end
