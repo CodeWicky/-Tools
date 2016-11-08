@@ -126,4 +126,14 @@
     return CGPointMake(self.width / 2.0,self.height / 2.0);
 }
 
+-(CGFloat)viewCornerR
+{
+    return self.layer.cornerRadius;
+}
+
+-(void)setViewCornerR:(CGFloat)viewCornerR
+{
+    self.layer.cornerRadius = viewCornerR;
+}
+
 @end

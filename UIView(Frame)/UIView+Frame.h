@@ -21,6 +21,7 @@
 @property (nonatomic ,assign) CGPoint bottomLeftPoint;
 @property (nonatomic ,assign) CGPoint bottomRightPoint;
 @property (nonatomic ,assign ,readonly) CGPoint centerOfSelf;
+@property (nonatomic ,assign) CGFloat viewCornerR;
 -(void)setOrigin:(CGPoint)origin;
 -(void)setSize:(CGSize)size;
 @end
