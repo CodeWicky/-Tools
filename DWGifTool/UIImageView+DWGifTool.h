@@ -40,7 +40,7 @@ static NSString * const kImageViewGifCancel = @"kImageViewGifCancel";
 -(instancetype)initWithGifPathString:(NSString *)path repeat:(BOOL)repeat;
 
 ///播放Gif
--(void)startGifWithPath:(NSString *)path repeatCount:(NSInteger)repeatCount;
+-(void)startGifWithPath:(NSString *)path repeatCount:(CGFloat)repeatCount;
 
 ///恢复动图
 -(void)resumeGif;
