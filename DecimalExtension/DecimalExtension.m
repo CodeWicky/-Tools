@@ -47,7 +47,7 @@ CGFloat angleFromCosinesLaw(CGFloat a,CGFloat b,CGFloat c){
     return acosf((powX2(a) + powX2(b) - powX2(c)) / (2 * a * b));
 }
 CGFloat lengthFromCosinesLaw(CGFloat a,CGFloat b,CGFloat alpha){
-    if (alpha < 0 || alpha > M_PI_2) {
+    if (alpha < 0 || alpha > M_PI) {
         return -1;
     }
     return sqrtf(powX2(a) + powX2(b) - 2 * a * b * cosf(alpha));
