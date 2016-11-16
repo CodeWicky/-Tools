@@ -16,7 +16,10 @@
  添加以block形式生成曲线api
  
  version 1.0.1
- 引入大于半月弧概念，修复无法绘制大于半圆弧的问题
+ 引入大于半圆弧概念，修复无法绘制大于半圆弧的问题
+ 
+ version 1.0.2
+ 添加正弦曲线绘制api，修复计算角度的api错误
  */
 
 #import <UIKit/UIKit.h>
@@ -76,6 +79,16 @@
  */
 @property (nonatomic ,copy) DWPathMaker *(^AddCurve)(CGFloat pointX,CGFloat pointY,CGFloat controlX1,CGFloat controlY1,CGFloat controlX2,CGFloat controlY2);
 
+///添加正弦曲线
+/**
+ A      振幅A
+ Omega  角速度w
+ Phi    相位差
+ K      偏移量K
+ deltaX 曲线横向长度
+ */
+@property (nonatomic ,copy) DWPathMaker *(^AddSin)(CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K,CGFloat deltaX);
+
 ///闭合曲线
 @property (nonatomic ,copy) DWPathMaker *(^ClosePath)();
 @end
@@ -83,6 +96,11 @@
 
 ///以block形式生成自定义的贝塞尔曲线（移动点、添加直线、圆弧、贝塞尔曲线、闭合曲线）
 +(instancetype)bezierPathWithPathMaker:(void(^)(DWPathMaker * maker))pathMaker;
+
+///以起始终止坐标生成曲线
++(instancetype)bezierPathWithStartPoint:(CGPoint)startP endPoint:(CGPoint)endP radius:(CGFloat)radius clockwise:(BOOL)clockwise moreThanHalf:(BOOL)moreThanHalf;
+
++(instancetype)bezierPathWithSinStartPoint:(CGPoint)startP A:(CGFloat)A Omega:(CGFloat)Omega Phi:(CGFloat)Phi K:(CGFloat)K deltaX:(CGFloat)deltaX;
 
 ///以起始终止坐标添加圆弧
 /**
@@ -94,4 +112,13 @@
  */
 -(void)addArcWithStartPoint:(CGPoint)startP endPoint:(CGPoint)endP radius:(CGFloat)radius clockwise:(BOOL)clockwise moreThanHalf:(BOOL)moreThanHalf;
 
+///绘制正弦曲线
+/**
+ A      振幅A
+ Omega  角速度w
+ Phi    相位差
+ K      偏移量K
+ deltaX 曲线横向长度
+ */
+-(void)addSinWithA:(CGFloat)A Omega:(CGFloat)Omega Phi:(CGFloat)Phi K:(CGFloat)K deltaX:(CGFloat)deltaX;
 @end

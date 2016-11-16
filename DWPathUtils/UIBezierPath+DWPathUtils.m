@@ -58,6 +58,14 @@
     };
 }
 
+-(DWPathMaker *(^)(CGFloat, CGFloat, CGFloat, CGFloat, CGFloat))AddSin
+{
+    return ^(CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K,CGFloat deltaX){
+        [self.path addSinWithA:A Omega:Omega Phi:Phi K:K deltaX:deltaX];
+        return self;
+    };
+}
+
 -(DWPathMaker *(^)())ClosePath
 {
     return ^(){
@@ -80,12 +88,55 @@
     return path;
 }
 
++(instancetype)bezierPathWithStartPoint:(CGPoint)startP endPoint:(CGPoint)endP radius:(CGFloat)radius clockwise:(BOOL)clockwise moreThanHalf:(BOOL)moreThanHalf
+{
+    UIBezierPath * path = [UIBezierPath bezierPath];
+    [path moveToPoint:startP];
+    [path addArcWithStartPoint:startP endPoint:endP radius:radius clockwise:clockwise moreThanHalf:moreThanHalf];
+    return path;
+}
+
++(instancetype)bezierPathWithSinStartPoint:(CGPoint)startP A:(CGFloat)A Omega:(CGFloat)Omega Phi:(CGFloat)Phi K:(CGFloat)K deltaX:(CGFloat)deltaX
+{
+    UIBezierPath * path = [UIBezierPath bezierPath];
+    [path moveToPoint:startP];
+    [path addSinWithA:A Omega:Omega Phi:Phi K:K deltaX:deltaX];
+    return path;
+}
+
 -(void)addArcWithStartPoint:(CGPoint)startP endPoint:(CGPoint)endP radius:(CGFloat)radius clockwise:(BOOL)clockwise moreThanHalf:(BOOL)moreThanHalf
 {
     CGPoint center = [self getCenterFromFirstPoint:startP secondPoint:endP radius:radius clockwise:clockwise moreThanhalf:moreThanHalf];
     CGFloat startA = [self getAngleFromFirstPoint:center secondP:startP clockwise:clockwise moreThanHalf:moreThanHalf];
     CGFloat endA = [self getAngleFromFirstPoint:center secondP:endP clockwise:clockwise moreThanHalf:moreThanHalf];
     [self addArcWithCenter:center radius:radius startAngle:startA endAngle:endA clockwise:clockwise];
+}
+
+-(void)addSinWithA:(CGFloat)A Omega:(CGFloat)Omega Phi:(CGFloat)Phi K:(CGFloat)K deltaX:(CGFloat)deltaX
+{
+    CGPoint originPoint = self.currentPoint;
+    
+    CGPoint currentPoint = self.currentPoint;
+    CGFloat currentX = 0;
+    CGFloat step = 0.05;
+    while (currentX <= deltaX) {
+        currentX += step;
+        currentPoint = CGPointMake(currentPoint.x + step, currentPoint.y - deltaSinValueWith(currentX, A, Omega, Phi, K, step));
+        [self addLineToPoint:currentPoint];
+    }
+    
+    if (currentX != deltaX) {
+        step = deltaX;
+        [self addLineToPoint:CGPointMake(originPoint.x + step, originPoint.y - deltaSinValueWith(deltaX, A, Omega, Phi, K, step))];
+    }
+}
+
+CGFloat sinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K){
+    return A * sinf(Omega * x + Phi) + K;
+}
+
+CGFloat deltaSinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K ,CGFloat step){
+    return sinValueWith(x, A, Omega, Phi, K) - sinValueWith(x - step, A, Omega, Phi, K);
 }
 
 ///根据两点、半径、顺逆时针获取圆心
@@ -117,7 +168,7 @@ CGFloat round6f(CGFloat x){
     return roundf(x * 1000000) / 1000000.0;
 }
 
-///获取二点相对一点的角度
+///获取第二点相对第一点的角度
 -(CGFloat)getAngleFromFirstPoint:(CGPoint)firstP
                          secondP:(CGPoint)secondP
                        clockwise:(BOOL)clockwise
@@ -128,7 +179,7 @@ CGFloat round6f(CGFloat x){
     deltaX = round6f(deltaX);
     deltaY = round6f(deltaY);
     if (deltaY > 0) {
-        return acos(deltaX / deltaY);
+        return atan(deltaY / deltaX);
     }
     if (deltaY == 0) {
         if (deltaX >= 0) {
@@ -141,7 +192,7 @@ CGFloat round6f(CGFloat x){
     }
     else
     {
-        return acos(deltaX / deltaY) + ((clockwise != moreThanHalf)?M_PI:0);
+        return atan(deltaY / deltaX) + ((clockwise != moreThanHalf)?M_PI:0);
     }
 }
 
