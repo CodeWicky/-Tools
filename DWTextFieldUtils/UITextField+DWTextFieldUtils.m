@@ -12,7 +12,7 @@
 @implementation UITextField (DWTextFieldUtils)
 -(BOOL)dw_ShouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
-    NSAssert(self.componentsLength.count, @"To user this Method you should make sure setting the property of 'componetsLength!'");
+    NSAssert(self.componentsLength.count, @"To use this Method 'dw_ShouldChangeCharactersInRange:replacementString:' you should make sure setting the property of 'componetsLength!'");
     ///获取目标字符串
     string = [self.text stringByReplacingCharactersInRange:range withString:string];
     
