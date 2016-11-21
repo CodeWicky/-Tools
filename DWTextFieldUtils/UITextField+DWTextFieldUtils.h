@@ -33,6 +33,9 @@
  */
 @property (nonatomic ,copy) NSString * componentsSeperator;
 
+///剔除分隔符的绝对字符串
+@property (nonatomic ,strong ,readonly) NSString * absoluteString;
+
 ///若需要限制长度并分割，请在需要限制的条件下在shouldChange代理中返回此方法
 /**
  形如

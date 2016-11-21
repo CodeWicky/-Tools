@@ -10,6 +10,7 @@
 #import <objc/runtime.h>
 
 @implementation UITextField (DWTextFieldUtils)
+@implementation UITextField (DWTextFieldUtils)
 -(BOOL)dw_ShouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
     NSAssert(self.componentsLength.count, @"To use this Method 'dw_ShouldChangeCharactersInRange:replacementString:' you should make sure setting the property of 'componetsLength!'");
@@ -17,7 +18,7 @@
     string = [self.text stringByReplacingCharactersInRange:range withString:string];
     
     ///获取目标字符串对应的无分隔符字符串
-    string = [self absoluteTelePhoneString:string];
+    string = [self absoluteNoSeperatorString:string];
     
     ///获取最大长度
     __block NSInteger limitL = 0;
@@ -32,7 +33,7 @@
     }
     
     ///否则处理字符串至带分隔符字符串
-    string = [self handleTelePhoneStringWithString:string];
+    string = [self handleSeperatorStringWithString:string];
     
     ///强行改变textField
     self.text = string;
@@ -52,7 +53,7 @@
 /**
  获取无分隔符的字符串
  */
--(NSString *)absoluteTelePhoneString:(NSString *)string
+-(NSString *)absoluteNoSeperatorString:(NSString *)string
 {
     return [string stringByReplacingOccurrencesOfString:self.componentsSeperator withString:@""];
 }
@@ -60,7 +61,7 @@
 /**
  处理纯字符串至以分隔符分隔的字符串
  */
--(NSString *)handleTelePhoneStringWithString:(NSString *)string
+-(NSString *)handleSeperatorStringWithString:(NSString *)string
 {
     ///获取分隔数组并排除最后一位
     NSMutableArray * numArr = self.componentsLength.mutableCopy;
@@ -126,5 +127,10 @@
 -(void)setComponentsSeperator:(NSString *)componentsSeperator
 {
     objc_setAssociatedObject(self, @selector(componentsSeperator), componentsSeperator, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+-(NSString *)absoluteString
+{
+    return [self absoluteNoSeperatorString:self.text];
 }
 @end
