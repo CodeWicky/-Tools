@@ -10,7 +10,6 @@
 #import <objc/runtime.h>
 
 @implementation UITextField (DWTextFieldUtils)
-@implementation UITextField (DWTextFieldUtils)
 -(BOOL)dw_ShouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
     NSAssert(self.componentsLength.count, @"To use this Method 'dw_ShouldChangeCharactersInRange:replacementString:' you should make sure setting the property of 'componetsLength!'");
@@ -47,7 +46,7 @@
  */
 -(NSString *)string:(NSString *)string insertSeperatorAtIndex:(NSInteger)index
 {
-    return [string stringByReplacingCharactersInRange:NSMakeRange(index, 0) withString:self.componentsSeperator];
+    return [string stringByReplacingCharactersInRange:NSMakeRange(index, 0) withString:self.componentsSeparator];
 }
 
 /**
@@ -55,7 +54,7 @@
  */
 -(NSString *)absoluteNoSeperatorString:(NSString *)string
 {
-    return [string stringByReplacingOccurrencesOfString:self.componentsSeperator withString:@""];
+    return [string stringByReplacingOccurrencesOfString:self.componentsSeparator withString:@""];
 }
 
 /**
@@ -114,19 +113,19 @@
     objc_setAssociatedObject(self, @selector(componentsLength), componentsLength, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
--(NSString *)componentsSeperator
+-(NSString *)componentsSeparator
 {
-    NSString * seperator = objc_getAssociatedObject(self, _cmd);
-    if (seperator == nil) {
-        seperator = @" ";
-        objc_setAssociatedObject(self, _cmd, seperator, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    NSString * separator = objc_getAssociatedObject(self, _cmd);
+    if (separator == nil) {
+        separator = @" ";
+        objc_setAssociatedObject(self, _cmd, separator, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
-    return seperator;
+    return separator;
 }
 
--(void)setComponentsSeperator:(NSString *)componentsSeperator
+-(void)setComponentsSeparator:(NSString *)componentsSeperator
 {
-    objc_setAssociatedObject(self, @selector(componentsSeperator), componentsSeperator, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, @selector(componentsSeparator), componentsSeperator, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 -(NSString *)absoluteString

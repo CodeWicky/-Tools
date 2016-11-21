@@ -31,7 +31,7 @@
 /**
  默认为空格
  */
-@property (nonatomic ,copy) NSString * componentsSeperator;
+@property (nonatomic ,copy) NSString * componentsSeparator;
 
 ///剔除分隔符的绝对字符串
 @property (nonatomic ,strong ,readonly) NSString * absoluteString;
