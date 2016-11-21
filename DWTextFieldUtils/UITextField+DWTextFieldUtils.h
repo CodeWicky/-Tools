@@ -14,6 +14,9 @@
  
  version 1.0.0
  添加按位分隔api
+ 
+ version 1.0.1
+ 分隔符支持任意长度，字符串中可含有分隔符且无影响
  */
 #import <UIKit/UIKit.h>
 
