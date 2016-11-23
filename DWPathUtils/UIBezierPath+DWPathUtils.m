@@ -74,6 +74,14 @@
     };
 }
 
+-(DWPathMaker *(^)(DWPathUtilsMirrorAxis, CGRect))MirrorPath
+{
+    return ^(DWPathUtilsMirrorAxis axis,CGRect bounds){
+        [self.path dw_MirrorAxis:axis inBounds:bounds];
+        return self;
+    };
+}
+
 @end
 @implementation UIBezierPath (DWPathUtils)
 
@@ -128,6 +136,19 @@
     if (currentX != deltaX) {
         step = deltaX;
         [self addLineToPoint:CGPointMake(originPoint.x + step, originPoint.y - deltaSinValueWith(deltaX, A, Omega, Phi, K, step))];
+    }
+}
+
+-(void)dw_MirrorAxis:(DWPathUtilsMirrorAxis)axis inBounds:(CGRect)bounds
+{
+    if (axis == DWPathUtilsMirrorAxisX) {
+        [self applyTransform:CGAffineTransformMakeScale(-1, 1)];
+        [self applyTransform:CGAffineTransformMakeTranslation(0, 2 * bounds.origin.y + bounds.size.height)];
+    }
+    else
+    {
+        [self applyTransform:CGAffineTransformMakeScale(1, -1)];
+        [self applyTransform:CGAffineTransformMakeTranslation(2 * bounds.origin.x + bounds.size.width, 0)];
     }
 }
 
