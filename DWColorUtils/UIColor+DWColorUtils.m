@@ -29,6 +29,11 @@
     return [UIColor colorWithRGBString:string alpha:1];
 }
 
+-(BOOL)isEqualToColor:(UIColor *)color
+{
+    return CGColorEqualToColor(self.CGColor, color.CGColor);
+}
+
 -(UIColor *(^)(CGFloat))alphaWith
 {
     return ^(CGFloat alpha){

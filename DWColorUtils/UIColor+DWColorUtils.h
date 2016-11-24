@@ -22,4 +22,9 @@
  以16进制字符串生成颜色
  */
 +(instancetype)colorWithRGBString:(NSString *)string;
+
+/**
+ 返回颜色是否相同
+ */
+-(BOOL)isEqualToColor:(UIColor *)color;
 @end
