@@ -24,6 +24,14 @@
 
 #import <UIKit/UIKit.h>
 
+/**
+ 镜像轴
+ */
+typedef NS_ENUM(NSUInteger, DWPathUtilsMirrorAxis) {
+    DWPathUtilsMirrorAxisX,///x轴镜像
+    DWPathUtilsMirrorAxisY///y轴镜像
+};
+
 @interface DWPathMaker : NSObject
 
 @property (nonatomic ,strong) UIBezierPath * path;
@@ -91,6 +99,12 @@
 
 ///闭合曲线
 @property (nonatomic ,copy) DWPathMaker *(^ClosePath)();
+
+///镜像曲线
+/**
+ path转换为指定bounds的指定中心轴线的镜像路径
+ */
+@property (nonatomic ,copy) DWPathMaker *(^MirrorPath)(DWPathUtilsMirrorAxis axis,CGRect bounds);
 @end
 @interface UIBezierPath (DWPathUtils)
 
@@ -121,4 +135,7 @@
  deltaX 曲线横向长度
  */
 -(void)addSinWithA:(CGFloat)A Omega:(CGFloat)Omega Phi:(CGFloat)Phi K:(CGFloat)K deltaX:(CGFloat)deltaX;
+
+///使path以指定bounds的指定轴线做镜像
+-(void)dw_MirrorAxis:(DWPathUtilsMirrorAxis)axis inBounds:(CGRect)bounds;
 @end
