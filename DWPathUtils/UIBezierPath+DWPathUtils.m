@@ -143,12 +143,12 @@
 {
     if (axis == DWPathUtilsMirrorAxisX) {
         [self applyTransform:CGAffineTransformMakeScale(-1, 1)];
-        [self applyTransform:CGAffineTransformMakeTranslation(0, 2 * bounds.origin.y + bounds.size.height)];
+        [self applyTransform:CGAffineTransformMakeTranslation(2 * bounds.origin.x + bounds.size.width, 0)];
     }
     else
     {
         [self applyTransform:CGAffineTransformMakeScale(1, -1)];
-        [self applyTransform:CGAffineTransformMakeTranslation(2 * bounds.origin.x + bounds.size.width, 0)];
+        [self applyTransform:CGAffineTransformMakeTranslation(0, 2 * bounds.origin.y + bounds.size.height)];
     }
 }
 
