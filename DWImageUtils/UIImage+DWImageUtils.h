@@ -30,6 +30,9 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
  */
 -(UIImage *)dw_CornerRadius:(CGFloat)radius withWidth:(CGFloat)width contentMode:(DWContentMode)mode;
 
+///按给定path剪裁图片
+-(UIImage *)dw_ClipImageWithPath:(UIBezierPath *)path mode:(DWContentMode)mode;
+
 ///获取旋转角度的图片
 /**
  注:角度计数单位为弧度制
@@ -74,8 +77,8 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
 -(UIImage *)dw_GetTiledImageWithSize:(CGSize)size;
 
 ///UIView转化为UIImage
-+(UIImage *)imageFromView:(UIView *)view;
++(UIImage *)dw_ImageFromView:(UIView *)view;
 
 ///将两个图片生成一张图片
-+(UIImage*)mergeImage:(UIImage*)firstImage withImage:(UIImage*)secondImage;
++(UIImage*)dw_MergeImage:(UIImage*)firstImage withImage:(UIImage*)secondImage;
 @end

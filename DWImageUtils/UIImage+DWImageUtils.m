@@ -59,6 +59,53 @@
     return image;
 }
 
+-(UIImage *)dw_ClipImageWithPath:(UIBezierPath *)path mode:(DWContentMode)mode
+{
+    CGFloat originScale = self.size.width * 1.0 / self.size.height;
+    CGRect boxBounds = path.bounds;
+    CGFloat width = boxBounds.size.width;
+    CGFloat height = width / originScale;
+    switch (mode) {
+        case DWContentModeScaleAspectFit:
+        {
+            if (height > boxBounds.size.height) {
+                height = boxBounds.size.height;
+                width = height * originScale;
+            }
+        }
+            break;
+        case DWContentModeScaleAspectFill:
+        {
+            if (height < boxBounds.size.height) {
+                height = boxBounds.size.height;
+                width = height * originScale;
+            }
+        }
+            break;
+        default:
+            if (height != boxBounds.size.height) {
+                height = boxBounds.size.height;
+            }
+            break;
+    }
+    
+    
+    ///开启上下文
+    UIGraphicsBeginImageContextWithOptions(boxBounds.size, NO, [UIScreen mainScreen].scale);
+    CGContextRef bitmap = UIGraphicsGetCurrentContext();
+    [path addClip];
+    ///移动原点至图片中心
+    CGContextTranslateCTM(bitmap, boxBounds.size.width/2.0, boxBounds.size.height/2.0);
+    CGContextScaleCTM(bitmap, 1.0, -1.0);
+    CGContextDrawImage(bitmap, CGRectMake(-width / 2, -height / 2, width, height), self.CGImage);
+    
+    ///生成图片
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return newImage;
+}
+
 -(UIImage *)dw_RotateImageWithAngle:(CGFloat)angle
 {
     UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.size.width, self.size.height)];
@@ -80,7 +127,7 @@
     CGContextRotateCTM(bitmap, angle);
     CGContextDrawImage(bitmap, CGRectMake(-self.size.width / 2, -self.size.height / 2, self.size.width, self.size.height), [self CGImage]);
     
-    ///旋转
+    ///生成图片
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
