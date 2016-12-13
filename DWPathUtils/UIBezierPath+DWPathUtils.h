@@ -120,6 +120,7 @@ typedef NS_ENUM(NSUInteger, DWPathUtilsMirrorAxis) {
 ///以起始终止坐标生成曲线
 +(instancetype)bezierPathWithStartPoint:(CGPoint)startP endPoint:(CGPoint)endP radius:(CGFloat)radius clockwise:(BOOL)clockwise moreThanHalf:(BOOL)moreThanHalf;
 
+///生成正弦曲线
 +(instancetype)bezierPathWithSinStartPoint:(CGPoint)startP A:(CGFloat)A Omega:(CGFloat)Omega Phi:(CGFloat)Phi K:(CGFloat)K deltaX:(CGFloat)deltaX;
 
 ///以起始终止坐标添加圆弧
