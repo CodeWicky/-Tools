@@ -105,6 +105,12 @@ typedef NS_ENUM(NSUInteger, DWPathUtilsMirrorAxis) {
  path转换为指定bounds的指定中心轴线的镜像路径
  */
 @property (nonatomic ,copy) DWPathMaker *(^MirrorPath)(DWPathUtilsMirrorAxis axis,CGRect bounds);
+
+///保证图形区域中心不变以内距形式缩放路径
+@property (nonatomic ,copy) DWPathMaker *(^ScalePathWithMargin)(CGFloat margin);
+
+///保证图形区域中心不变以比例形式缩放路径
+@property (nonatomic ,copy) DWPathMaker *(^ScalePathWithScale)(CGFloat scale);
 @end
 @interface UIBezierPath (DWPathUtils)
 
@@ -138,4 +144,10 @@ typedef NS_ENUM(NSUInteger, DWPathUtilsMirrorAxis) {
 
 ///使path以指定bounds的指定轴线做镜像
 -(void)dw_MirrorAxis:(DWPathUtilsMirrorAxis)axis inBounds:(CGRect)bounds;
+
+///保证图形区域中心不变以内距形式缩放路径
+-(void)dw_ScalePathWithMargin:(CGFloat)margin;
+
+///保证图形区域中心不变以比例形式缩放路径
+-(void)dw_ScalePathWithScale:(CGFloat)scale;
 @end

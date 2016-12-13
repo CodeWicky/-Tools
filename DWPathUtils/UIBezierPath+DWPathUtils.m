@@ -82,6 +82,22 @@
     };
 }
 
+-(DWPathMaker *(^)(CGFloat))ScalePathWithMargin
+{
+    return ^(CGFloat margin){
+        [self.path dw_ScalePathWithMargin:margin];
+        return self;
+    };
+}
+
+-(DWPathMaker *(^)(CGFloat))ScalePathWithScale
+{
+    return ^(CGFloat scale){
+        [self.path dw_ScalePathWithScale:scale];
+        return self;
+    };
+}
+
 @end
 @implementation UIBezierPath (DWPathUtils)
 
@@ -150,6 +166,30 @@
         [self applyTransform:CGAffineTransformMakeScale(1, -1)];
         [self applyTransform:CGAffineTransformMakeTranslation(0, 2 * bounds.origin.y + bounds.size.height)];
     }
+}
+
+-(void)dw_ScalePathWithMargin:(CGFloat)margin
+{
+    if (margin == 0) {
+        return;
+    }
+    CGFloat widthScale = 1 - margin * 2 / self.bounds.size.width;
+    CGFloat heightScale = 1 - margin * 2 / self.bounds.size.height;
+    CGFloat offsetX = self.bounds.origin.x * (1 - widthScale) + margin;
+    CGFloat offsetY = self.bounds.origin.y * (1 - heightScale) + margin;
+    [self applyTransform:CGAffineTransformMakeScale(widthScale, heightScale)];
+    [self applyTransform:CGAffineTransformMakeTranslation(offsetX, offsetY)];
+}
+
+-(void)dw_ScalePathWithScale:(CGFloat)scale
+{
+    if (scale == 1) {
+        return;
+    }
+    CGFloat marginX = self.bounds.size.width * (1 - scale) / 2;
+    CGFloat marginY = self.bounds.size.height * (1 - scale) / 2;
+    [self applyTransform:CGAffineTransformMakeScale(scale, scale)];
+    [self applyTransform:CGAffineTransformMakeTranslation(marginX * 3, marginY * 3)];
 }
 
 CGFloat sinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K){
