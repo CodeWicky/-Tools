@@ -106,6 +106,18 @@
     return newImage;
 }
 
++(UIImage *)dw_ImageWithColor:(UIColor *)color
+{
+    CGRect rect=CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
 -(UIImage *)dw_RotateImageWithAngle:(CGFloat)angle
 {
     UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.size.width, self.size.height)];
@@ -124,7 +136,7 @@
     ///移动原点至图片中心
     CGContextTranslateCTM(bitmap, rotatedSize.width/2.0, rotatedSize.height/2.0);
     CGContextScaleCTM(bitmap, 1.0, -1.0);
-    CGContextRotateCTM(bitmap, angle);
+    CGContextRotateCTM(bitmap, -angle);
     CGContextDrawImage(bitmap, CGRectMake(-self.size.width / 2, -self.size.height / 2, self.size.width, self.size.height), [self CGImage]);
     
     ///生成图片

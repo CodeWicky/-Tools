@@ -33,6 +33,9 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
 ///按给定path剪裁图片
 -(UIImage *)dw_ClipImageWithPath:(UIBezierPath *)path mode:(DWContentMode)mode;
 
+///按给定颜色生层图片
++(UIImage *)dw_ImageWithColor:(UIColor *)color;
+
 ///获取旋转角度的图片
 /**
  注:角度计数单位为弧度制
