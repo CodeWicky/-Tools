@@ -205,6 +205,31 @@
     return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
 }
 
+-(NSString *)dw_ImageToBase64String
+{
+    NSData *imageData = nil;
+    NSString *mimeType = nil;
+    
+    if ([self imageHasAlpha]) {
+        imageData = UIImagePNGRepresentation(self);
+        mimeType = @"image/png";
+    } else {
+        imageData = UIImageJPEGRepresentation(self, 1.0f);
+        mimeType = @"image/jpeg";
+    }
+    return [NSString stringWithFormat:@"data:%@;base64,%@", mimeType,
+            [imageData base64EncodedStringWithOptions: 0]];
+}
+
++ (UIImage *)dw_ImageWithBase64String:(NSString *)base64String
+{
+    NSURL *url = [NSURL URLWithString: base64String];
+    NSData *data = [NSData dataWithContentsOfURL: url];
+    UIImage *image = [UIImage imageWithData: data];
+    
+    return image;
+}
+
 -(UIImage *)dw_FixOrientation
 {
     if (self.imageOrientation == UIImageOrientationUp) return self;
@@ -488,8 +513,17 @@
     return image;
 }
 
+-(BOOL)imageHasAlpha
+{
+    CGImageAlphaInfo alpha = CGImageGetAlphaInfo(self.CGImage);
+    return (alpha == kCGImageAlphaFirst ||
+            alpha == kCGImageAlphaLast ||
+            alpha == kCGImageAlphaPremultipliedFirst ||
+            alpha == kCGImageAlphaPremultipliedLast);
+}
+
 ///交换宽和高
-static CGRect swapWidthAndHeight(CGRect rect)
+static inline CGRect swapWidthAndHeight(CGRect rect)
 {
     CGFloat swap = rect.size.width;
     rect.size.width = rect.size.height;

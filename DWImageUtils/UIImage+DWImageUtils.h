@@ -62,6 +62,11 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
  */
 -(UIColor *)dw_ColorAtPoint:(CGPoint)point;
 
+///转换图片为Base64字符串
+-(NSString *)dw_ImageToBase64String;
+
+///Base64转换为图片
++ (UIImage *)dw_ImageWithBase64String:(NSString *)base64String;
 #pragma mark ---以下代码来自网络---
 ///纠正图片方向
 -(UIImage *)dw_FixOrientation;
