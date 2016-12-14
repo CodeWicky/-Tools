@@ -89,7 +89,6 @@
             break;
     }
     
-    
     ///开启上下文
     UIGraphicsBeginImageContextWithOptions(boxBounds.size, NO, [UIScreen mainScreen].scale);
     CGContextRef bitmap = UIGraphicsGetCurrentContext();
@@ -124,10 +123,6 @@
     CGAffineTransform t = CGAffineTransformMakeRotation(angle);
     rotatedViewBox.transform = t;
     CGSize rotatedSize = rotatedViewBox.frame.size;
-    
-    ///保证开启最大正方形，防止变形
-    CGFloat length = MAX(rotatedSize.width, rotatedSize.height);
-    rotatedSize = CGSizeMake(length, length);
     
     ///开启上下文
     UIGraphicsBeginImageContextWithOptions(rotatedSize, NO, [UIScreen mainScreen].scale);

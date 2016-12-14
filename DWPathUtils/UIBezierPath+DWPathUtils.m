@@ -192,6 +192,18 @@
     [self applyTransform:CGAffineTransformMakeTranslation(marginX * 3, marginY * 3)];
 }
 
+-(void)dw_RotatePathWithAngle:(CGFloat)angle
+{
+    if (angle == 0) {
+        return;
+    }
+    CGFloat offsetX = self.bounds.origin.x + self.bounds.size.width / 2;
+    CGFloat offsetY = self.bounds.origin.y + self.bounds.size.height / 2;
+    [self applyTransform:CGAffineTransformMakeTranslation(-offsetX, -offsetY)];
+    [self applyTransform:CGAffineTransformMakeRotation(angle)];
+    [self applyTransform:CGAffineTransformMakeTranslation(offsetX, offsetY)];
+}
+
 CGFloat sinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K){
     return A * sinf(Omega * x + Phi) + K;
 }

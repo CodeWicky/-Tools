@@ -151,4 +151,7 @@ typedef NS_ENUM(NSUInteger, DWPathUtilsMirrorAxis) {
 
 ///保证图形区域中心不变以比例形式缩放路径
 -(void)dw_ScalePathWithScale:(CGFloat)scale;
+
+///保证图形区域中心不变旋转路径
+-(void)dw_RotatePathWithAngle:(CGFloat)angle;
 @end
