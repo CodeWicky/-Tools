@@ -194,6 +194,7 @@
 
 -(void)dw_RotatePathWithAngle:(CGFloat)angle
 {
+    angle = fmod(angle, M_PI * 2);
     if (angle == 0) {
         return;
     }
