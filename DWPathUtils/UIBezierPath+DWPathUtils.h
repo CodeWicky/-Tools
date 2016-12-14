@@ -111,7 +111,12 @@ typedef NS_ENUM(NSUInteger, DWPathUtilsMirrorAxis) {
 
 ///保证图形区域中心不变以比例形式缩放路径
 @property (nonatomic ,copy) DWPathMaker *(^ScalePathWithScale)(CGFloat scale);
+
+///保证图形区域中心不变以角度旋转路径
+@property (nonatomic ,copy) DWPathMaker *(^RotatePathWithAngle)(CGFloat angle);
+
 @end
+
 @interface UIBezierPath (DWPathUtils)
 
 ///以block形式生成自定义的贝塞尔曲线（移动点、添加直线、圆弧、贝塞尔曲线、闭合曲线）

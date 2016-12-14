@@ -98,6 +98,14 @@
     };
 }
 
+-(DWPathMaker *(^)(CGFloat))RotatePathWithAngle
+{
+    return ^(CGFloat angle){
+        [self.path dw_RotatePathWithAngle:angle];
+        return self;
+    };
+}
+
 @end
 @implementation UIBezierPath (DWPathUtils)
 
