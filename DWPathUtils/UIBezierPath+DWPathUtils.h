@@ -115,6 +115,12 @@ typedef NS_ENUM(NSUInteger, DWPathUtilsMirrorAxis) {
 ///保证图形区域中心不变以角度旋转路径
 @property (nonatomic ,copy) DWPathMaker *(^RotatePathWithAngle)(CGFloat angle);
 
+///平移路径
+@property (nonatomic ,copy) DWPathMaker *(^TranslatePathWithOffset)(CGFloat offsetX,CGFloat offsetY);
+
+///移动路径至原点
+@property (nonatomic ,copy) DWPathMaker *(^PathOriginToZero)();
+
 @end
 
 @interface UIBezierPath (DWPathUtils)
@@ -159,4 +165,10 @@ typedef NS_ENUM(NSUInteger, DWPathUtilsMirrorAxis) {
 
 ///保证图形区域中心不变旋转路径
 -(void)dw_RotatePathWithAngle:(CGFloat)angle;
+
+///平移路径
+-(void)dw_TranslatePathWithOffsetX:(CGFloat)offsetX offsetY:(CGFloat)offsetY;
+
+///移动path回到原点
+-(void)dw_PathOriginToZero;
 @end

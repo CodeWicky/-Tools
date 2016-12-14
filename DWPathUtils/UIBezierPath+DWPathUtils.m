@@ -106,6 +106,22 @@
     };
 }
 
+-(DWPathMaker *(^)(CGFloat, CGFloat))TranslatePathWithOffset
+{
+    return ^(CGFloat offsetX,CGFloat offsetY){
+        [self.path dw_TranslatePathWithOffsetX:offsetX offsetY:offsetY];
+        return self;
+    };
+}
+
+-(DWPathMaker *(^)())PathOriginToZero
+{
+    return ^(){
+        [self.path dw_PathOriginToZero];
+        return self;
+    };
+}
+
 @end
 @implementation UIBezierPath (DWPathUtils)
 
@@ -167,12 +183,12 @@
 {
     if (axis == DWPathUtilsMirrorAxisX) {
         [self applyTransform:CGAffineTransformMakeScale(-1, 1)];
-        [self applyTransform:CGAffineTransformMakeTranslation(2 * bounds.origin.x + bounds.size.width, 0)];
+        [self dw_TranslatePathWithOffsetX:2 * bounds.origin.x + bounds.size.width offsetY:0];
     }
     else
     {
         [self applyTransform:CGAffineTransformMakeScale(1, -1)];
-        [self applyTransform:CGAffineTransformMakeTranslation(0, 2 * bounds.origin.y + bounds.size.height)];
+        [self dw_TranslatePathWithOffsetX:0 offsetY:2 * bounds.origin.y + bounds.size.height];
     }
 }
 
@@ -186,7 +202,7 @@
     CGFloat offsetX = self.bounds.origin.x * (1 - widthScale) + margin;
     CGFloat offsetY = self.bounds.origin.y * (1 - heightScale) + margin;
     [self applyTransform:CGAffineTransformMakeScale(widthScale, heightScale)];
-    [self applyTransform:CGAffineTransformMakeTranslation(offsetX, offsetY)];
+    [self dw_TranslatePathWithOffsetX:offsetX offsetY:offsetY];
 }
 
 -(void)dw_ScalePathWithScale:(CGFloat)scale
@@ -197,7 +213,7 @@
     CGFloat marginX = self.bounds.size.width * (1 - scale) / 2;
     CGFloat marginY = self.bounds.size.height * (1 - scale) / 2;
     [self applyTransform:CGAffineTransformMakeScale(scale, scale)];
-    [self applyTransform:CGAffineTransformMakeTranslation(marginX * 3, marginY * 3)];
+    [self dw_TranslatePathWithOffsetX:marginX * 3 offsetY:marginY * 3];
 }
 
 -(void)dw_RotatePathWithAngle:(CGFloat)angle
@@ -208,16 +224,29 @@
     }
     CGFloat offsetX = self.bounds.origin.x + self.bounds.size.width / 2;
     CGFloat offsetY = self.bounds.origin.y + self.bounds.size.height / 2;
-    [self applyTransform:CGAffineTransformMakeTranslation(-offsetX, -offsetY)];
+    [self dw_TranslatePathWithOffsetX:-offsetX offsetY:-offsetY];
     [self applyTransform:CGAffineTransformMakeRotation(angle)];
+    [self dw_TranslatePathWithOffsetX:offsetX offsetY:offsetY];
+}
+
+-(void)dw_TranslatePathWithOffsetX:(CGFloat)offsetX offsetY:(CGFloat)offsetY
+{
+    if (!(offsetX * offsetY)) {
+        return;
+    }
     [self applyTransform:CGAffineTransformMakeTranslation(offsetX, offsetY)];
 }
 
-CGFloat sinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K){
+-(void)dw_PathOriginToZero
+{
+    [self dw_TranslatePathWithOffsetX:-self.bounds.origin.x offsetY:-self.bounds.origin.y];
+}
+
+static inline CGFloat sinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K){
     return A * sinf(Omega * x + Phi) + K;
 }
 
-CGFloat deltaSinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K ,CGFloat step){
+static inline CGFloat deltaSinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K ,CGFloat step){
     return sinValueWith(x, A, Omega, Phi, K) - sinValueWith(x - step, A, Omega, Phi, K);
 }
 

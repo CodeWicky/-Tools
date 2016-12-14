@@ -31,6 +31,14 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
 -(UIImage *)dw_CornerRadius:(CGFloat)radius withWidth:(CGFloat)width contentMode:(DWContentMode)mode;
 
 ///按给定path剪裁图片
+/**
+ path:路径，剪裁区域。
+ mode:填充模式
+ 
+ 注:
+ 1.路径中心对应图片中心
+ 2.路径只决定剪裁图形，不影响剪裁位置
+ */
 -(UIImage *)dw_ClipImageWithPath:(UIBezierPath *)path mode:(DWContentMode)mode;
 
 ///按给定颜色生层图片

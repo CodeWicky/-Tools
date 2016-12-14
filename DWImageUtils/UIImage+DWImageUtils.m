@@ -92,9 +92,14 @@
     ///开启上下文
     UIGraphicsBeginImageContextWithOptions(boxBounds.size, NO, [UIScreen mainScreen].scale);
     CGContextRef bitmap = UIGraphicsGetCurrentContext();
-    [path addClip];
+    
+    ///归零path
+    UIBezierPath * newPath = [path copy];
+    [newPath applyTransform:CGAffineTransformMakeTranslation(-path.bounds.origin.x, -path.bounds.origin.y)];
+    [newPath addClip];
+    
     ///移动原点至图片中心
-    CGContextTranslateCTM(bitmap, boxBounds.size.width/2.0, boxBounds.size.height/2.0);
+    CGContextTranslateCTM(bitmap, boxBounds.size.width / 2.0, boxBounds.size.height / 2.0);
     CGContextScaleCTM(bitmap, 1.0, -1.0);
     CGContextDrawImage(bitmap, CGRectMake(-width / 2, -height / 2, width, height), self.CGImage);
     
