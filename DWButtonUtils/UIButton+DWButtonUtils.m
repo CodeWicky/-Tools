@@ -19,13 +19,22 @@
 
 +(void)load
 {
-    Method origin = class_getInstanceMethod(self, @selector(sendAction:to:forEvent:));
-    Method destination = class_getInstanceMethod(self, @selector(dw_sendAction:to:forEvent:));
-    method_exchangeImplementations(origin, destination);
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        SEL originSel = @selector(sendAction:to:forEvent:);
+        SEL destinationSel = @selector(dw_sendAction:to:forEvent:);
+        Method originMethod = class_getInstanceMethod(self, originSel);
+        Method destinationMethod = class_getInstanceMethod(self, destinationSel);
+        class_addMethod(self, originSel, method_getImplementation(destinationMethod), method_getTypeEncoding(destinationMethod));
+        class_replaceMethod(self, destinationSel, method_getImplementation(originMethod), method_getTypeEncoding(originMethod));
+    });
 }
 
 -(void)dw_sendAction:(SEL)action to:(id)target forEvent:(UIEvent *)event
 {
+    if (![self isKindOfClass:[UIButton class]]) {
+        [self dw_sendAction:action to:target forEvent:event];
+    }
     if (self.ignoreClick) {
         return;
     }
