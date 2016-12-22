@@ -163,6 +163,57 @@ void setter(id self1, SEL _cmd1, id newValue) {
     return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 }
 
+#pragma mark ---交换实例方法---
++(BOOL)dw_SwizzlingInstanceMethodWithSelectorA:(SEL)selA selectorB:(SEL)selB
+{
+    return [self dw_SwizzlingSelA:selA selB:selB handler:^(Method * methodA, Method * methodB) {
+        *methodA = class_getInstanceMethod([self class], selA);
+        *methodB = class_getInstanceMethod([self class], selB);
+    }];
+}
+
+#pragma mark ---交换类方法---
++(BOOL)dw_SwizzlingClassMethodWithSelectorA:(SEL)selA selectorB:(SEL)selB
+{
+    return [self dw_SwizzlingSelA:selA selB:selB handler:^(Method * methodA, Method * methodB) {
+        *methodA = class_getClassMethod([self class], selA);
+        *methodB = class_getClassMethod([self class], selB);
+    }];
+}
+
++(BOOL)dw_SwizzlingSelA:(SEL)selA selB:(SEL)selB handler:(void(^)(Method * methodA,Method * methodB))handler
+{
+    __block BOOL success = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        Method methodA = nil;
+        Method methodB = nil;
+        if (!handler) {
+            return ;
+        }
+        handler(&methodA,&methodB);
+        if (!methodA || !methodB) {
+            return ;
+        }
+        BOOL isAdd = class_addMethod([self class], selA, method_getImplementation(methodB), method_getTypeEncoding(methodB));
+        if (isAdd) {
+            class_replaceMethod([self class], selB, method_getImplementation(methodA), method_getTypeEncoding(methodA));
+        }
+        else
+        {
+            method_exchangeImplementations(methodA, methodB);
+        }
+        success = YES;
+    });
+    return success;
+}
+
+#pragma mark ---为方法绑定实现---
++(void)dw_SetMethod:(IMP)method forSelector:(SEL)sel type:(NSString *)type
+{
+    class_replaceMethod([self class], sel, method, type.UTF8String);
+}
+
 ///优化description方法
 -(NSString *)description
 {

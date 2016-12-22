@@ -74,4 +74,13 @@
 
 ///根据model生成Json字符串
 -(NSString *)dw_CreateJsonString;
+
+///交换实例方法
++(BOOL)dw_SwizzlingInstanceMethodWithSelectorA:(SEL)selA selectorB:(SEL)selB;
+
+///交换类方法
++(BOOL)dw_SwizzlingClassMethodWithSelectorA:(SEL)selA selectorB:(SEL)selB;
+
+///为方法绑定实现
++(void)dw_SetMethod:(IMP)method forSelector:(SEL)sel type:(NSString *)type;
 @end
