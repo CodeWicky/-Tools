@@ -109,7 +109,12 @@
                 break;
         }
     }
-    return @{@"component":component,@"condition":@(condition)};
+    return [self dw_CreateRegExpConfigWithRegExpString:component condition:condition];
+}
+
+-(NSDictionary *)dw_CreateRegExpConfigWithRegExpString:(NSString *)regExpString condition:(DWRegExpCondition)condition
+{
+    return @{@"component":regExpString,@"condition":@(condition)};
 }
 
 -(NSString *)dw_GetRegExpStringWithConfigs:(NSArray *)configs
@@ -189,22 +194,35 @@ static inline NSString * handleRange(NSString * component,NSUInteger min,NSUInte
 {
     return ^(DWRegExpComponent component,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount){
         NSString * componentStr = [self.utils dw_GetRegExpComponentStringWithComponents:component];
-        handleConfig(self, componentStr, condition, minCount, maxCount);
+        handleConfigWithRange(self, componentStr, condition, minCount, maxCount);
         return self;
     };
 }
 
--(DWRegExpMaker *(^)(NSString *, DWRegExpCondition, NSUInteger, NSUInteger))AddConditionWithRegExpString
+-(DWRegExpMaker *(^)(NSString *, DWRegExpCondition, NSUInteger, NSUInteger))AddConditionWithComponentRegExpString
 {
     return ^(NSString * regExpStr,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount){
-        handleConfig(self, regExpStr, condition, minCount, maxCount);
+        handleConfigWithRange(self, regExpStr, condition, minCount, maxCount);
         return self;
     };
 }
 
-static inline void handleConfig(DWRegExpMaker * maker,NSString * regExpStr,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount)
+-(DWRegExpMaker *(^)(NSString *, DWRegExpCondition))AddConditionWithCompleteRegExpString
+{
+    return ^(NSString * regExpStr,DWRegExpCondition condition){
+        handleConfig(self, regExpStr, condition);
+        return self;
+    };
+}
+
+static inline void handleConfigWithRange(DWRegExpMaker * maker,NSString * regExpStr,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount)
 {
     NSDictionary * config = [maker.utils dw_CreateRegExpConfigWithComponent:regExpStr condition:condition minCount:minCount maxCount:maxCount];
+    [maker.utils.configs addObject:config];
+}
+
+static inline void handleConfig(DWRegExpMaker * maker,NSString * regExpStr,DWRegExpCondition condition){
+    NSDictionary * config = [maker.utils dw_CreateRegExpConfigWithRegExpString:regExpStr condition:condition];
     [maker.utils.configs addObject:config];
 }
 

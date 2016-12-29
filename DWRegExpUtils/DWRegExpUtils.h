@@ -13,13 +13,23 @@
  
  以链式语法帮你优雅的按照组件自动生成正则
  
+ 使用方法：
+ 按照检测目标规则顺序添加检测条件即可
+ 
+ 使用说明：
+ 非预查模式以组件添加顺序组成检测条件，预查模式位置不影响检测条件，均为前置。
+ 
+ 概念解释：
+ 预查：即全局作用域，目标字符串整串符合要求
+ 非预查：即顺序匹配。将非预查条件按顺序添加即可组成目标检测条件
+ 
  version 1.0.0
  提供链式语法以组件化生成正则语句
  */
 
 #import <Foundation/Foundation.h>
 
-typedef NS_OPTIONS(NSUInteger, DWRegExpComponent) {
+typedef NS_OPTIONS(NSUInteger, DWRegExpComponent) {///正则组件
     DWRegExpComponentNumber = 1 << 0,///数字
     DWRegExpComponentUppercaseLetter = 1 << 1,///大写字母
     DWRegExpComponentLowercaseLetter = 1 << 2,///小写字母
@@ -32,7 +42,7 @@ typedef NS_OPTIONS(NSUInteger, DWRegExpComponent) {
     DWRegExpComponentCharacter = DWRegExpComponentChinese | DWRegExpComponentLetter | DWRegExpComponentNumber | DWRegExpComponentSymbol,///中英文符号组合
 };
 
-typedef NS_ENUM(NSUInteger, DWRegExpCondition) {
+typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
     DWRegExpConditionPreSearchAllIS,///预查、全部是
     DWRegExpConditionPreSearchAllNot,///预查、全不是
     DWRegExpConditionPreSearchContain,///预查、是，不全
@@ -52,9 +62,14 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {
 @property (nonatomic ,copy) DWRegExpMaker * (^AddConditionWithComponentType)(DWRegExpComponent component,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount);
 
 /**
- 以正则文本生成正则
+ 以正则组件生成正则
  */
-@property (nonatomic ,copy) DWRegExpMaker * (^AddConditionWithRegExpString)(NSString * regExpStr,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount);
+@property (nonatomic ,copy) DWRegExpMaker * (^AddConditionWithComponentRegExpString)(NSString * regExpStr,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount);
+
+/**
+ 以完整正则表达式添加条件
+ */
+@property (nonatomic ,copy) DWRegExpMaker * (^AddConditionWithCompleteRegExpString)(NSString * regExpStr,DWRegExpCondition condition);
 
 @end
 
@@ -77,6 +92,11 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {
  若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
  */
 -(NSDictionary *)dw_CreateRegExpConfigWithComponent:(NSString *)component condition:(DWRegExpCondition)condition minCount:(NSUInteger)min maxCount:(NSUInteger)max;
+
+/**
+ 以正则文本、条件模式生成配置文件
+ */
+-(NSDictionary *)dw_CreateRegExpConfigWithRegExpString:(NSString *)regExpString condition:(DWRegExpCondition)condition;
 
 /**
  以配置文件生成正则文本
