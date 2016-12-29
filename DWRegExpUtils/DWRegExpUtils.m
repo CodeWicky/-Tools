@@ -19,7 +19,7 @@
 @property (nonatomic ,strong) DWRegExpUtils * utils;
 
 @end
-
+static DWRegExpUtils * utils = nil;
 @implementation DWRegExpUtils
 
 +(NSString *)dw_GetRegExpStringWithMaker:(void (^)(DWRegExpMaker *))stringMaker
@@ -151,6 +151,11 @@
     return regS;
 }
 
++(BOOL)dw_ValidateString:(NSString *)string withComponents:(DWRegExpComponent)components
+{
+    return [DWRegExpUtils dw_ValidateString:string withRegExpString:[NSString stringWithFormat:@"[%@]*",[[DWRegExpUtils shareRegExpUtils] dw_GetRegExpComponentStringWithComponents:components]]];
+}
+
 ///追加范围
 static inline NSString * handleRange(NSString * component,NSUInteger min,NSUInteger max,BOOL preSearch){
     if (max != DWINTEGERNULL) {
@@ -184,6 +189,56 @@ static inline NSString * handleRange(NSString * component,NSUInteger min,NSUInte
         _configs = [NSMutableArray array];
     }
     return _configs;
+}
+
+#pragma mark --- 预置正则匹配 ---
+
++(BOOL)dw_validateNumber:(NSString *)string
+{
+    return [DWRegExpUtils dw_ValidateString:string withComponents:DWRegExpComponentNumber];
+}
+
++(BOOL)dw_ValidateLetter:(NSString *)string
+{
+    return [DWRegExpUtils dw_ValidateString:string withComponents:DWRegExpComponentLetter];
+}
+
++(BOOL)dw_ValidateChinese:(NSString *)string
+{
+    return [DWRegExpUtils dw_ValidateString:string withComponents:DWRegExpComponentChinese];
+}
+
++(BOOL)dw_ValidateSymbol:(NSString *)string
+{
+    return [DWRegExpUtils dw_ValidateString:string withComponents:DWRegExpComponentSymbol];
+}
+
++(BOOL)dw_ValidatePassword:(NSString *)string minLength:(NSUInteger)min maxLength:(NSUInteger)max
+{
+    return [DWRegExpUtils dw_ValidateString:string withRegExpString:[NSString stringWithFormat:@"((?![_]+$)(?![a-zA-Z]+$)(?![\\d]+$))[\\da-zA-Z_]{%lu,%lu}",min,max]];
+}
+
++(BOOL)dw_ValidateEmail:(NSString *)string
+{
+    return [DWRegExpUtils dw_ValidateString:string withRegExpString:@"^[A-Za-z\\d]+([-_.][A-Za-z\\d]+)*@([A-Za-z\\d]+[-.])*([A-Za-z\\d]+[.])+[A-Za-z\\d]{2,5}$"];
+}
+#pragma mark --- 单例 ---
++(instancetype)shareRegExpUtils
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        utils = [[DWRegExpUtils alloc] init];
+    });
+    return utils;
+}
+
++(instancetype)allocWithZone:(struct _NSZone *)zone
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        utils = [super allocWithZone:zone];
+    });
+    return utils;
 }
 
 @end

@@ -76,6 +76,11 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
 @interface DWRegExpUtils : NSObject
 
 /**
+ 单例模式
+ */
++(instancetype)shareRegExpUtils;
+
+/**
  以链式语句生成正则
  */
 +(NSString *)dw_GetRegExpStringWithMaker:(void(^)(DWRegExpMaker * maker))stringMaker;
@@ -107,5 +112,46 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
  验证正则文本
  */
 +(BOOL)dw_ValidateString:(NSString *)string withRegExpString:(NSString *)regExp;
+
+/**
+ 以组件验证文本
+ */
++(BOOL)dw_ValidateString:(NSString *)string withComponents:(DWRegExpComponent)components;
+
+#pragma mark --- 预置正则匹配 ---
+
+/**
+ 验证数字
+ */
++(BOOL)dw_validateNumber:(NSString *)string;
+
+/**
+ 验证英文字母
+ */
++(BOOL)dw_ValidateLetter:(NSString *)string;
+
+/**
+ 验证中文
+ */
++(BOOL)dw_ValidateChinese:(NSString *)string;
+
+/**
+ 验证符号
+ */
++(BOOL)dw_ValidateSymbol:(NSString *)string;
+
+/**
+ 验证密码
+ 
+ 注：数字、字母、下划线、至少包含两种
+ */
++(BOOL)dw_ValidatePassword:(NSString *)string minLength:(NSUInteger)min maxLength:(NSUInteger)max;
+
+/**
+ 验证邮箱
+ */
++(BOOL)dw_ValidateEmail:(NSString *)string;
+
+
 
 @end
