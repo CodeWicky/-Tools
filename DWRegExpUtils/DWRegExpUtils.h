@@ -58,11 +58,21 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
 
 /**
  以组件类别生成正则
+ 
+ 注：
+ 1.若指定位数则min、max传相同数值
+ 2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
+ 若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
  */
 @property (nonatomic ,copy) DWRegExpMaker * (^AddConditionWithComponentType)(DWRegExpComponent component,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount);
 
 /**
- 以正则组件生成正则
+ 以正则组件、条件模式、范围生成配置文件
+ 
+ 注：
+ 1.若指定位数则min、max传相同数值
+ 2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
+ 若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
  */
 @property (nonatomic ,copy) DWRegExpMaker * (^AddConditionWithComponentRegExpString)(NSString * regExpStr,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount);
 
@@ -93,7 +103,9 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
 /**
  以正则组件、条件模式、范围生成配置文件
  
- 注：若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
+ 注：
+ 1.若指定位数则min、max传相同数值
+ 2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
  若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
  */
 -(NSDictionary *)dw_CreateRegExpConfigWithComponent:(NSString *)component condition:(DWRegExpCondition)condition minCount:(NSUInteger)min maxCount:(NSUInteger)max;
@@ -152,6 +164,19 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
  */
 +(BOOL)dw_ValidateEmail:(NSString *)string;
 
+/**
+ 验证手机
+ */
++(BOOL)dw_ValidateMobile:(NSString *)string;
 
+/**
+ 验证电话
+ */
++(BOOL)dw_ValidateTele:(NSString *)string;
+
+/**
+ 验证URL
+ */
++(BOOL)dw_ValidateURL:(NSString *)string;
 
 @end

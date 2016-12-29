@@ -162,6 +162,10 @@ static inline NSString * handleRange(NSString * component,NSUInteger min,NSUInte
         if (min == DWINTEGERNULL) {
             min = 0;
         }
+        else if (min == max)
+        {
+            return [NSString stringWithFormat:@"%@{%lu}",component,min];
+        }
         component = [NSString stringWithFormat:@"%@{%lu,%lu}",component,min,max];
     }
     else
@@ -221,6 +225,21 @@ static inline NSString * handleRange(NSString * component,NSUInteger min,NSUInte
 +(BOOL)dw_ValidateEmail:(NSString *)string
 {
     return [DWRegExpUtils dw_ValidateString:string withRegExpString:@"^[A-Za-z\\d]+([-_.][A-Za-z\\d]+)*@([A-Za-z\\d]+[-.])*([A-Za-z\\d]+[.])+[A-Za-z\\d]{2,5}$"];
+}
+
++(BOOL)dw_ValidateMobile:(NSString *)string
+{
+    return [DWRegExpUtils dw_ValidateString:string withRegExpString:@"1[34578]\\d{9}"];
+}
+
++(BOOL)dw_ValidateTele:(NSString *)string
+{
+    return [DWRegExpUtils dw_ValidateString:string withRegExpString:@"(0[\\d]{2,3}-)?([2-9][\\d]{6,7})(-[\\d]{1,4})?"];
+}
+
++(BOOL)dw_ValidateURL:(NSString *)string
+{
+    return [DWRegExpUtils dw_ValidateString:string withRegExpString:@"((http|ftp|https)://)?((([a-zA-Z0-9]+[a-zA-Z0-9_-]*\\.)+[a-zA-Z]{2,6})|(([0-9]{1,3}\\.){3}[0-9]{1,3}(:[0-9]{1,4})?))((/[a-zA-Z\\d]+)*(\\?([a-zA-Z\\d_]+=[a-zA-Z\\d\\u4E00-\\u9FA5\\s\\+%#_-]+&)*([a-zA-Z\\d_]+=[a-zA-Z\\d\\u4E00-\\u9FA5\\s\\+%#_-]+))?)?"];
 }
 #pragma mark --- 单例 ---
 +(instancetype)shareRegExpUtils
