@@ -25,6 +25,16 @@
  
  version 1.0.0
  提供链式语法以组件化生成正则语句
+ 
+ version 1.0.1
+ 提供基础验证类方法
+ 
+ version 1.0.2
+ 修改组件类型api，添加附加串接口
+ 
+ version 1.0.3
+ 提供其他验证类方法
+ 
  */
 
 #import <Foundation/Foundation.h>
@@ -57,17 +67,17 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
 @interface DWRegExpMaker : NSObject;
 
 /**
- 以组件类别生成正则
+ 以组件类别及附加串添加条件
  
  注：
  1.若指定位数则min、max传相同数值
  2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
  若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
  */
-@property (nonatomic ,copy) DWRegExpMaker * (^AddConditionWithComponentType)(DWRegExpComponent component,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount);
+@property (nonatomic ,copy) DWRegExpMaker * (^AddConditionWithComponentType)(DWRegExpComponent component,NSString * additionalStr,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount);
 
 /**
- 以正则组件、条件模式、范围生成配置文件
+ 以正则组件、条件模式、范围添加条件
  
  注：
  1.若指定位数则min、max传相同数值
@@ -97,8 +107,16 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
 
 /**
  根据组件类型返回正则组件
+ 
+ components         组件类型
+ additionalString   组件附加串，可为nil，则无附加串
+ 
+ 用法：
+ 比如想要数字与下划线组件可以如下传参
+ DWRegExpComponentNumber、@"_"
+ 
  */
--(NSString *)dw_GetRegExpComponentStringWithComponents:(DWRegExpComponent)components;
+-(NSString *)dw_GetRegExpComponentStringWithComponents:(DWRegExpComponent)components additionalString:(NSString *)addition;
 
 /**
  以正则组件、条件模式、范围生成配置文件
@@ -128,14 +146,14 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
 /**
  以组件验证文本
  */
-+(BOOL)dw_ValidateString:(NSString *)string withComponents:(DWRegExpComponent)components;
++(BOOL)dw_ValidateString:(NSString *)string withComponents:(DWRegExpComponent)components minCount:(NSUInteger)min maxCount:(NSUInteger)max;
 
 #pragma mark --- 预置正则匹配 ---
 
 /**
  验证数字
  */
-+(BOOL)dw_validateNumber:(NSString *)string;
++(BOOL)dw_ValidateNumber:(NSString *)string;
 
 /**
  验证英文字母
@@ -178,5 +196,20 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
  验证URL
  */
 +(BOOL)dw_ValidateURL:(NSString *)string;
+
+/**
+ 验证自然数
+ */
++(BOOL)dw_ValidateNatureNumber:(NSString *)string;
+
+/**
+ 验证银行卡有效性
+ */
++(BOOL)dw_ValidateBankNo:(NSString *)string;
+
+/**
+ 验证身份证号
+ */
++(BOOL)dw_ValidateIDCardNo:(NSString *)string;
 
 @end
