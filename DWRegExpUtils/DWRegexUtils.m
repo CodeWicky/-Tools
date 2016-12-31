@@ -1,62 +1,62 @@
 //
-//  DWRegExpUtils.m
-//  RegExp
+//  DWRegexUtils.m
+//  Regex
 //
 //  Created by Wicky on 2016/12/27.
 //  Copyright © 2016年 Wicky. All rights reserved.
 //
 
-#import "DWRegExpUtils.h"
+#import "DWRegexUtils.h"
 
-@interface DWRegExpUtils ()
+@interface DWRegexUtils ()
 
 @property (nonatomic ,strong) NSMutableArray * configs;
 
 @end
 
-@interface DWRegExpMaker()
+@interface DWRegexMaker()
 
-@property (nonatomic ,strong) DWRegExpUtils * utils;
+@property (nonatomic ,strong) DWRegexUtils * utils;
 
 @end
-static DWRegExpUtils * utils = nil;
+static DWRegexUtils * utils = nil;
 
 static NSDictionary * provinceDic = nil;
-@implementation DWRegExpUtils
+@implementation DWRegexUtils
 
-+(NSString *)dw_GetRegExpStringWithMaker:(void (^)(DWRegExpMaker *))stringMaker
++(NSString *)dw_GetRegexStringWithMaker:(void (^)(DWRegexMaker *))stringMaker
 {
-    DWRegExpUtils * utils = [DWRegExpUtils new];
+    DWRegexUtils * utils = [DWRegexUtils new];
     if (stringMaker) {
-        DWRegExpMaker * maker = [[DWRegExpMaker alloc] init];
+        DWRegexMaker * maker = [[DWRegexMaker alloc] init];
         maker.utils = utils;
         stringMaker(maker);
     }
-    return [utils dw_GetRegExpStringWithConfigs:utils.configs];
+    return [utils dw_GetRegexStringWithConfigs:utils.configs];
 }
 
--(NSString *)dw_GetRegExpComponentStringWithComponents:(DWRegExpComponent)components additionalString:(NSString *)addition
+-(NSString *)dw_GetRegexComponentStringWithComponents:(DWRegexComponent)components additionalString:(NSString *)addition
 {
     NSString * regExp = @"";
-    if (components & DWRegExpComponentEntire) {
+    if (components & DWRegexComponentEntire) {
         return @"\\s\\S";
     }
-    if (components & DWRegExpComponentEntireExceptLF) {
+    if (components & DWRegexComponentEntireExceptLF) {
         return @".";
     }
-    if (components & DWRegExpComponentNumber) {
+    if (components & DWRegexComponentNumber) {
         regExp = [regExp stringByAppendingString:@"\\d"];
     }
-    if (components & DWRegExpComponentLowercaseLetter) {
+    if (components & DWRegexComponentLowercaseLetter) {
         regExp = [regExp stringByAppendingString:@"a-z"];
     }
-    if (components & DWRegExpComponentUppercaseLetter) {
+    if (components & DWRegexComponentUppercaseLetter) {
         regExp = [regExp stringByAppendingString:@"A-Z"];
     }
-    if (components & DWRegExpComponentChinese) {
+    if (components & DWRegexComponentChinese) {
         regExp = [regExp stringByAppendingString:@"\\u4E00-\\u9FA5"];
     }
-    if (components & DWRegExpComponentSymbol) {
+    if (components & DWRegexComponentSymbol) {
         regExp = [regExp stringByAppendingString:@"\\W_"];
     }
     if (addition.length) {
@@ -65,13 +65,13 @@ static NSDictionary * provinceDic = nil;
     return regExp;
 }
 
-+(BOOL)dw_ValidateString:(NSString *)string withRegExpString:(NSString *)regExp
++(BOOL)dw_ValidateString:(NSString *)string withRegexString:(NSString *)regExp
 {
     NSPredicate * predicate = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",regExp];
     return [predicate evaluateWithObject:string];
 }
 
--(NSDictionary *)dw_CreateRegExpConfigWithComponent:(NSString *)component condition:(DWRegExpCondition)condition minCount:(NSUInteger)min maxCount:(NSUInteger)max
+-(NSDictionary *)dw_CreateRegexConfigWithComponent:(NSString *)component condition:(DWRegexCondition)condition minCount:(NSUInteger)min maxCount:(NSUInteger)max
 {
     if (component.length == 0) {
         return nil;
@@ -82,29 +82,29 @@ static NSDictionary * provinceDic = nil;
     else
     {
         switch (condition) {
-            case DWRegExpConditionPreSearchAllIS:
+            case DWRegexConditionPreSearchAllIS:
                 component = [NSString stringWithFormat:@"(?=[%@]+$)",component];
                 break;
-            case DWRegExpConditionPreSearchAllNot:
+            case DWRegexConditionPreSearchAllNot:
                 component = [NSString stringWithFormat:@"(?!.*[%@]",component];
                 component = handleRange(component, min, max,NO);
                 component = [NSString stringWithFormat:@"%@.*)",component];
                 break;
-            case DWRegExpConditionPreSearchNotAll:
+            case DWRegexConditionPreSearchNotAll:
                 component = [NSString stringWithFormat:@"(?![%@]+$)",component];
                 break;
-            case DWRegExpConditionPreSearchContain:
+            case DWRegexConditionPreSearchContain:
                 component = [NSString stringWithFormat:@"(?=.*[%@]",component];
                 component = handleRange(component, min, max,NO);
                 component = [NSString stringWithFormat:@"%@)",component];
                 break;
-            case DWRegExpConditionContain:
+            case DWRegexConditionContain:
             {
                 component = [NSString stringWithFormat:@"[%@]",component];
                 component = handleRange(component, min, max,YES);
             }
                 break;
-            case DWRegExpConditionWithout:
+            case DWRegexConditionWithout:
             {
                 component = [NSString stringWithFormat:@"[^%@]",component];
                 component = handleRange(component, min, max,YES);
@@ -114,33 +114,33 @@ static NSDictionary * provinceDic = nil;
                 break;
         }
     }
-    return [self dw_CreateRegExpConfigWithRegExpString:component condition:condition];
+    return [self dw_CreateRegexConfigWithRegexString:component condition:condition];
 }
 
--(NSDictionary *)dw_CreateRegExpConfigWithRegExpString:(NSString *)regExpString condition:(DWRegExpCondition)condition
+-(NSDictionary *)dw_CreateRegexConfigWithRegexString:(NSString *)regExpString condition:(DWRegexCondition)condition
 {
     return @{@"component":regExpString,@"condition":@(condition)};
 }
 
--(NSString *)dw_GetRegExpStringWithConfigs:(NSArray *)configs
+-(NSString *)dw_GetRegexStringWithConfigs:(NSArray *)configs
 {
     NSMutableString * preS = [NSMutableString stringWithFormat:@"()"];
     NSMutableString * regS = [NSMutableString stringWithFormat:@""];
     [configs enumerateObjectsUsingBlock:^(NSDictionary * dic, NSUInteger idx, BOOL * _Nonnull stop) {
-        DWRegExpCondition condition = [dic[@"condition"] integerValue];
+        DWRegexCondition condition = [dic[@"condition"] integerValue];
         NSString * component = dic[@"component"];
         if (component.length) {
             switch (condition) {
-                case DWRegExpConditionPreSearchAllIS:
-                case DWRegExpConditionPreSearchAllNot:
-                case DWRegExpConditionPreSearchNotAll:
-                case DWRegExpConditionPreSearchContain:
+                case DWRegexConditionPreSearchAllIS:
+                case DWRegexConditionPreSearchAllNot:
+                case DWRegexConditionPreSearchNotAll:
+                case DWRegexConditionPreSearchContain:
                 {
                     [preS insertString:component atIndex:1];
                 }
                     break;
-                case DWRegExpConditionContain:
-                case DWRegExpConditionWithout:
+                case DWRegexConditionContain:
+                case DWRegexConditionWithout:
                 {
                    [regS appendString:component];
                 }
@@ -156,11 +156,11 @@ static NSDictionary * provinceDic = nil;
     return regS;
 }
 
-+(BOOL)dw_ValidateString:(NSString *)string withComponents:(DWRegExpComponent)components minCount:(NSUInteger)min maxCount:(NSUInteger)max
++(BOOL)dw_ValidateString:(NSString *)string withComponents:(DWRegexComponent)components minCount:(NSUInteger)min maxCount:(NSUInteger)max
 {
-    NSString * regExp = [[DWRegExpUtils shareRegExpUtils] dw_GetRegExpComponentStringWithComponents:components additionalString:nil];
+    NSString * regExp = [[DWRegexUtils shareRegexUtils] dw_GetRegexComponentStringWithComponents:components additionalString:nil];
     regExp = handleRange(regExp, min, max, NO);
-    return [DWRegExpUtils dw_ValidateString:string withRegExpString:regExp];
+    return [DWRegexUtils dw_ValidateString:string withRegexString:regExp];
 }
 
 ///追加范围
@@ -208,52 +208,52 @@ static inline NSString * handleRange(NSString * component,NSUInteger min,NSUInte
 
 +(BOOL)dw_ValidateNumber:(NSString *)string
 {
-    return [DWRegExpUtils dw_ValidateString:string withComponents:DWRegExpComponentNumber minCount:DWINTEGERNULL maxCount:DWINTEGERNULL];
+    return [DWRegexUtils dw_ValidateString:string withComponents:DWRegexComponentNumber minCount:DWINTEGERNULL maxCount:DWINTEGERNULL];
 }
 
 +(BOOL)dw_ValidateLetter:(NSString *)string
 {
-    return [DWRegExpUtils dw_ValidateString:string withComponents:DWRegExpComponentLetter minCount:DWINTEGERNULL maxCount:DWINTEGERNULL];
+    return [DWRegexUtils dw_ValidateString:string withComponents:DWRegexComponentLetter minCount:DWINTEGERNULL maxCount:DWINTEGERNULL];
 }
 
 +(BOOL)dw_ValidateChinese:(NSString *)string
 {
-    return [DWRegExpUtils dw_ValidateString:string withComponents:DWRegExpComponentChinese minCount:DWINTEGERNULL maxCount:DWINTEGERNULL];
+    return [DWRegexUtils dw_ValidateString:string withComponents:DWRegexComponentChinese minCount:DWINTEGERNULL maxCount:DWINTEGERNULL];
 }
 
 +(BOOL)dw_ValidateSymbol:(NSString *)string
 {
-    return [DWRegExpUtils dw_ValidateString:string withComponents:DWRegExpComponentSymbol minCount:DWINTEGERNULL maxCount:DWINTEGERNULL];
+    return [DWRegexUtils dw_ValidateString:string withComponents:DWRegexComponentSymbol minCount:DWINTEGERNULL maxCount:DWINTEGERNULL];
 }
 
 +(BOOL)dw_ValidatePassword:(NSString *)string minLength:(NSUInteger)min maxLength:(NSUInteger)max
 {
-    return [DWRegExpUtils dw_ValidateString:string withRegExpString:[NSString stringWithFormat:@"((?![_]+$)(?![a-zA-Z]+$)(?![\\d]+$))[\\da-zA-Z_]{%lu,%lu}",min,max]];
+    return [DWRegexUtils dw_ValidateString:string withRegexString:[NSString stringWithFormat:@"((?![_]+$)(?![a-zA-Z]+$)(?![\\d]+$))[\\da-zA-Z_]{%lu,%lu}",min,max]];
 }
 
 +(BOOL)dw_ValidateEmail:(NSString *)string
 {
-    return [DWRegExpUtils dw_ValidateString:string withRegExpString:@"^[A-Za-z\\d]+([-_.][A-Za-z\\d]+)*@([A-Za-z\\d]+[-.])*([A-Za-z\\d]+[.])+[A-Za-z\\d]{2,5}$"];
+    return [DWRegexUtils dw_ValidateString:string withRegexString:@"^[A-Za-z\\d]+([-_.][A-Za-z\\d]+)*@([A-Za-z\\d]+[-.])*([A-Za-z\\d]+[.])+[A-Za-z\\d]{2,5}$"];
 }
 
 +(BOOL)dw_ValidateMobile:(NSString *)string
 {
-    return [DWRegExpUtils dw_ValidateString:string withRegExpString:@"1[34578]\\d{9}"];
+    return [DWRegexUtils dw_ValidateString:string withRegexString:@"1[34578]\\d{9}"];
 }
 
 +(BOOL)dw_ValidateTele:(NSString *)string
 {
-    return [DWRegExpUtils dw_ValidateString:string withRegExpString:@"(0[\\d]{2,3}-)?([2-9][\\d]{6,7})(-[\\d]{1,4})?"];
+    return [DWRegexUtils dw_ValidateString:string withRegexString:@"(0[\\d]{2,3}-)?([2-9][\\d]{6,7})(-[\\d]{1,4})?"];
 }
 
 +(BOOL)dw_ValidateURL:(NSString *)string
 {
-    return [DWRegExpUtils dw_ValidateString:string withRegExpString:@"((http|ftp|https)://)?((([a-zA-Z0-9]+[a-zA-Z0-9_-]*\\.)+[a-zA-Z]{2,6})|(([0-9]{1,3}\\.){3}[0-9]{1,3}(:[0-9]{1,4})?))((/[a-zA-Z\\d]+)*(\\?([a-zA-Z\\d_]+=[a-zA-Z\\d\\u4E00-\\u9FA5\\s\\+%#_-]+&)*([a-zA-Z\\d_]+=[a-zA-Z\\d\\u4E00-\\u9FA5\\s\\+%#_-]+))?)?"];
+    return [DWRegexUtils dw_ValidateString:string withRegexString:@"((http|ftp|https)://)?((([a-zA-Z0-9]+[a-zA-Z0-9_-]*\\.)+[a-zA-Z]{2,6})|(([0-9]{1,3}\\.){3}[0-9]{1,3}(:[0-9]{1,4})?))((/[a-zA-Z\\d]+)*(\\?([a-zA-Z\\d_]+=[a-zA-Z\\d\\u4E00-\\u9FA5\\s\\+%#_-]+&)*([a-zA-Z\\d_]+=[a-zA-Z\\d\\u4E00-\\u9FA5\\s\\+%#_-]+))?)?"];
 }
 
 +(BOOL)dw_ValidateNatureNumber:(NSString *)string
 {
-    return [DWRegExpUtils dw_ValidateString:string withRegExpString:@"\\d+(\\.\\d+)?"];
+    return [DWRegexUtils dw_ValidateString:string withRegexString:@"\\d+(\\.\\d+)?"];
 }
 
 #pragma mark ------ 预置计算验证 ------
@@ -262,7 +262,7 @@ static inline NSString * handleRange(NSString * component,NSUInteger min,NSUInte
 {
     NSString *tmpStr = [string stringByReplacingOccurrencesOfString:@" " withString:@""];
     
-    if (![DWRegExpUtils dw_ValidateString:string withComponents:(DWRegExpComponentNumber) minCount:16 maxCount:19]) {
+    if (![DWRegexUtils dw_ValidateString:string withComponents:(DWRegexComponentNumber) minCount:16 maxCount:19]) {
         return NO;
     }
     
@@ -293,10 +293,10 @@ static inline NSString * handleRange(NSString * component,NSUInteger min,NSUInte
 {
     NSString *tmpStr = [string stringByReplacingOccurrencesOfString:@" " withString:@""];
     
-    [DWRegExpUtils shareRegExpUtils];
+    [DWRegexUtils shareRegexUtils];
     
     //判断位数及数字
-    if (![DWRegExpUtils dw_ValidateString:tmpStr withRegExpString:@"\\d{17}[X\\d]"] && ![DWRegExpUtils dw_ValidateString:tmpStr withRegExpString:@"\\d{15}"]) {
+    if (![DWRegexUtils dw_ValidateString:tmpStr withRegexString:@"\\d{17}[X\\d]"] && ![DWRegexUtils dw_ValidateString:tmpStr withRegexString:@"\\d{15}"]) {
         return NO;
     }
     
@@ -389,11 +389,11 @@ static inline NSString * handleRange(NSString * component,NSUInteger min,NSUInte
     return [str substringWithRange:NSMakeRange(value1,value2)];
 }
 #pragma mark --- 单例 ---
-+(instancetype)shareRegExpUtils
++(instancetype)shareRegexUtils
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        utils = [[DWRegExpUtils alloc] init];
+        utils = [[DWRegexUtils alloc] init];
         provinceDic = @{@"11":@"北京",@"12":@"天津",@"13":@"河北",@"14":@"山西",@"15":@"内蒙古",@"21":@"辽宁",@"22":@"吉林",@"23":@"黑龙江",@"31":@"上海",@"32":@"江苏",@"33":@"浙江",@"34":@"安徽",@"35":@"福建",@"36":@"江西",@"37":@"山东",@"41":@"河南",@"42":@"湖北",@"43":@"湖南",@"44":@"广东",@"45":@"广西",@"46":@"海南",@"50":@"重庆",@"51":@"四川",@"52":@"贵州",@"53":@"云南",@"54":@"西藏",@"61":@"陕西",@"62":@"甘肃",@"63":@"青海",@"64":@"宁夏",@"65":@"新疆",@"71":@"台湾",@"81":@"香港",@"82":@"澳门",@"91":@"国外"};
     });
     return utils;
@@ -411,41 +411,41 @@ static inline NSString * handleRange(NSString * component,NSUInteger min,NSUInte
 
 @end
 
-@implementation DWRegExpMaker
+@implementation DWRegexMaker
 
--(DWRegExpMaker *(^)(DWRegExpComponent, NSString *, DWRegExpCondition, NSUInteger, NSUInteger))AddConditionWithComponentType
+-(DWRegexMaker *(^)(DWRegexComponent, NSString *, DWRegexCondition, NSUInteger, NSUInteger))AddConditionWithComponentType
 {
-    return ^(DWRegExpComponent component,NSString * additionalString,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount){
-        NSString * componentStr = [self.utils dw_GetRegExpComponentStringWithComponents:component additionalString:additionalString];
+    return ^(DWRegexComponent component,NSString * additionalString,DWRegexCondition condition,NSUInteger minCount,NSUInteger maxCount){
+        NSString * componentStr = [self.utils dw_GetRegexComponentStringWithComponents:component additionalString:additionalString];
         handleConfigWithRange(self, componentStr, condition, minCount, maxCount);
         return self;
     };
 }
 
--(DWRegExpMaker *(^)(NSString *, DWRegExpCondition, NSUInteger, NSUInteger))AddConditionWithComponentRegExpString
+-(DWRegexMaker *(^)(NSString *, DWRegexCondition, NSUInteger, NSUInteger))AddConditionWithComponentRegexString
 {
-    return ^(NSString * regExpStr,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount){
+    return ^(NSString * regExpStr,DWRegexCondition condition,NSUInteger minCount,NSUInteger maxCount){
         handleConfigWithRange(self, regExpStr, condition, minCount, maxCount);
         return self;
     };
 }
 
--(DWRegExpMaker *(^)(NSString *, DWRegExpCondition))AddConditionWithCompleteRegExpString
+-(DWRegexMaker *(^)(NSString *, DWRegexCondition))AddConditionWithCompleteRegexString
 {
-    return ^(NSString * regExpStr,DWRegExpCondition condition){
+    return ^(NSString * regExpStr,DWRegexCondition condition){
         handleConfig(self, regExpStr, condition);
         return self;
     };
 }
 
-static inline void handleConfigWithRange(DWRegExpMaker * maker,NSString * regExpStr,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount)
+static inline void handleConfigWithRange(DWRegexMaker * maker,NSString * regExpStr,DWRegexCondition condition,NSUInteger minCount,NSUInteger maxCount)
 {
-    NSDictionary * config = [maker.utils dw_CreateRegExpConfigWithComponent:regExpStr condition:condition minCount:minCount maxCount:maxCount];
+    NSDictionary * config = [maker.utils dw_CreateRegexConfigWithComponent:regExpStr condition:condition minCount:minCount maxCount:maxCount];
     [maker.utils.configs addObject:config];
 }
 
-static inline void handleConfig(DWRegExpMaker * maker,NSString * regExpStr,DWRegExpCondition condition){
-    NSDictionary * config = [maker.utils dw_CreateRegExpConfigWithRegExpString:regExpStr condition:condition];
+static inline void handleConfig(DWRegexMaker * maker,NSString * regExpStr,DWRegexCondition condition){
+    NSDictionary * config = [maker.utils dw_CreateRegexConfigWithRegexString:regExpStr condition:condition];
     [maker.utils.configs addObject:config];
 }
 

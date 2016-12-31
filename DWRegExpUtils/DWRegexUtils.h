@@ -1,13 +1,13 @@
 //
-//  DWRegExpUtils.h
-//  RegExp
+//  DWRegexUtils.h
+//  Regex
 //
 //  Created by Wicky on 2016/12/27.
 //  Copyright © 2016年 Wicky. All rights reserved.
 //
 
 /**
- DWRegExpUtils
+ DWRegexUtils
  
  正则语句快速生成工具类
  
@@ -39,32 +39,32 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_OPTIONS(NSUInteger, DWRegExpComponent) {///正则组件
-    DWRegExpComponentNumber = 1 << 0,///数字
-    DWRegExpComponentUppercaseLetter = 1 << 1,///大写字母
-    DWRegExpComponentLowercaseLetter = 1 << 2,///小写字母
-    DWRegExpComponentChinese = 1 << 3,///汉字
-    DWRegExpComponentSymbol = 1 << 4,///符号
-    DWRegExpComponentEntireExceptLF = 1 << 5,///除换行符外所有字符
-    DWRegExpComponentEntire = 1<< 6,///任意字符（包括\n\r）
-    DWRegExpComponentLetter = DWRegExpComponentUppercaseLetter | DWRegExpComponentLowercaseLetter,///任意字母
-    DWRegExpComponentPassword = DWRegExpComponentNumber | DWRegExpComponentLetter,///字母数字组合
-    DWRegExpComponentCharacter = DWRegExpComponentChinese | DWRegExpComponentLetter | DWRegExpComponentNumber | DWRegExpComponentSymbol,///中英文符号组合
+typedef NS_OPTIONS(NSUInteger, DWRegexComponent) {///正则组件
+    DWRegexComponentNumber = 1 << 0,///数字
+    DWRegexComponentUppercaseLetter = 1 << 1,///大写字母
+    DWRegexComponentLowercaseLetter = 1 << 2,///小写字母
+    DWRegexComponentChinese = 1 << 3,///汉字
+    DWRegexComponentSymbol = 1 << 4,///符号
+    DWRegexComponentEntireExceptLF = 1 << 5,///除换行符外所有字符
+    DWRegexComponentEntire = 1<< 6,///任意字符（包括\n\r）
+    DWRegexComponentLetter = DWRegexComponentUppercaseLetter | DWRegexComponentLowercaseLetter,///任意字母
+    DWRegexComponentPassword = DWRegexComponentNumber | DWRegexComponentLetter,///字母数字组合
+    DWRegexComponentCharacter = DWRegexComponentChinese | DWRegexComponentLetter | DWRegexComponentNumber | DWRegexComponentSymbol,///中英文符号组合
 };
 
-typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
-    DWRegExpConditionPreSearchAllIS,///预查、全部是
-    DWRegExpConditionPreSearchAllNot,///预查、全不是
-    DWRegExpConditionPreSearchContain,///预查、是，不全
-    DWRegExpConditionPreSearchNotAll,///预查、不全是
-    DWRegExpConditionContain,///包含
-    DWRegExpConditionWithout///不包含
+typedef NS_ENUM(NSUInteger, DWRegexCondition) {///组件条件模式
+    DWRegexConditionPreSearchAllIS,///预查、全部是
+    DWRegexConditionPreSearchAllNot,///预查、全不是
+    DWRegexConditionPreSearchContain,///预查、是，不全
+    DWRegexConditionPreSearchNotAll,///预查、不全是
+    DWRegexConditionContain,///包含
+    DWRegexConditionWithout///不包含
 };
 
 #define DWINTEGERNULL ULONG_MAX
 
-@class DWRegExpUtils;
-@interface DWRegExpMaker : NSObject;
+@class DWRegexUtils;
+@interface DWRegexMaker : NSObject;
 
 /**
  以组件类别及附加串添加条件
@@ -74,7 +74,7 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
  2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
  若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
  */
-@property (nonatomic ,copy) DWRegExpMaker * (^AddConditionWithComponentType)(DWRegExpComponent component,NSString * additionalStr,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount);
+@property (nonatomic ,copy) DWRegexMaker * (^AddConditionWithComponentType)(DWRegexComponent component,NSString * additionalStr,DWRegexCondition condition,NSUInteger minCount,NSUInteger maxCount);
 
 /**
  以正则组件、条件模式、范围添加条件
@@ -84,26 +84,26 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
  2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
  若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
  */
-@property (nonatomic ,copy) DWRegExpMaker * (^AddConditionWithComponentRegExpString)(NSString * regExpStr,DWRegExpCondition condition,NSUInteger minCount,NSUInteger maxCount);
+@property (nonatomic ,copy) DWRegexMaker * (^AddConditionWithComponentRegexString)(NSString * regExpStr,DWRegexCondition condition,NSUInteger minCount,NSUInteger maxCount);
 
 /**
  以完整正则表达式添加条件
  */
-@property (nonatomic ,copy) DWRegExpMaker * (^AddConditionWithCompleteRegExpString)(NSString * regExpStr,DWRegExpCondition condition);
+@property (nonatomic ,copy) DWRegexMaker * (^AddConditionWithCompleteRegexString)(NSString * regExpStr,DWRegexCondition condition);
 
 @end
 
-@interface DWRegExpUtils : NSObject
+@interface DWRegexUtils : NSObject
 
 /**
  单例模式
  */
-+(instancetype)shareRegExpUtils;
++(instancetype)shareRegexUtils;
 
 /**
  以链式语句生成正则
  */
-+(NSString *)dw_GetRegExpStringWithMaker:(void(^)(DWRegExpMaker * maker))stringMaker;
++(NSString *)dw_GetRegexStringWithMaker:(void(^)(DWRegexMaker * maker))stringMaker;
 
 /**
  根据组件类型返回正则组件
@@ -113,10 +113,10 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
  
  用法：
  比如想要数字与下划线组件可以如下传参
- DWRegExpComponentNumber、@"_"
+ DWRegexComponentNumber、@"_"
  
  */
--(NSString *)dw_GetRegExpComponentStringWithComponents:(DWRegExpComponent)components additionalString:(NSString *)addition;
+-(NSString *)dw_GetRegexComponentStringWithComponents:(DWRegexComponent)components additionalString:(NSString *)addition;
 
 /**
  以正则组件、条件模式、范围生成配置文件
@@ -126,27 +126,27 @@ typedef NS_ENUM(NSUInteger, DWRegExpCondition) {///组件条件模式
  2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
  若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
  */
--(NSDictionary *)dw_CreateRegExpConfigWithComponent:(NSString *)component condition:(DWRegExpCondition)condition minCount:(NSUInteger)min maxCount:(NSUInteger)max;
+-(NSDictionary *)dw_CreateRegexConfigWithComponent:(NSString *)component condition:(DWRegexCondition)condition minCount:(NSUInteger)min maxCount:(NSUInteger)max;
 
 /**
  以正则文本、条件模式生成配置文件
  */
--(NSDictionary *)dw_CreateRegExpConfigWithRegExpString:(NSString *)regExpString condition:(DWRegExpCondition)condition;
+-(NSDictionary *)dw_CreateRegexConfigWithRegexString:(NSString *)regExpString condition:(DWRegexCondition)condition;
 
 /**
  以配置文件生成正则文本
  */
--(NSString *)dw_GetRegExpStringWithConfigs:(NSArray *)configs;
+-(NSString *)dw_GetRegexStringWithConfigs:(NSArray *)configs;
 
 /**
  验证正则文本
  */
-+(BOOL)dw_ValidateString:(NSString *)string withRegExpString:(NSString *)regExp;
++(BOOL)dw_ValidateString:(NSString *)string withRegexString:(NSString *)regExp;
 
 /**
  以组件验证文本
  */
-+(BOOL)dw_ValidateString:(NSString *)string withComponents:(DWRegExpComponent)components minCount:(NSUInteger)min maxCount:(NSUInteger)max;
++(BOOL)dw_ValidateString:(NSString *)string withComponents:(DWRegexComponent)components minCount:(NSUInteger)min maxCount:(NSUInteger)max;
 
 #pragma mark --- 预置正则匹配 ---
 
