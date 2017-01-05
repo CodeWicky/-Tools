@@ -35,6 +35,12 @@
  version 1.0.3
  提供其他验证类方法
  
+ version 1.0.4
+ 添加贪婪模式
+ 添加返回文本中返回正则的所有结果api
+ 添加返回替换字符串中所有符合正则的子串的结果的api
+ 修复组件模式验证bug
+ 提供正则常量，并优化部分基本预置正则验证算法
  */
 
 #import <Foundation/Foundation.h>
@@ -74,7 +80,7 @@ typedef NS_ENUM(NSUInteger, DWRegexCondition) {///组件条件模式
  2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
  若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
  */
-@property (nonatomic ,copy) DWRegexMaker * (^AddConditionWithComponentType)(DWRegexComponent component,NSString * additionalStr,DWRegexCondition condition,NSUInteger minCount,NSUInteger maxCount);
+@property (nonatomic ,copy) DWRegexMaker * (^AddConditionWithComponentType)(DWRegexComponent component,NSString * additionalStr,DWRegexCondition condition,NSUInteger minCount,NSUInteger maxCount,BOOL greedy);
 
 /**
  以正则组件、条件模式、范围添加条件
@@ -84,12 +90,20 @@ typedef NS_ENUM(NSUInteger, DWRegexCondition) {///组件条件模式
  2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
  若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
  */
-@property (nonatomic ,copy) DWRegexMaker * (^AddConditionWithComponentRegexString)(NSString * regExpStr,DWRegexCondition condition,NSUInteger minCount,NSUInteger maxCount);
+@property (nonatomic ,copy) DWRegexMaker * (^AddConditionWithComponentRegexString)(NSString * regExpStr,DWRegexCondition condition,NSUInteger minCount,NSUInteger maxCount,BOOL greedy);
 
 /**
  以完整正则表达式添加条件
  */
 @property (nonatomic ,copy) DWRegexMaker * (^AddConditionWithCompleteRegexString)(NSString * regExpStr,DWRegexCondition condition);
+
+@end
+
+@interface DWRegexResult : NSObject
+
+@property (nonatomic ,copy) NSString * result;
+
+@property (nonatomic ,assign) NSRange range;
 
 @end
 
@@ -125,8 +139,9 @@ typedef NS_ENUM(NSUInteger, DWRegexCondition) {///组件条件模式
  1.若指定位数则min、max传相同数值
  2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
  若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
+ 3.是否为贪婪模式
  */
--(NSDictionary *)dw_CreateRegexConfigWithComponent:(NSString *)component condition:(DWRegexCondition)condition minCount:(NSUInteger)min maxCount:(NSUInteger)max;
+-(NSDictionary *)dw_CreateRegexConfigWithComponent:(NSString *)component condition:(DWRegexCondition)condition minCount:(NSUInteger)min maxCount:(NSUInteger)max greedy:(BOOL)greedy;
 
 /**
  以正则文本、条件模式生成配置文件
@@ -137,6 +152,17 @@ typedef NS_ENUM(NSUInteger, DWRegexCondition) {///组件条件模式
  以配置文件生成正则文本
  */
 -(NSString *)dw_GetRegexStringWithConfigs:(NSArray *)configs;
+
+/**
+ 返回字符串中所有符合正则的结果
+ */
++(NSArray<DWRegexResult *> *)dw_GetMatchesStringsInString:(NSString *)string withRegex:(NSString *)regex;
+
+
+/**
+ 替换指定范围内符合正则的字符串
+ */
++(NSString *)dw_ReplaceMatchesStringsInString:(NSString *)string withRegex:(NSString *)regex replacement:(NSString *)replacement inRange:(NSRange)range;
 
 /**
  验证正则文本
@@ -213,3 +239,27 @@ typedef NS_ENUM(NSUInteger, DWRegexCondition) {///组件条件模式
 +(BOOL)dw_ValidateIDCardNo:(NSString *)string;
 
 @end
+
+@interface NSString (DWRegexUtils)
+
+-(NSArray<DWRegexResult *> *)stringMatchesByRegex:(NSString *)regex;
+
+@end
+
+extern NSString * const DWRegexNumber;//数字
+
+extern NSString * const DWRegexLetter;//字母
+
+extern NSString * const DWRegexChinese;//汉字
+
+extern NSString * const DWRegexSymbol;//符号
+
+extern NSString * const DWRegexEmail;//邮件地址
+
+extern NSString * const DWRegexMobile;//手机号码
+
+extern NSString * const DWRegexTele;//电话号码
+
+extern NSString * const DWRegexURL;//URL
+
+extern NSString * const DWRegexNatureNumber;//自然数
