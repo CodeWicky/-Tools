@@ -41,6 +41,9 @@
  添加返回替换字符串中所有符合正则的子串的结果的api
  修复组件模式验证bug
  提供正则常量，并优化部分基本预置正则验证算法
+ 
+ version 1.0.5
+ 修改URL正则：path段添加_支持
  */
 
 #import <Foundation/Foundation.h>
