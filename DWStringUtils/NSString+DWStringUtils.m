@@ -9,11 +9,11 @@
 #import "NSString+DWStringUtils.h"
 
 @implementation NSString (DWStringUtils)
-+(NSString *)stringWithMetaString:(NSString *)meta count:(NSUInteger)count
++(NSString *)stringWithMetaString:(NSString *)metaString count:(NSUInteger)count
 {
     NSString * string = [NSString stringWithFormat:@"%.0f",pow(10, count)];
     string = [string substringFromIndex:1];
-    string = [string stringByReplacingOccurrencesOfString:@"0" withString:meta];
+    string = [string stringByReplacingOccurrencesOfString:@"0" withString:metaString];
     return string;
 }
 @end
