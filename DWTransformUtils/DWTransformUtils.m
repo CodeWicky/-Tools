@@ -10,7 +10,7 @@
 
 @implementation DWTransformUtils
 
-+(CGAffineTransform)transformWithOriginSize:(CGSize)size leanOffset:(CGFloat)offset leanType:(DWTransformLeanType)leanType
++(CGAffineTransform)dw_TransformWithOriginSize:(CGSize)size leanOffset:(CGFloat)offset leanType:(DWTransformLeanType)leanType
 {
     CGAffineTransform trans = CGAffineTransformIdentity;
     switch (leanType) {
@@ -69,9 +69,33 @@
     return trans;
 }
 
-+(CATransform3D)transform3DWithOriginSize:(CGSize)size leanOffset:(CGFloat)offset leanType:(DWTransformLeanType)leanType
++(CATransform3D)dw_Transform3DWithOriginSize:(CGSize)size leanOffset:(CGFloat)offset leanType:(DWTransformLeanType)leanType
 {
-    return CATransform3DMakeAffineTransform([self transformWithOriginSize:size leanOffset:offset leanType:leanType]);
+    return CATransform3DMakeAffineTransform([self dw_TransformWithOriginSize:size leanOffset:offset leanType:leanType]);
 }
 
++(CGFloat)dw_GetScaleXByTransform:(CGAffineTransform)trans
+{
+    return sqrt(trans.a * trans.a + trans.c * trans.c);
+}
+
++(CGFloat)dw_GetScaleYByTransform:(CGAffineTransform)trans
+{
+    return sqrt(trans.b * trans.b + trans.d * trans.d);
+}
+
++(CGFloat)dw_GetTranslateXByTransform:(CGAffineTransform)trans
+{
+    return trans.tx;
+}
+
++(CGFloat)dw_GetTranslateYByTransform:(CGAffineTransform)trans
+{
+    return trans.ty;
+}
+
++(CGFloat)dw_GetRotateByTransform:(CGAffineTransform)trans
+{
+    return atan2(trans.b, trans.a);
+}
 @end

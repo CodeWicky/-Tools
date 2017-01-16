@@ -21,8 +21,17 @@ typedef NS_ENUM(NSUInteger, DWTransformLeanType) {///倾斜类型
 
 @interface DWTransformUtils : NSObject
 
-+(CGAffineTransform)transformWithOriginSize:(CGSize)size leanOffset:(CGFloat)offset leanType:(DWTransformLeanType)leanType;
++(CGAffineTransform)dw_TransformWithOriginSize:(CGSize)size leanOffset:(CGFloat)offset leanType:(DWTransformLeanType)leanType;
 
-+(CATransform3D)transform3DWithOriginSize:(CGSize)size leanOffset:(CGFloat)offset leanType:(DWTransformLeanType)leanType;
++(CATransform3D)dw_Transform3DWithOriginSize:(CGSize)size leanOffset:(CGFloat)offset leanType:(DWTransformLeanType)leanType;
 
++(CGFloat)dw_GetScaleXByTransform:(CGAffineTransform)trans;
+
++(CGFloat)dw_GetScaleYByTransform:(CGAffineTransform)trans;
+
++(CGFloat)dw_GetTranslateXByTransform:(CGAffineTransform)trans;
+
++(CGFloat)dw_GetTranslateYByTransform:(CGAffineTransform)trans;
+
++(CGFloat)dw_GetRotateByTransform:(CGAffineTransform)trans;
 @end
