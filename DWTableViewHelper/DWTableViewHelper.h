@@ -14,6 +14,9 @@
  version 1.0.0
  添加常用代理映射
  添加helper基础属性
+ 
+ version 1.0.1
+ 去除注册，改为更适用的重用模式
  */
 
 #import <UIKit/UIKit.h>
@@ -50,8 +53,6 @@
 ///helper行高
 /**
  优先级：映射代理行高 > 数据模型行高 > helper行高 > 默认行高44
- 
- 
  */
 @property (nonatomic ,assign) CGFloat rowHeight;
 

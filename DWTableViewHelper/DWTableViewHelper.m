@@ -86,7 +86,6 @@ NSSelectorFromString(targetStr);\
         _needSeparator = YES;
         _separatorMargin = 0;
         _rowHeight = -1;
-        registerCell(tabV, dataSource);
     }
     return self;
 }
@@ -110,7 +109,11 @@ NSSelectorFromString(targetStr);\
         return [DWDelegate dw_TableView:tableView cellForRowAtIndexPath:indexPath];
     }
     DWTableViewHelperModel * model = self.dataSource[indexPath.row];
-    DWTableViewHelperCell * cell = [tableView dequeueReusableCellWithIdentifier:model.cellID forIndexPath:indexPath];
+    Class cellClass = NSClassFromString(model.cellClassStr);
+    __kindof DWTableViewHelperCell * cell = [tableView dequeueReusableCellWithIdentifier:model.cellID];
+    if (!cell) {
+        cell = [[cellClass alloc] initWithStyle:(UITableViewCellStyleDefault) reuseIdentifier:model.cellID];
+    }
     cell.model = model;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     return cell;
@@ -173,7 +176,6 @@ NSSelectorFromString(targetStr);\
     if (self.placeHolderView) {
         handlePlaceHolderView(self.placeHolderView,self.tabV, self.dataSource, &hasPlaceHolderView);
     }
-    registerCell(self.tabV, dataSource);
 }
 
 -(void)setPlaceHolderView:(UIView *)placeHolderView
@@ -208,17 +210,6 @@ static inline CALayer * createLine(CGFloat width,CGPoint position,UIColor * colo
     line.bounds = CGRectMake(0, 0, width, 0.5);
     line.position = position;
     return line;
-}
-
-static inline void registerCell(__kindof UITableView * tabV,NSArray<DWTableViewHelperModel *> * arr){
-    NSMutableSet * set = [NSMutableSet set];
-    [arr enumerateObjectsUsingBlock:^(DWTableViewHelperModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [set addObject:[NSString stringWithFormat:@"%@|%@",obj.cellClassStr,obj.cellID]];
-    }];
-    [set enumerateObjectsUsingBlock:^(NSString * obj, BOOL * _Nonnull stop) {
-        NSArray * arr = [obj componentsSeparatedByString:@"|"];
-        [tabV registerClass:NSClassFromString(arr.firstObject) forCellReuseIdentifier:arr.lastObject];
-    }];
 }
 
 static inline NSArray * MYFParas(NSObject * aObj,...){
