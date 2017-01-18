@@ -84,6 +84,7 @@ NSSelectorFromString(targetStr);\
         tabV.separatorStyle = UITableViewCellSeparatorStyleNone;
         _dataSource = dataSource;
         _needSeparator = YES;
+        _multiSection = NO;
         _separatorMargin = 0;
         _rowHeight = -1;
     }
@@ -94,12 +95,18 @@ NSSelectorFromString(targetStr);\
     if (DWRespond) {
         return [DWDelegate dw_TableView:tableView numberOfRowsInSection:section];
     }
+    if (self.multiSection) {
+        return [[self.dataSource objectAtIndex:section] count];
+    }
     return self.dataSource.count;
 }
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     if (DWRespond) {
         return [DWDelegate dw_NumberOfSectionsInTableView:tableView];
+    }
+    if (self.multiSection) {
+        return self.dataSource.count;
     }
     return 1;
 }
@@ -108,7 +115,7 @@ NSSelectorFromString(targetStr);\
     if (DWRespond) {
         return [DWDelegate dw_TableView:tableView cellForRowAtIndexPath:indexPath];
     }
-    DWTableViewHelperModel * model = self.dataSource[indexPath.row];
+    DWTableViewHelperModel * model = modelFromIndexPath(indexPath, self);
     Class cellClass = NSClassFromString(model.cellClassStr);
     __kindof DWTableViewHelperCell * cell = [tableView dequeueReusableCellWithIdentifier:model.cellID];
     if (!cell) {
@@ -139,8 +146,9 @@ NSSelectorFromString(targetStr);\
     if (DWRespond) {
         return [DWDelegate dw_TableView:tableView heightForRowAtIndexPath:indexPath];
     }
-    if (self.dataSource[indexPath.row].cellRowHeight >= 0) {
-        return self.dataSource[indexPath.row].cellRowHeight;
+    DWTableViewHelperModel * model = modelFromIndexPath(indexPath, self);
+    if (model.cellRowHeight >= 0) {
+        return model.cellRowHeight;
     }
     if (self.rowHeight >= 0) {
         return self.rowHeight;
@@ -226,6 +234,19 @@ static inline NSArray * MYFParas(NSObject * aObj,...){
     va_end(argList);
     return keys.copy;
 };
+
+static inline DWTableViewHelperModel * modelFromIndexPath(NSIndexPath * indexPath ,DWTableViewHelper * helper)
+{
+    DWTableViewHelperModel * model = nil;
+    if (helper.multiSection) {
+        model = helper.dataSource[indexPath.section][indexPath.row];
+    }
+    else
+    {
+        model = helper.dataSource[indexPath.row];
+    }
+    return model;
+}
 @end
 @implementation DWTableViewHelperModel
 -(instancetype)init{

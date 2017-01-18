@@ -17,6 +17,9 @@
  
  version 1.0.1
  去除注册，改为更适用的重用模式
+ 
+ version 1.0.2
+ 添加多分组模式
  */
 
 #import <UIKit/UIKit.h>
@@ -42,7 +45,7 @@
  */
 @interface DWTableViewHelper : NSObject
 @property (nonatomic ,weak) id<DWTableViewHelperDelegate> helperDelegate;
-@property (nonatomic ,strong) NSArray<DWTableViewHelperModel *> * dataSource;
+@property (nonatomic ,strong) NSArray * dataSource;
 
 ///自动绘制分割线
 @property (nonatomic ,assign) BOOL needSeparator;
@@ -58,6 +61,9 @@
 
 ///无数据占位图
 @property (nonatomic ,strong) UIView * placeHolderView;
+
+///多分组模式
+@property (nonatomic ,assign) BOOL multiSection;
 
 ///实例化方法
 -(instancetype)initWithTabV:(__kindof UITableView *)tabV dataSource:(NSArray *)dataSource;
