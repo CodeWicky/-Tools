@@ -101,29 +101,9 @@
     return [objc_getAssociatedObject(self, _cmd) UIEdgeInsetsValue];
 }
 
--(CGRect)enlargedRect
-{
-    CGFloat topEdge = self.dw_EnlargeRect.top;
-    CGFloat leftEdge = self.dw_EnlargeRect.left;
-    CGFloat bottomEdge = self.dw_EnlargeRect.bottom;
-    CGFloat rightEdge = self.dw_EnlargeRect.right;
-    
-    if (topEdge || rightEdge || bottomEdge || leftEdge)
-    {
-        return CGRectMake(self.bounds.origin.x - leftEdge,
-                          self.bounds.origin.y - topEdge,
-                          self.bounds.size.width + leftEdge + rightEdge,
-                          self.bounds.size.height + topEdge + bottomEdge);
-    }
-    else
-    {
-        return self.bounds;
-    }
-}
-
 -(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
-    CGRect rect = [self enlargedRect];
+    CGRect rect = UIEdgeInsetsInsetRect(self.bounds, self.dw_EnlargeRect);
     if (CGRectEqualToRect(rect, self.bounds))
     {
         return [super pointInside:point withEvent:event];

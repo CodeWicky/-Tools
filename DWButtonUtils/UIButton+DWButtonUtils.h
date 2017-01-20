@@ -16,7 +16,7 @@
 @property (nonatomic ,assign) NSTimeInterval dw_IgnoreClickInterval;
 
 /**
- 扩大按钮响应区域，上左下右，正数扩大负数缩小
+ 扩大按钮响应区域，上左下右，负数扩大正数缩小
  */
 @property (nonatomic ,assign) UIEdgeInsets dw_EnlargeRect;
 
