@@ -13,6 +13,8 @@
 
 @property (nonatomic ,assign) BOOL ignoreClick;
 
+@property (nonatomic ,copy) void (^actionBlock)(UIButton *);
+
 @end
 
 @implementation UIButton (DWButtonUtils)
@@ -28,6 +30,19 @@
         class_addMethod(self, originSel, method_getImplementation(destinationMethod), method_getTypeEncoding(destinationMethod));
         class_replaceMethod(self, destinationSel, method_getImplementation(originMethod), method_getTypeEncoding(originMethod));
     });
+}
+
+-(void)dw_addActionBlock:(void (^)(UIButton *))action
+{
+    self.actionBlock = action;
+    [self addTarget:self action:@selector(dw_blockBtnAction:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+-(void)dw_blockBtnAction:(UIButton *)sender
+{
+    if (self.actionBlock) {
+        self.actionBlock(self);
+    }
 }
 
 -(void)dw_sendAction:(SEL)action to:(id)target forEvent:(UIEvent *)event
@@ -56,6 +71,16 @@
     return [objc_getAssociatedObject(self, _cmd) doubleValue];
 }
 
+-(void)setActionBlock:(void (^)(UIButton *))actionBlock
+{
+    objc_setAssociatedObject(self, @selector(actionBlock), actionBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+-(void (^)(UIButton *))actionBlock
+{
+    return objc_getAssociatedObject(self, _cmd);
+}
+
 -(void)setIgnoreClick:(BOOL)ignoreClick
 {
     objc_setAssociatedObject(self, @selector(ignoreClick), @(ignoreClick), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -76,29 +101,9 @@
     return [objc_getAssociatedObject(self, _cmd) UIEdgeInsetsValue];
 }
 
--(CGRect)enlargedRect
-{
-    CGFloat topEdge = self.dw_EnlargeRect.top;
-    CGFloat leftEdge = self.dw_EnlargeRect.left;
-    CGFloat bottomEdge = self.dw_EnlargeRect.bottom;
-    CGFloat rightEdge = self.dw_EnlargeRect.right;
-    
-    if (topEdge || rightEdge || bottomEdge || leftEdge)
-    {
-        return CGRectMake(self.bounds.origin.x - leftEdge,
-                          self.bounds.origin.y - topEdge,
-                          self.bounds.size.width + leftEdge + rightEdge,
-                          self.bounds.size.height + topEdge + bottomEdge);
-    }
-    else
-    {
-        return self.bounds;
-    }
-}
-
 -(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
-    CGRect rect = [self enlargedRect];
+    CGRect rect = UIEdgeInsetsInsetRect(self.bounds, self.dw_EnlargeRect);
     if (CGRectEqualToRect(rect, self.bounds))
     {
         return [super pointInside:point withEvent:event];
