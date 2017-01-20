@@ -20,4 +20,7 @@
  */
 @property (nonatomic ,assign) UIEdgeInsets dw_EnlargeRect;
 
+
+-(void)dw_addActionBlock:(void(^)(UIButton * btn))action;
+
 @end

@@ -13,6 +13,8 @@
 
 @property (nonatomic ,assign) BOOL ignoreClick;
 
+@property (nonatomic ,copy) void (^actionBlock)(UIButton *);
+
 @end
 
 @implementation UIButton (DWButtonUtils)
@@ -28,6 +30,19 @@
         class_addMethod(self, originSel, method_getImplementation(destinationMethod), method_getTypeEncoding(destinationMethod));
         class_replaceMethod(self, destinationSel, method_getImplementation(originMethod), method_getTypeEncoding(originMethod));
     });
+}
+
+-(void)dw_addActionBlock:(void (^)(UIButton *))action
+{
+    self.actionBlock = action;
+    [self addTarget:self action:@selector(dw_blockBtnAction:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+-(void)dw_blockBtnAction:(UIButton *)sender
+{
+    if (self.actionBlock) {
+        self.actionBlock(self);
+    }
 }
 
 -(void)dw_sendAction:(SEL)action to:(id)target forEvent:(UIEvent *)event
@@ -54,6 +69,16 @@
 -(NSTimeInterval)dw_IgnoreClickInterval
 {
     return [objc_getAssociatedObject(self, _cmd) doubleValue];
+}
+
+-(void)setActionBlock:(void (^)(UIButton *))actionBlock
+{
+    objc_setAssociatedObject(self, @selector(actionBlock), actionBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+-(void (^)(UIButton *))actionBlock
+{
+    return objc_getAssociatedObject(self, _cmd);
 }
 
 -(void)setIgnoreClick:(BOOL)ignoreClick
