@@ -29,17 +29,17 @@
 
 -(CGRect)dw_textRectForBounds:(CGRect)bounds limitedToNumberOfLines:(NSInteger)numberOfLines
 {
-    CGRect rect = [self dw_textRectForBounds:bounds limitedToNumberOfLines:numberOfLines];///获取系统计算的rect，不影响水平对齐方式
+    CGRect rect = [self dw_textRectForBounds:UIEdgeInsetsInsetRect(bounds, self.textInset) limitedToNumberOfLines:numberOfLines];///获取系统计算的rect，不影响水平对齐方式
     CGPoint origin = rect.origin;
     switch (self.textVerticalAlignment) {///调整竖直对齐方式
         case DWTextVerticalAlignmentTop:
-            origin.y = 0;
+            origin.y = self.textInset.top;
             break;
         case DWTextVerticalAlignmentBottom:
-            origin.y = self.bounds.size.height - rect.size.height;
+            origin.y = self.bounds.size.height - self.textInset.bottom - rect.size.height;
             break;
         default:
-            origin.y = self.bounds.size.height / 2.0 - rect.size.height / 2.0;
+            origin.y = (self.bounds.size.height - self.textInset.top - self.textInset.bottom) / 2.0 - rect.size.height / 2.0 + self.textInset.top;
             break;
     }
     rect.origin = origin;
@@ -49,10 +49,22 @@
 -(void)setTextVerticalAlignment:(DWTextVerticalAlignment)textVerticalAlignment
 {
     objc_setAssociatedObject(self, @selector(textVerticalAlignment), @(textVerticalAlignment), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self setNeedsDisplay];
 }
 
 -(DWTextVerticalAlignment)textVerticalAlignment
 {
     return [objc_getAssociatedObject(self, _cmd) integerValue];
+}
+
+-(void)setTextInset:(UIEdgeInsets)textInset
+{
+    objc_setAssociatedObject(self, @selector(textInset), [NSValue valueWithUIEdgeInsets:textInset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self setNeedsDisplay];
+}
+
+-(UIEdgeInsets)textInset
+{
+    return [objc_getAssociatedObject(self, _cmd) UIEdgeInsetsValue];
 }
 @end

@@ -14,7 +14,8 @@
  version 1.0.0
  提供垂直对齐方式
  
- 
+ version 1.0.1
+ 提供文本显示内距
  */
 
 #import <UIKit/UIKit.h>
@@ -30,5 +31,7 @@ typedef NS_ENUM(NSUInteger, DWTextVerticalAlignment) {///垂直对齐方式
  垂直对齐方式
  */
 @property (nonatomic ,assign) DWTextVerticalAlignment textVerticalAlignment;
+
+@property (nonatomic ,assign) UIEdgeInsets textInset;
 
 @end
