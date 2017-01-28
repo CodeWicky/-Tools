@@ -64,7 +64,7 @@ NSSelectorFromString(targetStr);\
 })
 
 #define DWDelegate self.helperDelegate
-
+static UIImage * ImageNull = nil;
 @interface DWTableViewHelper ()<UITableViewDelegate,UITableViewDataSource>
 {
     BOOL hasPlaceHolderView;
@@ -87,8 +87,79 @@ NSSelectorFromString(targetStr);\
         _multiSection = NO;
         _separatorMargin = 0;
         _rowHeight = -1;
+        _selectEnable = tabV.editing;
     }
     return self;
+}
+
+-(void)setAllSelect:(BOOL)select
+{
+    NSUInteger count = [self numberOfSectionsInTableView:self.tabV];
+    if (select) {
+        for (int i = 0; i < count; i++) {
+            [self setSection:i allSelect:select];
+        }
+    }
+    else
+    {
+        [self.tabV reloadData];
+    }
+}
+
+-(void)setSection:(NSUInteger)section allSelect:(BOOL)select
+{
+    NSUInteger count = [self numberOfSectionsInTableView:self.tabV];
+    if (section >= count) {
+        return;
+    }
+    NSUInteger rows = [self tableView:self.tabV numberOfRowsInSection:section];
+    if (select) {
+        for (int i = 0; i < rows; i++) {
+            [self.tabV selectRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:section] animated:NO scrollPosition:UITableViewScrollPositionNone];
+        }
+    }
+    else
+    {
+        for (int i = 0; i < rows; i++) {
+            [self.tabV deselectRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:section] animated:NO];
+        }
+    }
+}
+
+-(void)invertSelectAll
+{
+    NSUInteger count = [self numberOfSectionsInTableView:self.tabV];
+    for (int i = 0; i < count; i++) {
+        [self invertSelectSection:i];
+    }
+}
+
+-(void)invertSelectSection:(NSUInteger)section
+{
+    NSUInteger count = [self numberOfSectionsInTableView:self.tabV];
+    if (section >= count) {
+        return;
+    }
+    NSUInteger rows = [self tableView:self.tabV numberOfRowsInSection:section];
+    NSArray * arr = filterArray(self.selectedRows, ^BOOL(NSIndexPath * obj, NSUInteger idx, NSUInteger count, BOOL *stop) {
+        return obj.section == section;
+    });
+    for (int i = 0; i < rows; i++) {
+        __block BOOL select = NO;
+        [arr enumerateObjectsUsingBlock:^(NSIndexPath * obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if (obj.row == i) {
+                select = YES;
+                *stop = YES;
+            }
+        }];
+        if (select) {
+            [self.tabV deselectRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:section] animated:NO];
+        }
+        else
+        {
+            [self.tabV selectRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:section] animated:NO scrollPosition:UITableViewScrollPositionNone];
+        }
+    }
 }
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
@@ -122,11 +193,16 @@ NSSelectorFromString(targetStr);\
         cell = [[cellClass alloc] initWithStyle:(UITableViewCellStyleDefault) reuseIdentifier:model.cellID];
     }
     cell.model = model;
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     return cell;
 }
--(void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+-(void)tableView:(UITableView *)tableView willDisplayCell:(DWTableViewHelperCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (self.cellEditSelectedIcon && cell.model.cellEditSelectedIcon == ImageNull) {
+        cell.model.cellEditSelectedIcon = self.cellEditSelectedIcon;
+    }
+    if (self.cellEditUnselectedIcon && cell.model.cellEditUnselectedIcon == ImageNull) {
+        cell.model.cellEditUnselectedIcon = self.cellEditUnselectedIcon;
+    }
     DWRespondTo(MYFParas(tableView,cell,indexPath,nil));
     if (self.needSeparator) {
         NSInteger row = indexPath.row;
@@ -157,6 +233,9 @@ NSSelectorFromString(targetStr);\
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (self.selectEnable) {
+        return;
+    }
     DWRespondTo(MYFParas(tableView,indexPath,nil));
 }
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
@@ -176,6 +255,12 @@ NSSelectorFromString(targetStr);\
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     DWRespondTo(MYFParas(scrollView,nil));
+}
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (DWRespond) {
+        return [DWDelegate dw_TableView:tableView editingStyleForRowAtIndexPath:indexPath];
+    }
+    return UITableViewCellEditingStyleDelete | UITableViewCellEditingStyleInsert;
 }
 
 -(void)setDataSource:(NSArray<DWTableViewHelperModel *> *)dataSource
@@ -198,6 +283,17 @@ NSSelectorFromString(targetStr);\
     if (_placeHolderView) {
         handlePlaceHolderView(_placeHolderView, self.tabV, self.dataSource, &hasPlaceHolderView);
     }
+}
+
+-(void)setSelectEnable:(BOOL)selectEnable
+{
+    _selectEnable = selectEnable;
+    [self.tabV setEditing:selectEnable animated:YES];
+}
+
+-(NSArray *)selectedRows
+{
+    return self.tabV.indexPathsForSelectedRows.copy;
 }
 
 static inline void handlePlaceHolderView(UIView * placeHolderView,UITableView * tabV,NSArray * dataSource,BOOL * hasPlaceHolderView){
@@ -247,19 +343,36 @@ static inline DWTableViewHelperModel * modelFromIndexPath(NSIndexPath * indexPat
     }
     return model;
 }
+
+static inline NSArray * filterArray(NSArray * array,BOOL(^block)(id obj, NSUInteger idx,NSUInteger count,BOOL * stop))
+{
+    NSMutableArray * arr = [NSMutableArray array];
+    [array enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (block(obj,idx,arr.count,stop)) {
+            [arr addObject:obj];
+        }
+    }];
+    return arr.copy;
+}
 @end
 @implementation DWTableViewHelperModel
 -(instancetype)init{
     self = [super init];
     if (self) {
         _cellRowHeight = -1;
+        if (!ImageNull) {
+            ImageNull = [UIImage new];
+        }
         _cellID = [NSString stringWithFormat:@"%@DefaultCellID",NSStringFromClass([self class])];
+        _cellEditSelectedIcon = ImageNull;
+        _cellEditUnselectedIcon = ImageNull;
     }
     return self;
 }
 @end
 @implementation DWTableViewHelperCell
-
+static UIImage * defaultSelectIcon = nil;
+static UIImage * defaultUnselectIcon = nil;
 -(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -270,9 +383,73 @@ static inline DWTableViewHelperModel * modelFromIndexPath(NSIndexPath * indexPat
     return self;
 }
 
+-(void)layoutSubviews
+{
+    BOOL toSetSelectIcon = self.model.cellEditSelectedIcon != ImageNull && self.model.cellEditSelectedIcon != nil;
+    BOOL toSetUnselectIcon = self.model.cellEditUnselectedIcon != ImageNull && self.model.cellEditUnselectedIcon != nil;
+    for (UIControl *control in self.subviews){
+        if ([control isMemberOfClass:NSClassFromString(@"UITableViewCellEditControl")]){
+            for (UIView *v in control.subviews)
+            {
+                if ([v isKindOfClass: [UIImageView class]]) {
+                    UIImageView *img = (UIImageView *)v;
+                    if (self.selected) {
+                        if (toSetSelectIcon) {
+                            if (!defaultSelectIcon) {
+                                defaultSelectIcon = img.image;
+                            }
+                            img.image = self.model.cellEditSelectedIcon;
+                        } else if (defaultSelectIcon) {
+                            img.image = defaultSelectIcon;
+                        }
+                    } else {
+                        if (toSetUnselectIcon) {
+                            if (!defaultUnselectIcon) {
+                                defaultUnselectIcon = img.image;
+                            }
+                            img.image = self.model.cellEditUnselectedIcon;
+                        } else if (defaultUnselectIcon) {
+                            img.image = defaultUnselectIcon;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    [super layoutSubviews];
+}
+
+///适配第一次图片为空的情况
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated
+{
+    [super setEditing:editing animated:animated];
+    BOOL toSetUnselectIcon = self.model.cellEditUnselectedIcon != ImageNull && self.model.cellEditUnselectedIcon != nil;
+    for (UIControl *control in self.subviews){
+        if ([control isMemberOfClass:NSClassFromString(@"UITableViewCellEditControl")]){
+            for (UIView *v in control.subviews)
+            {
+                if ([v isKindOfClass: [UIImageView class]]) {
+                    UIImageView *img=(UIImageView *)v;
+                    if (!self.selected) {
+                        if (toSetUnselectIcon) {
+                            if (!defaultUnselectIcon) {
+                                defaultUnselectIcon = img.image;
+                            }
+                            img.image = self.model.cellEditUnselectedIcon;
+                        } else if (defaultUnselectIcon) {
+                            img.image = defaultUnselectIcon;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 -(void)setupUI
 {
-    
+    self.multipleSelectionBackgroundView = [UIView new];
+    self.selectedBackgroundView = [UIView new];
 }
 
 -(void)setupConstraints
