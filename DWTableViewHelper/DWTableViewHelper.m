@@ -86,7 +86,7 @@ static UIImage * ImageNull = nil;
         _needSeparator = YES;
         _multiSection = NO;
         _separatorMargin = 0;
-        _rowHeight = -1;
+        _cellRowHeight = -1;
         _selectEnable = tabV.editing;
     }
     return self;
@@ -187,10 +187,23 @@ static UIImage * ImageNull = nil;
         return [DWDelegate dw_TableView:tableView cellForRowAtIndexPath:indexPath];
     }
     DWTableViewHelperModel * model = modelFromIndexPath(indexPath, self);
-    Class cellClass = NSClassFromString(model.cellClassStr);
-    __kindof DWTableViewHelperCell * cell = [tableView dequeueReusableCellWithIdentifier:model.cellID];
+    Class cellClass;
+    NSString * cellID;
+    if (model.cellClassStr.length && model.cellID.length) {
+        cellID = model.cellID;
+        cellClass = NSClassFromString(model.cellClassStr);
+    } else if (self.cellClassStr.length && self.cellID.length) {
+        cellID = self.cellID;
+        cellClass = NSClassFromString(self.cellClassStr);
+    } else {
+        NSAssert(NO, @"cellClassStr and cellID must be set together at least one time in DWTableViewHelperModel or DWTableViewHelper");
+    }
+    if (!cellClass) {
+        NSAssert(NO, @"cannot load a cellClass from cellClassStr,check the cellClassStr you have set");
+    }
+    __kindof DWTableViewHelperCell * cell = [tableView dequeueReusableCellWithIdentifier:cellID];
     if (!cell) {
-        cell = [[cellClass alloc] initWithStyle:(UITableViewCellStyleDefault) reuseIdentifier:model.cellID];
+        cell = [[cellClass alloc] initWithStyle:(UITableViewCellStyleDefault) reuseIdentifier:cellID];
     }
     cell.model = model;
     return cell;
@@ -226,8 +239,8 @@ static UIImage * ImageNull = nil;
     if (model.cellRowHeight >= 0) {
         return model.cellRowHeight;
     }
-    if (self.rowHeight >= 0) {
-        return self.rowHeight;
+    if (self.cellRowHeight >= 0) {
+        return self.cellRowHeight;
     }
     return 44;
 }

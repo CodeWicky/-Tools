@@ -23,6 +23,9 @@
  
  version 1.0.3
  添加选择模式及相关api
+ 
+ version 1.0.4
+ 添加helper设置cell类型及复用标识
  */
 
 #import <UIKit/UIKit.h>
@@ -61,12 +64,6 @@
 ///分割线距屏幕两侧宽度
 @property (nonatomic ,assign) CGFloat separatorMargin;
 
-///helper行高
-/**
- 优先级：映射代理行高 > 数据模型行高 > helper行高 > 默认行高44
- */
-@property (nonatomic ,assign) CGFloat rowHeight;
-
 ///无数据占位图
 @property (nonatomic ,strong) UIView * placeHolderView;
 
@@ -79,11 +76,40 @@
 ///返回被选中的cell的indexPath的数组
 @property (nonatomic ,strong) NSArray * selectedRows;
 
+#pragma mark --- cell 基本属性 ---
+/**
+ 通过helper设置为批量设置，优先级较低；通过model设置为特殊设置，优先级较高。
+ 可通过helper批量设置后针对特殊cell通过model单独设置属性。
+ */
+
+///cell类型与复用标识
+/**
+ 优先级：映射代理 > 数据模型 > helper
+ 
+ cell类型与复用标识两者必须同时在helper或model中至少设置一次。
+ 若helper及model中均设置正确则model中优先级更高
+ 
+ 通过helper设置cell类型与复用标识更加适用于以下场景：
+ 需要共享数据模型但是要展示不同种类cell的场景
+ 
+ 此时需要手动将model中cell类型或者复用标识置为nil（理论上两者均存在默认值所以需要置nil）并通过helper进行指定cell类型
+ */
+///cell类型
+@property (nonatomic ,copy) NSString * cellClassStr;
+
+///复用标识
+@property (nonatomic ,copy) NSString * cellID;
+
+///helper行高
+/**
+ 优先级：映射代理行高 > 数据模型行高 > helper行高 > 默认行高44
+ */
+@property (nonatomic ,assign) CGFloat cellRowHeight;
+
 ///选中模式图标
 /**
- 优先级：model图片 > helper图片 > 系统默认图标
+ 优先级：数据模型图片 > helper图片 > 系统默认图标
  
- 通过helper设置为批量设置，优先级较低；通过model设置为特殊设置，优先级较高。
  若设置helper图片后，model设置图片不受影响，未设置图片的model将会被设置为helper图片。
  若通过helper批量设置后，个别cell要使用系统默认图标，请将对应model的图片设置为nil。
  */
@@ -117,11 +143,11 @@
  */
 @interface DWTableViewHelperModel : NSObject
 
-///复用标识
-@property (nonatomic ,copy) NSString * cellID;
-
 ///cell类型
 @property (nonatomic ,copy) NSString * cellClassStr;
+
+///复用标识
+@property (nonatomic ,copy) NSString * cellID;
 
 ///行高
 @property (nonatomic ,assign) CGFloat cellRowHeight;
