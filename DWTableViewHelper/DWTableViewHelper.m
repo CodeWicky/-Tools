@@ -104,6 +104,39 @@ static UIImage * ImageNull = nil;
     return self;
 }
 
+-(void)reloadDataWithCompletion:(void (^)())completion
+{
+    if (!completion) {
+        [self.tabV reloadData];
+        return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.tabV reloadData];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion();
+        });
+    });
+}
+
+-(void)reloadDataAndHandlePlaceHolderView
+{
+    BOOL haveData = [self caculateHaveData];
+    __weak typeof(self)weakSelf = self;
+    [self reloadDataWithCompletion:^{
+        handlePlaceHolderView(weakSelf.placeHolderView, weakSelf.tabV, !haveData, &hasPlaceHolderView);
+    }];
+}
+
+-(void)showPlaceHolderView
+{
+    handlePlaceHolderView(self.placeHolderView, self.tabV, YES, &hasPlaceHolderView);
+}
+
+-(void)hidePlaceHolderView
+{
+    handlePlaceHolderView(self.placeHolderView, self.tabV, NO, &hasPlaceHolderView);
+}
+
 -(void)setAllSelect:(BOOL)select
 {
     NSUInteger count = [self numberOfSectionsInTableView:self.tabV];
@@ -301,7 +334,7 @@ static UIImage * ImageNull = nil;
 {
     _dataSource = dataSource;
     if (self.placeHolderView) {
-        handlePlaceHolderView(self.placeHolderView,self.tabV, self.dataSource, &hasPlaceHolderView);
+        handlePlaceHolderView(self.placeHolderView,self.tabV, ![self caculateHaveData], &hasPlaceHolderView);
     }
 }
 
@@ -315,7 +348,7 @@ static UIImage * ImageNull = nil;
     }
     _placeHolderView = placeHolderView;
     if (_placeHolderView) {
-        handlePlaceHolderView(_placeHolderView, self.tabV, self.dataSource, &hasPlaceHolderView);
+        handlePlaceHolderView(_placeHolderView, self.tabV,![self caculateHaveData], &hasPlaceHolderView);
     }
 }
 
@@ -325,17 +358,36 @@ static UIImage * ImageNull = nil;
     [self.tabV setEditing:selectEnable animated:YES];
 }
 
+-(BOOL)caculateHaveData
+{
+    NSInteger count = 0;
+    if (self.multiSection) {
+        NSInteger sections = [self numberOfSectionsInTableView:self.tabV];
+        for (int i = 0; i < sections; i++) {
+            count += [self rowsOfSection:i];
+        }
+    } else {
+        count = [self rowsOfSection:0];
+    }
+    return count > 0 ? YES : NO;
+}
+
+-(NSInteger)rowsOfSection:(NSUInteger)section
+{
+    return [self tableView:self.tabV numberOfRowsInSection:section];
+}
+
 -(NSArray *)selectedRows
 {
     return self.tabV.indexPathsForSelectedRows.copy;
 }
 
-static inline void handlePlaceHolderView(UIView * placeHolderView,UITableView * tabV,NSArray * dataSource,BOOL * hasPlaceHolderView){
-    if (dataSource.count && *hasPlaceHolderView) {
+static inline void handlePlaceHolderView(UIView * placeHolderView,UITableView * tabV,BOOL toSetHave,BOOL * hasPlaceHolderView){
+    if (!toSetHave && *hasPlaceHolderView) {
         [placeHolderView removeFromSuperview];
         *hasPlaceHolderView = NO;
     }
-    else if (!dataSource.count && !*hasPlaceHolderView)
+    else if (toSetHave && !*hasPlaceHolderView)
     {
         [tabV addSubview:placeHolderView];
         *hasPlaceHolderView = YES;
@@ -403,7 +455,15 @@ static inline NSArray * filterArray(NSArray * array,BOOL(^block)(id obj, NSUInte
         if (!ImageNull) {
             ImageNull = [UIImage new];
         }
-        self.cellID = [NSString stringWithFormat:@"%@DefaultCellID",NSStringFromClass([self class])];
+        NSString * cellClass = NSStringFromClass([self class]);
+        NSArray * arr = [cellClass componentsSeparatedByString:@"Model"];
+        if (arr.count) {
+            cellClass = [NSString stringWithFormat:@"%@Cell",arr.firstObject];
+        } else {
+            cellClass = @"DWTableViewHelperCell";
+        }
+        self.cellClassStr = cellClass;
+        self.cellID = [NSString stringWithFormat:@"%@DefaultCellID",cellClass];
         self.cellEditSelectedIcon = ImageNull;
         self.cellEditUnselectedIcon = ImageNull;
     }

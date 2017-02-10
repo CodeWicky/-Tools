@@ -29,6 +29,9 @@
  
  version 1.0.5
  将cell的基础属性提出协议，helper与model同时遵守协议
+ 
+ version 1.0.6
+ 修正占位视图展示时机，提供两个刷新列表扩展方法，提供展示、隐藏占位图接口
  */
 
 #import <UIKit/UIKit.h>
@@ -130,6 +133,18 @@
 
 ///实例化方法
 -(instancetype)initWithTabV:(__kindof UITableView *)tabV dataSource:(NSArray *)dataSource;
+
+///刷新列表同时自动处理占位图
+-(void)reloadDataAndHandlePlaceHolderView;
+
+///刷新列表并在完成时进行回调
+-(void)reloadDataWithCompletion:(void(^)())completion;
+
+///展示占位图
+-(void)showPlaceHolderView;
+
+///隐藏占位图
+-(void)hidePlaceHolderView;
 
 ///设置全部选中或取消全部选中
 -(void)setAllSelect:(BOOL)select;
