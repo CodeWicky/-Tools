@@ -7,8 +7,32 @@
 //
 
 #import "UIImage+DWImageUtils.h"
-
+#import <ImageIO/ImageIO.h>
 @implementation UIImage (DWImageUtils)
+
++(UIImage *)dw_ImageNamed:(NSString *)name
+{
+    NSString * path = [[NSBundle mainBundle] pathForResource:name ofType:nil];
+    if (!path) {
+        path = [[NSBundle mainBundle] pathForResource:name ofType:@"png"];
+    }
+    if (!path) {
+        return nil;
+    }
+    NSURL * url = [NSURL fileURLWithPath:path];
+    return [self dw_ImageWithUrl:url];
+}
+
++(UIImage *)dw_ImageWithUrl:(NSURL *)url
+{
+    NSDictionary*options = @{(__bridge id)kCGImageSourceShouldCache: @YES};
+    CGImageSourceRef source = CGImageSourceCreateWithURL((__bridge CFURLRef)url,NULL);CGImageRef imageRef = CGImageSourceCreateImageAtIndex(source,0,(__bridge CFDictionaryRef)options);
+    UIImage *image = [UIImage imageWithCGImage:imageRef];
+    CGImageRelease(imageRef);
+    CFRelease(source);
+    return image;
+}
+
 -(UIImage *)dw_CornerRadius:(CGFloat)radius withWidth:(CGFloat)width contentMode:(DWContentMode)mode
 {
     CGFloat originScale = self.size.width / self.size.height;
