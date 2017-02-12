@@ -15,4 +15,9 @@
  count          元字符串的个数
  */
 +(NSString *)stringWithMetaString:(NSString *)metaString count:(NSUInteger)count;
+
+///根据字号及尺寸限制返回文本尺寸
+-(CGSize)stringSizeWithFont:(UIFont *)font
+                 widthLimit:(CGFloat)widthLimit
+                heightLimit:(CGFloat)heightLimit;
 @end
