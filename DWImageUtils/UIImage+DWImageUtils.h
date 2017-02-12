@@ -15,6 +15,23 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
     DWContentModeScaleToFill//拉伸模式
 };
 @interface UIImage (DWImageUtils)
+
+/**
+ 高性能按图片名称检索本地图片
+
+ @param name 图片文件名
+ @return 图片实例
+ */
++(UIImage *)dw_ImageNamed:(NSString *)name;
+
+/**
+ 高性能返回无延迟立即解压的图片实例
+
+ @param url 图片路径，本地网络均可
+ @return 图片实例
+ */
++(UIImage *)dw_ImageWithUrl:(NSURL *)url;
+
 ///获取带圆角的图片
 /*
  radius:返回图片的圆角半径
