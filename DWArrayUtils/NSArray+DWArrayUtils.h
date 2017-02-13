@@ -31,4 +31,7 @@
 
 ///获取arr中相对于自身的补集
 -(NSArray *)dw_ComplementaryArrayFromArr:(NSArray *)arr usingEqualBlock:(BOOL(^)(id obj1,id obj2))block;
+
+///将数组按数量分为多个数组
+-(NSArray *)dw_SplitArrayByCapacity:(NSUInteger)capacity;
 @end

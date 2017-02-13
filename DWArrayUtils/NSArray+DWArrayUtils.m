@@ -40,4 +40,21 @@
 {
     return [arr dw_ComplementaryArrayWithArr:self usingEqualBlock:block];
 }
+-(NSArray *)dw_SplitArrayByCapacity:(NSUInteger)capacity
+{
+    if (capacity == 0) {
+        return nil;
+    }
+    NSMutableArray * arr = [NSMutableArray array];
+    NSMutableArray * arrTemp = [NSMutableArray array];
+    [self enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (idx && (idx % capacity == 0)) {
+            [arr addObject:[arrTemp copy]];
+            [arrTemp removeAllObjects];
+        }
+        [arrTemp addObject:obj];
+    }];
+    [arr addObject:arrTemp];
+    return arr;
+}
 @end
