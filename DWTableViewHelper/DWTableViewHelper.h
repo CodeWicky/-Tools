@@ -32,6 +32,9 @@
  
  version 1.0.6
  修正占位视图展示时机，提供两个刷新列表扩展方法，提供展示、隐藏占位图接口
+ 
+ version 1.0.7
+ 添加选则模式下单选多选控制
  */
 
 #import <UIKit/UIKit.h>
@@ -42,6 +45,7 @@
 
 @optional
 -(void)dw_TableView:(__kindof UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
+-(void)dw_TableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath;
 -(UIView *)dw_TableView:(__kindof UITableView *)tableView viewForHeaderInSection:(NSInteger)section;
 -(UIView *)dw_TableView:(__kindof UITableView *)tableView viewForFooterInSection:(NSInteger)section;
 -(void)dw_TableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath;
@@ -127,6 +131,9 @@
 
 ///设置是否为选择模式
 @property (nonatomic ,assign) BOOL selectEnable;
+
+///是否允许多选
+@property (nonatomic ,assign) BOOL multiSelect;
 
 ///返回被选中的cell的indexPath的数组
 @property (nonatomic ,strong) NSArray * selectedRows;

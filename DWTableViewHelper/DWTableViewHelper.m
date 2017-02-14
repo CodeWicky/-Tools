@@ -80,6 +80,8 @@ static UIImage * ImageNull = nil;
 
 @property (nonatomic ,strong) UITableView * tabV;
 
+@property (nonatomic ,strong) NSIndexPath * lastSelected;
+
 @end
 
 @implementation DWTableViewHelper
@@ -245,9 +247,11 @@ static UIImage * ImageNull = nil;
         cellClass = NSClassFromString(self.cellClassStr);
     } else {
         NSAssert(NO, @"cellClassStr and cellID must be set together at least one time in DWTableViewHelperModel or DWTableViewHelper");
+        return nil;
     }
     if (!cellClass) {
         NSAssert(NO, @"cannot load a cellClass from cellClassStr,check the cellClassStr you have set");
+        return nil;
     }
     __kindof DWTableViewHelperCell * cell = [tableView dequeueReusableCellWithIdentifier:cellIDTemp];
     if (!cell) {
@@ -297,6 +301,19 @@ static UIImage * ImageNull = nil;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (self.selectEnable) {
+        if (!self.multiSelect && self.lastSelected) {
+            [tableView deselectRowAtIndexPath:self.lastSelected animated:YES];
+        }
+        self.lastSelected = indexPath;
+        return;
+    }
+    DWRespondTo(MYFParas(tableView,indexPath,nil));
+}
+
+-(void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (self.selectEnable) {
+        self.lastSelected = nil;
         return;
     }
     DWRespondTo(MYFParas(tableView,indexPath,nil));
@@ -356,6 +373,23 @@ static UIImage * ImageNull = nil;
 {
     _selectEnable = selectEnable;
     [self.tabV setEditing:selectEnable animated:YES];
+}
+
+-(void)setMultiSelect:(BOOL)multiSelect
+{
+    _multiSelect = multiSelect;
+    if (!multiSelect) {
+        if (self.selectedRows.count > 1) {
+            NSIndexPath * idxP = self.selectedRows.firstObject;
+            [self.tabV reloadData];
+            if (self.lastSelected) {
+                [self.tabV selectRowAtIndexPath:self.lastSelected animated:NO scrollPosition:UITableViewScrollPositionNone];
+            } else {
+                self.lastSelected = idxP;
+                [self.tabV selectRowAtIndexPath:idxP animated:NO scrollPosition:UITableViewScrollPositionNone];
+            }
+        }
+    }
 }
 
 -(BOOL)caculateHaveData
