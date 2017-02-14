@@ -22,6 +22,9 @@
  概念解释：
  预查：即全局作用域，目标字符串整串符合要求
  非预查：即顺序匹配。将非预查条件按顺序添加即可组成目标检测条件
+ 正则组件：组成正则语句元素的目标字符集，可为组件添加范围、添加即可组成正则语句
+ 正则条件：提取出的六种条件模式，用来为组件添加约束
+ 贪婪：尽可能多的匹配结果
  
  version 1.0.0
  提供链式语法以组件化生成正则语句
@@ -78,6 +81,8 @@ typedef NS_ENUM(NSUInteger, DWRegexCondition) {///组件条件模式
 /**
  以组件类别及附加串添加条件
  
+ 即以组件类别和附加串共同组成正则组件并添加条件
+ 
  注：
  1.若指定位数则min、max传相同数值
  2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
@@ -88,6 +93,8 @@ typedef NS_ENUM(NSUInteger, DWRegexCondition) {///组件条件模式
 /**
  以正则组件、条件模式、范围添加条件
  
+ 即以正则组件添加条件、范围
+ 
  注：
  1.若指定位数则min、max传相同数值
  2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
@@ -97,6 +104,8 @@ typedef NS_ENUM(NSUInteger, DWRegexCondition) {///组件条件模式
 
 /**
  以完整正则表达式添加条件
+ 
+ 即为完整的正则表达式作为子串添加条件，构建更加复杂的正则表达式
  */
 @property (nonatomic ,copy) DWRegexMaker * (^AddConditionWithCompleteRegexString)(NSString * regExpStr,DWRegexCondition condition);
 
@@ -132,6 +141,7 @@ typedef NS_ENUM(NSUInteger, DWRegexCondition) {///组件条件模式
  比如想要数字与下划线组件可以如下传参
  DWRegexComponentNumber、@"_"
  
+ 返回的字符串即可作为元素（即正则组件），可为其添加范围，可为其添加条件
  */
 -(NSString *)dw_GetRegexComponentStringWithComponents:(DWRegexComponent)components additionalString:(NSString *)addition;
 
