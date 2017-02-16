@@ -7,6 +7,23 @@
 //
 
 #import "UIColor+DWColorUtils.h"
+#import <objc/runtime.h>
+
+#define __DW__Value__(x) \
+-(CGFloat)x\
+{\
+    if (!self.colorConfigs) {\
+        [self getColorConfigs];\
+    }\
+    return [self.colorConfigs[NSStringFromSelector(_cmd)] floatValue];\
+}\
+
+
+@interface UIColor ()
+
+@property (nonatomic ,strong) NSDictionary * colorConfigs;
+
+@end
 
 @implementation UIColor (DWColorUtils)
 +(instancetype)colorWithRGBString:(NSString *)string alpha:(CGFloat)alpha
@@ -40,4 +57,34 @@
         return [self colorWithAlphaComponent:alpha];
     };
 }
+
+-(void)getColorConfigs
+{
+    NSInteger numComponents = CGColorGetNumberOfComponents(self.CGColor);
+    if (numComponents == 4)
+    {
+        NSMutableDictionary * dic = [NSMutableDictionary dictionary];
+        const CGFloat *components = CGColorGetComponents(self.CGColor);
+        dic[@"red"] = @(components[0]);
+        dic[@"green"] = @(components[1]);
+        dic[@"blue"] = @(components[2]);
+        dic[@"alpha"] = @(components[3]);
+        self.colorConfigs = [dic copy];
+    }
+}
+
+-(NSDictionary *)colorConfigs
+{
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+-(void)setColorConfigs:(NSDictionary *)colorConfigs
+{
+    objc_setAssociatedObject(self, @selector(colorConfigs), colorConfigs, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+__DW__Value__(red)
+__DW__Value__(green)
+__DW__Value__(blue)
+__DW__Value__(alpha)
 @end
