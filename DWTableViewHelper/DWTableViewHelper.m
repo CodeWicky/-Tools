@@ -319,12 +319,34 @@ static UIImage * ImageNull = nil;
     DWRespondTo(MYFParas(tableView,indexPath,nil));
 }
 
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    if (DWRespond) {
+        return [DWDelegate dw_TableView:tableView heightForHeaderInSection:section];
+    }
+    if (self.helperDelegate && [self.helperDelegate respondsToSelector:@selector(dw_TableView:viewForHeaderInSection:)]) {
+        return [self.helperDelegate dw_TableView:tableView viewForHeaderInSection:section].bounds.size.height;
+    }
+    return 0.01;
+}
+
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     if (DWRespond) {
         return [DWDelegate dw_TableView:tableView viewForHeaderInSection:section];
     }
     return nil;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    if (DWRespond) {
+        return [DWDelegate dw_TableView:tableView heightForFooterInSection:section];
+    }
+    if (self.helperDelegate && [self.helperDelegate respondsToSelector:@selector(dw_TableView:heightForFooterInSection:)]) {
+        return [self.helperDelegate dw_TableView:tableView viewForFooterInSection:section].bounds.size.height;
+    }
+    return 0.01;
 }
 
 -(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section

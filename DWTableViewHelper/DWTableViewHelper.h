@@ -35,6 +35,9 @@
  
  version 1.0.7
  添加选则模式下单选多选控制
+ 
+ version 1.0.8
+ 补充组头视图、尾视图行高代理映射并简化代理链
  */
 
 #import <UIKit/UIKit.h>
@@ -46,7 +49,9 @@
 @optional
 -(void)dw_TableView:(__kindof UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 -(void)dw_TableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath;
+-(CGFloat)dw_TableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section;
 -(UIView *)dw_TableView:(__kindof UITableView *)tableView viewForHeaderInSection:(NSInteger)section;
+-(CGFloat)dw_TableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section;
 -(UIView *)dw_TableView:(__kindof UITableView *)tableView viewForFooterInSection:(NSInteger)section;
 -(void)dw_TableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath;
 -(CGFloat)dw_TableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath;
@@ -55,7 +60,6 @@
 -(NSInteger)dw_NumberOfSectionsInTableView:(UITableView *)tableView;
 -(void)dw_ScrollViewDidScroll:(UIScrollView *)scrollView;
 -(UITableViewCellEditingStyle)dw_TableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath;
-
 @end
 
 #pragma mark --- cell 基础属性协议---
@@ -92,7 +96,7 @@
 ///选中模式图标
 /**
  优先级：数据模型图片 > helper图片 > 系统默认图标
-
+ 
  若设置helper图片后，model设置图片不受影响，未设置图片的model将会被设置为helper图片。
  若通过helper批量设置后，个别cell要使用系统默认图标，请将对应model的图片设置为nil。
  */
