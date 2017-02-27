@@ -14,6 +14,24 @@
 @end
 
 @implementation NSObject (DWRuntimeUtils)
+
+-(NSString *)dw_Description
+{
+    NSArray * allKeys = [[self class] dw_GetAllProperties];
+    //分割线
+    NSString * starStr = @"\n********************\n";
+    //类名及地址
+    NSString * descriptionStr = [NSString stringWithFormat:@"\n\n<%@:%p>",[self class],self];
+    descriptionStr = [descriptionStr stringByAppendingString:starStr];
+    for (NSString * key in allKeys) {
+        id value = [self dw_SafeValueForKey:key];
+        //每个属性及对应值
+        descriptionStr = [descriptionStr stringByAppendingString:[NSString stringWithFormat:@"\n%@ = %@;\n",key,value]];
+    }
+    descriptionStr = [descriptionStr stringByAppendingString:starStr];
+    return descriptionStr;
+}
+
 #pragma mark ---动态添加属性---
 +(void)dw_AddPropertyWithName:(NSString *)propertyName
              propertyClass:(Class)propertyClass
@@ -106,6 +124,21 @@ void setter(id self1, SEL _cmd1, id newValue) {
     }
     //在使用了c函数的creat, copy等函数是记得手动释放,要不然会引起内存泄露问题
     free(propertyList);
+    return arrM.copy;
+}
+
+#pragma mark ---获取实例变量列表---
++(NSArray *)dw_GetAllIvar
+{
+    unsigned int count = 0;
+    Ivar *ivarList = class_copyIvarList([self class], &count);
+    NSMutableArray * arrM = [NSMutableArray arrayWithCapacity:count];
+    for (int i = 0; i<count; i++) {
+        Ivar ivar = ivarList[i];
+        const char *cName = ivar_getName(ivar);
+        [arrM addObject:[NSString stringWithCString:cName encoding:NSUTF8StringEncoding]];
+    }
+    free(ivarList);
     return arrM.copy;
 }
 
@@ -214,21 +247,4 @@ void setter(id self1, SEL _cmd1, id newValue) {
     class_replaceMethod([self class], sel, method, type.UTF8String);
 }
 
-///优化description方法
--(NSString *)description
-{
-    NSArray * allKeys = [[self class] dw_GetAllProperties];
-    //分割线
-    NSString * starStr = @"\n********************\n";
-    //类名及地址
-    NSString * descriptionStr = [NSString stringWithFormat:@"\n\n<%@:%p>",[self class],self];
-    descriptionStr = [descriptionStr stringByAppendingString:starStr];
-    for (NSString * key in allKeys) {
-        id value = [self dw_SafeValueForKey:key];
-        //每个属性及对应值
-        descriptionStr = [descriptionStr stringByAppendingString:[NSString stringWithFormat:@"\n%@ = %@;\n",key,value]];
-    }
-    descriptionStr = [descriptionStr stringByAppendingString:starStr];
-    return descriptionStr;
-}
 @end

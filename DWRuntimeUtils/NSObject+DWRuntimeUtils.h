@@ -19,6 +19,10 @@
 
 #import <Foundation/Foundation.h>
 @interface NSObject (DWRuntimeUtils)
+
+///详细属性
+@property (nonatomic ,copy ,readonly) NSString * dw_Description;
+
 ///动态添加属性
 /*
  propertyName       添加属性名
@@ -51,6 +55,9 @@
 
 ///获取属性列表
 +(NSArray *)dw_GetAllProperties;
+
+///获取实例变量列表
++(NSArray *)dw_GetAllIvar;
 
 ///根据字典设置模型
 /*
