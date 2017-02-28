@@ -242,13 +242,20 @@ static DWWebImageManager * mgr = nil;
 @implementation DWWebImageDownloader
 
 #pragma mark --- 接口方法 ---
--(instancetype)initWithUrl:(NSString *)url session:(NSURLSession *)session
-{
+-(instancetype)initWithSession:(NSURLSession *)session {
     self = [super init];
     if (self) {
-        _url = url;
         _session = session;
         _downloadFinish = NO;
+    }
+    return self;
+}
+
+-(instancetype)initWithUrl:(NSString *)url session:(NSURLSession *)session
+{
+    self = [self initWithSession:session];
+    if (self) {
+        _url = url;
     }
     return self;
 }
@@ -262,6 +269,14 @@ static DWWebImageManager * mgr = nil;
         return;
     }
     [self downloadImageWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
+}
+
+-(void)resume {
+    [self.task resume];
+}
+
+-(void)cancel {
+    [self.task cancel];
 }
 
 #pragma mark --- Tool Method ---
@@ -340,13 +355,13 @@ static DWWebImageManager * mgr = nil;
 -(void)start
 {
     [super start];
-    [self.donwloader.task resume];
+    [self.donwloader resume];
 }
 
 -(void)cancel
 {
     [super cancel];
-    [self.donwloader.task cancel];
+    [self.donwloader cancel];
 }
 
 @end
