@@ -89,7 +89,7 @@ typedef NS_ENUM(NSUInteger, DWRegexCondition) {///组件条件模式
  注：
  1.若指定位数则min、max传相同数值
  2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
- 若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
+ 若为预查模式中contain或allNot则范围为最小值1，allIs和notAll无限制，若为包含模式则范围为最小值1
  */
 @property (nonatomic ,copy) DWRegexMaker * (^AddConditionWithComponentType)(DWRegexComponent component,NSString * additionalStr,DWRegexCondition condition,NSUInteger minCount,NSUInteger maxCount,BOOL greedy);
 
@@ -101,7 +101,7 @@ typedef NS_ENUM(NSUInteger, DWRegexCondition) {///组件条件模式
  注：
  1.若指定位数则min、max传相同数值
  2.若min、max均为DWINTEGERNULL根据不同模式会自动补全范围
- 若为预查模式则范围为最小值0，若为包含模式则范围为最小值1
+ 若为预查模式中contain或allNot则范围为最小值1，allIs和notAll无限制，若为包含模式则范围为最小值1
  */
 @property (nonatomic ,copy) DWRegexMaker * (^AddConditionWithComponentRegexString)(NSString * regExpStr,DWRegexCondition condition,NSUInteger minCount,NSUInteger maxCount,BOOL greedy);
 
