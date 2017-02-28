@@ -47,6 +47,9 @@
  
  version 1.0.5
  修改URL正则：path段添加_支持
+ 
+ version 1.0.6
+ 修复预查中包含模式和不包含模式范围自动补全
  */
 
 #import <Foundation/Foundation.h>

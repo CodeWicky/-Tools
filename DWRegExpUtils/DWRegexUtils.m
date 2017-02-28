@@ -87,6 +87,9 @@ static NSDictionary * provinceDic = nil;
                 break;
             case DWRegexConditionPreSearchAllNot:
                 component = [NSString stringWithFormat:@"(?!.*[%@]",component];
+                if (min == DWINTEGERNULL || min == 0) {
+                    min = 1;
+                }
                 component = handleRange(component, min, max,YES,YES);
                 component = [NSString stringWithFormat:@"%@.*)",component];
                 break;
@@ -95,6 +98,9 @@ static NSDictionary * provinceDic = nil;
                 break;
             case DWRegexConditionPreSearchContain:
                 component = [NSString stringWithFormat:@"(?=.*[%@]",component];
+                if (min == DWINTEGERNULL || min == 0) {
+                    min = 1;
+                }
                 component = handleRange(component, min, max,YES,YES);
                 component = [NSString stringWithFormat:@"%@)",component];
                 break;
@@ -142,7 +148,7 @@ static NSDictionary * provinceDic = nil;
                 case DWRegexConditionContain:
                 case DWRegexConditionWithout:
                 {
-                   [regS appendString:component];
+                    [regS appendString:component];
                 }
                     break;
                 default:
