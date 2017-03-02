@@ -11,4 +11,6 @@
 
 #define DWIndexPath(section,row) [NSIndexPath indexPathForRow:row inSection:section]
 
+#define NSStringFromIndexPath(idxP) [NSString stringWithFormat:@"S%ldR%ld",idxP.section,idxP.row]
+
 #endif /* DWMacro_h */
