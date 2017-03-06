@@ -79,6 +79,8 @@
 
 @property (nonatomic ,assign) NSUInteger volumn;
 
+@property (nonatomic ,strong) dispatch_semaphore_t semaphore;
+
 @end
 
 @implementation DWFixedDictionary
@@ -89,6 +91,7 @@
         return nil;
     }
     DWFixedDictionary * dic = [[DWFixedDictionary alloc] init];
+    dic.semaphore = dispatch_semaphore_create(1);
     dic.dictionary = [NSMutableDictionary dictionary];
     dic.volumn = volumn;
     dic.array = [NSMutableArray array];
@@ -96,6 +99,7 @@
 }
 
 -(void)setValue:(id)value forKey:(NSString *)key {
+    dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER);
     if ([self.array containsObject:key]) {
         if (self.objectDequeueBlock) {
             self.objectDequeueBlock(self.dictionary[key]);
@@ -111,14 +115,21 @@
     }
     [self.array addObject:key];
     [self.dictionary setValue:value forKey:key];
+    dispatch_semaphore_signal(self.semaphore);
 }
 
 -(id)valueForKey:(NSString *)key {
-    return [self.dictionary valueForKey:key];
+    dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER);
+    id value = [self.dictionary valueForKey:key];
+    dispatch_semaphore_signal(self.semaphore);
+    return value;
 }
 
 -(void)removeObjectForKey:(NSString *)key {
+    dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER);
     [self.dictionary removeObjectForKey:key];
+    [self.array removeObject:key];
+    dispatch_semaphore_signal(self.semaphore);
 }
 
 -(BOOL)containsKey:(NSString *)key {
