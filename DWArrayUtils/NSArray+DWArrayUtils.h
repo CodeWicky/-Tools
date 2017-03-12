@@ -8,16 +8,34 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSArray (DWArrayUtils)
+typedef BOOL(^DWFilter)(id obj, NSUInteger idx,NSUInteger count,BOOL * stop);
+/**
+ 处理数组过滤相关
+ */
+@interface NSArray (DWArrayFilterUtils)
 ///根据block过滤数组
 /**
- block  返回保留条件的block
+ filter  返回保留条件的filter
  
  e.g.
  return obj.length > 0;
  则返回数组中长度大于0的字符串组成的数组
  */
--(NSArray *)dw_FilterObjectsUsingBlock:(BOOL(^)(id obj, NSUInteger idx,NSUInteger count,BOOL * stop))block;
+-(NSArray *)dw_FilteredArrayUsingFilter:(DWFilter)filter;
+
+@end
+
+@interface NSMutableArray (DWArrayFilterUtils)
+
+-(void)dw_FilterUsingFilter:(DWFilter)filter;
+
+@end
+
+
+/**
+ 处理数组集合相关
+ */
+@interface NSArray (DWArrayCollectionUtils)
 
 ///获取自身中相对arr的补集
 /**
@@ -34,4 +52,34 @@
 
 ///将数组按数量分为多个数组
 -(NSArray *)dw_SplitArrayByCapacity:(NSUInteger)capacity;
+
+@end
+
+typedef NSComparisonResult(^DWComparator)(id obj1,id obj2);
+
+/**
+ 处理数组排序相关
+ */
+@interface NSArray (DWArraySortUtils)
+
+/**
+ 以堆排序进行排序
+
+ @param comparator 比较器，见系统比较器用法
+ @return 排序后数组
+ */
+-(NSArray *)dw_SortedArrayInHeapUsingComparator:(DWComparator)comparator;
+
+@end
+
+@interface NSMutableArray (DWArraySortUtils)
+
+
+/**
+ 以堆排序进行排序
+
+ @param comparator 比较器，见系统比较器用法
+ */
+-(void)dw_SortInHeapUsingComparator:(DWComparator)comparator;
+
 @end

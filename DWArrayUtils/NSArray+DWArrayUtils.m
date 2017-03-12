@@ -8,17 +8,37 @@
 
 #import "NSArray+DWArrayUtils.h"
 
-@implementation NSArray (DWArrayUtils)
--(NSArray *)dw_FilterObjectsUsingBlock:(BOOL(^)(id obj, NSUInteger idx,NSUInteger count,BOOL * stop))block
-{
-    NSMutableArray * arr = [NSMutableArray array];
-    [self enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (block(obj,idx,arr.count,stop)) {
-            [arr addObject:obj];
+@implementation NSArray (DWArrayFilterUtils)
+
+-(NSArray *)dw_FilteredArrayUsingFilter:(DWFilter)filter {
+    NSMutableArray * array = [NSMutableArray array];
+    filterArr(self,array,filter);
+    return array.copy;
+}
+
+#pragma mark --- Filter Array Method ---
+static inline void filterArr (NSArray * oriArr,NSMutableArray * desArr,DWFilter filter) {
+    [oriArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (filter(obj,idx,desArr.count,stop)) {
+            [desArr addObject:obj];
         }
     }];
-    return arr.copy;
 }
+
+@end
+
+@implementation NSMutableArray (DWArrayFilterUtils)
+
+-(void)dw_FilterUsingFilter:(DWFilter)filter {
+    NSArray * array = [NSArray arrayWithArray:self];
+    [self removeAllObjects];
+    filterArr(array, self, filter);
+}
+
+@end
+
+@implementation NSArray (DWArrayCollectionUtils)
+
 -(NSArray *)dw_ComplementaryArrayWithArr:(NSArray *)arr usingEqualBlock:(BOOL (^)(id,id))block
 {
     NSMutableArray * array = [NSMutableArray array];
@@ -36,10 +56,12 @@
     }];
     return array.copy;
 }
+
 -(NSArray *)dw_ComplementaryArrayFromArr:(NSArray *)arr usingEqualBlock:(BOOL (^)(id,id))block
 {
     return [arr dw_ComplementaryArrayWithArr:self usingEqualBlock:block];
 }
+
 -(NSArray *)dw_SplitArrayByCapacity:(NSUInteger)capacity
 {
     if (capacity == 0) {
@@ -55,6 +77,75 @@
         [arrTemp addObject:obj];
     }];
     [arr addObject:arrTemp];
-    return arr;
+    return arr.copy;
 }
+
+@end
+
+@implementation NSArray (DWArraySortUtils)
+
+-(NSArray *)dw_SortedArrayInHeapUsingComparator:(DWComparator)comparator {
+    NSMutableArray * array = [NSMutableArray arrayWithArray:self];
+    sortHeap(array, comparator);
+    return array.copy;
+}
+
+#pragma mark --- Heap Sort Method ---
+static inline NSUInteger leftLeaf(NSUInteger i) {
+    return 2 * i + 1;
+}
+
+static inline NSUInteger rightLeaf(NSUInteger i) {
+    return 2 * (i + 1);
+}
+
+static inline void swapArr (NSMutableArray * arr,NSUInteger m,NSUInteger n) {
+    if (m >= arr.count || n > arr.count) {
+        return;
+    }
+    id temp = arr[m];
+    arr[m] = arr[n];
+    arr[n] = temp;
+}
+
+static inline void maxHeap (NSMutableArray * arr,NSUInteger idx,NSUInteger len,DWComparator comparator) {
+    NSUInteger m = leftLeaf(idx);
+    NSUInteger n = rightLeaf(idx);
+    NSUInteger max = idx;
+    if (m < len && (comparator(arr[idx],arr[m]) == NSOrderedAscending)) {
+        max = m;
+    }
+    if (n < len && (comparator(arr[max],arr[n]) == NSOrderedAscending)) {
+        max = n;
+    }
+    if (max != idx) {
+        swapArr(arr, idx, max);
+        maxHeap(arr, max,len,comparator);
+    }
+}
+
+static inline void buildMaxHeap (NSMutableArray * arr,DWComparator comparator) {
+    for (NSInteger i = arr.count / 2 + 1;i >= 0;i --) {
+        maxHeap(arr, i,arr.count,comparator);
+    }
+}
+
+static inline void sortHeap (NSMutableArray * arr,DWComparator comparator) {
+    buildMaxHeap(arr, comparator);
+    NSInteger count = arr.count;
+    while (count > 0) {
+        swapArr(arr, 0, count - 1);
+        count -- ;
+        maxHeap(arr, 0, count,comparator);
+    }
+}
+
+@end
+
+@implementation NSMutableArray (DWArraySortUtils)
+
+-(void)dw_SortInHeapUsingComparator:(DWComparator)comparator {
+    sortHeap(self, comparator);
+}
+
 @end
