@@ -63,6 +63,22 @@ typedef BOOL(^DWFilter)(id obj, NSUInteger idx,NSUInteger count,BOOL * stop);
 
 typedef NSComparisonResult(^DWComparator)(id obj1,id obj2);
 
+///数字升序排列
+#define DWComparatorNumberAscending \
+if ([obj1 floatValue] < [obj2 floatValue]) {\
+return NSOrderedAscending;\
+} else {\
+    return NSOrderedDescending;\
+}\
+
+///数字降序排列
+#define DWComparatorNumberDescending \
+if ([obj1 floatValue] < [obj2 floatValue]) {\
+return NSOrderedDescending;\
+} else {\
+return NSOrderedAscending;\
+}\
+
 /**
  处理数组排序相关
  */
