@@ -20,6 +20,12 @@ typedef BOOL(^DWFilter)(id obj, NSUInteger idx,NSUInteger count,BOOL * stop);
  e.g.
  return obj.length > 0;
  则返回数组中长度大于0的字符串组成的数组
+ 
+ 参数解析：
+ obj    将要过滤的对象
+ idx    将要过滤的对象在原数组中的序列
+ count  目标数组中当前容量
+ stop   是否停止过滤，直接返回当前已过滤的目标数组
  */
 -(NSArray *)dw_FilteredArrayUsingFilter:(DWFilter)filter;
 
