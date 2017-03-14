@@ -67,9 +67,37 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
  */
 -(UIImage *)dw_RotateImageWithAngle:(CGFloat)angle;
 
-
 ///以灰色空间生成图片
 -(UIImage *)dw_ConvertToGrayImage;
+
+///生成图片的反色图片对象
+-(UIImage *)dw_ConvertToReversedColor;
+
+///以给定颜色生成图像剪影
+-(UIImage *)dw_ConvertToSketchWithColor:(UIColor *)color;
+
+/**
+ 生成处理每像素颜色后的图片
+
+ @param handler 处理回调
+ pixel为每一像素指向的内存指针
+ x为横坐标
+ y为纵坐标
+ @return 处理后的图片
+ 
+ eg:
+ 将图片有效像素点转换为红色
+ [self dw_ConvertImageWithPixelHandler:^(UInt8 *pixel, int x, int y) {
+ UInt8 alpha = * (pixel + 3);
+ if (alpha) {
+ *pixel = 255;
+ *(pixel + 1) = 0;
+ *(pixel + 2) = 0;
+ }
+ }];
+ 
+ */
+-(UIImage *)dw_ConvertImageWithPixelHandler:(void(^)(UInt8 * pixel,int x,int y))handler;
 
 ///取图片某点颜色
 /**
@@ -84,6 +112,7 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
 
 ///Base64转换为图片
 + (UIImage *)dw_ImageWithBase64String:(NSString *)base64String;
+
 #pragma mark ---以下代码来自网络---
 ///纠正图片方向
 -(UIImage *)dw_FixOrientation;

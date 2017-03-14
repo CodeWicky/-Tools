@@ -172,8 +172,8 @@
 
 -(UIImage *)dw_ConvertToGrayImage
 {
-    int width = self.size.width;
-    int height = self.size.height;
+    size_t width = self.size.width;
+    size_t height = self.size.height;
     
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
     CGContextRef context = CGBitmapContextCreate(nil,width,height,8,0,colorSpace,kCGImageAlphaNone);
@@ -191,6 +191,71 @@
     CGImageRelease(contextRef);
     
     return grayImage;
+}
+
+-(UIImage *)dw_ConvertToReversedColor {
+    return [self dw_ConvertImageWithPixelHandler:^(UInt8 *pixel, int x, int y) {
+        UInt8 alpha = * (pixel + 3);
+        if (alpha) {
+            *pixel = 255 - *pixel;
+            *(pixel + 1) = 255 - *(pixel + 1);
+            *(pixel + 2) = 255 - *(pixel + 2);
+        }
+    }];
+}
+
+-(UIImage *)dw_ConvertToSketchWithColor:(UIColor *)color {
+    NSInteger numComponents = CGColorGetNumberOfComponents(color.CGColor);
+    NSInteger red , green , blue;
+    red = green = blue = 0;
+    if (numComponents == 4)
+    {
+        const CGFloat *components = CGColorGetComponents(color.CGColor);
+        red = components[0] * 255;
+        green = components[1] * 255;
+        blue = components[2] * 255;
+    }
+    return [self dw_ConvertImageWithPixelHandler:^(UInt8 *pixel, int x, int y) {
+        UInt8 alpha = * (pixel + 3);
+        if (alpha) {
+            *pixel = red;
+            *(pixel + 1) = green;
+            *(pixel + 2) = blue;
+        }
+    }];
+}
+
+-(UIImage *)dw_ConvertImageWithPixelHandler:(void (^)(UInt8 *, int, int))handler {
+    if (!handler) {
+        return self;
+    }
+    size_t width = self.size.width;
+    size_t height = self.size.height;
+    size_t bitsPerComponent = CGImageGetBitsPerComponent(self.CGImage);
+    size_t bitsPerPixel = CGImageGetBitsPerPixel(self.CGImage);
+    size_t bytesPerRow = CGImageGetBytesPerRow(self.CGImage);
+    CGColorSpaceRef colorSpace = CGImageGetColorSpace(self.CGImage);
+    CGBitmapInfo bitmapInfo = CGImageGetBitmapInfo(self.CGImage);
+    bool shouldInterpolate = CGImageGetShouldInterpolate(self.CGImage);
+    CGColorRenderingIntent intent = CGImageGetRenderingIntent(self.CGImage);
+    CGDataProviderRef provider = CGImageGetDataProvider(self.CGImage);
+    CFDataRef data = CGDataProviderCopyData(provider);
+    UInt8 * buffer = (UInt8 *)CFDataGetBytePtr(data);
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            UInt8 * pixel = buffer + y * bytesPerRow + x * 4;
+            handler(pixel,x,y);
+        }
+    }
+    CFDataRef reverseData = CFDataCreate(NULL, buffer, CFDataGetLength(data));
+    CGDataProviderRef reverseProvider = CGDataProviderCreateWithCFData(reverseData);
+    CGImageRef reverseCGImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpace, bitmapInfo, reverseProvider, NULL, shouldInterpolate, intent);
+    UIImage * reverseImage = [UIImage imageWithCGImage:reverseCGImage];
+    CGImageRelease(reverseCGImage);
+    CGDataProviderRelease(reverseProvider);
+    CFRelease(reverseData);
+    CFRelease(data);
+    return reverseImage;
 }
 
 -(UIColor *)dw_ColorAtPoint:(CGPoint)point;
