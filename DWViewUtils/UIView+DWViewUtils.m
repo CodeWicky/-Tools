@@ -1,14 +1,14 @@
 //
-//  UIView+Frame.m
-//  UIView(Point)
+//  UIView+DWViewUtils.m
+//  a
 //
-//  Created by Wicky on 16/8/19.
-//  Copyright © 2016年 Wicky. All rights reserved.
+//  Created by Wicky on 2017/3/13.
+//  Copyright © 2017年 Wicky. All rights reserved.
 //
 
-#import "UIView+Frame.h"
+#import "UIView+DWViewUtils.h"
 
-@implementation UIView (Frame)
+@implementation UIView (DWViewFrameUtils)
 
 -(void)setOrigin:(CGPoint)origin
 {
@@ -134,6 +134,42 @@
 -(void)setViewCornerR:(CGFloat)viewCornerR
 {
     self.layer.cornerRadius = viewCornerR;
+}
+@end
+
+@implementation UIView (DWViewHierarchyUtils)
+
+-(BOOL)isInScreen {
+    SEL selec = NSSelectorFromString(@"_isInVisibleHierarchy");
+    NSMethodSignature * sign = [[UIView class] instanceMethodSignatureForSelector:selec];
+    NSInvocation * inv = [NSInvocation invocationWithMethodSignature:sign];
+    inv.target = self;
+    inv.selector = selec;
+    
+    BOOL visible = NO;
+    [inv invoke];
+    [inv getReturnValue:&visible];
+    return visible;
+}
+
+@end
+
+@implementation UIView (DWViewDecorateUtils)
+
+-(void)dw_AddLineWithFrame:(CGRect)frame color:(UIColor *)color {
+    CALayer * line = [CALayer layer];
+    line.frame = frame;
+    line.backgroundColor = color.CGColor;
+    [self.layer addSublayer:line];
+}
+
+-(void)dw_AddCorner:(UIRectCorner)corners radius:(CGFloat)radius {
+    UIBezierPath * maskP = [UIBezierPath bezierPathWithRoundedRect:self.bounds byRoundingCorners:corners cornerRadii:CGSizeMake(radius, radius)];
+    CAShapeLayer * layer = [CAShapeLayer layer];
+    layer.frame = self.bounds;
+    layer.fillColor = [UIColor blackColor].CGColor;
+    layer.path = maskP.CGPath;
+    self.layer.mask = layer;
 }
 
 @end

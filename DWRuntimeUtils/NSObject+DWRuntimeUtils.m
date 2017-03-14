@@ -142,6 +142,24 @@ void setter(id self1, SEL _cmd1, id newValue) {
     return arrM.copy;
 }
 
+#pragma mark --- 获取方法列表 ---
++(NSArray *)dw_GetAllMethods
+{
+    unsigned int count_f =0;
+    //获取方法链表
+    Method* methodList_f = class_copyMethodList([self class],&count_f);
+    NSMutableArray *methodsArray = [NSMutableArray arrayWithCapacity:count_f];
+    for(int i=0;i<count_f;i++)
+    {
+        Method temp_f = methodList_f[i];
+        SEL name_f = method_getName(temp_f);
+        NSString *methodStr = NSStringFromSelector(name_f);
+        [methodsArray addObject:methodStr];
+    }
+    free(methodList_f);
+    return methodsArray;
+}
+
 #pragma mark ---根据字典设置模型---
 +(id)dw_CreateModelWithDictionary:(NSDictionary *)dictionary
 {

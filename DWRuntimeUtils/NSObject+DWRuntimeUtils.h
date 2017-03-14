@@ -59,6 +59,10 @@
 ///获取实例变量列表
 +(NSArray *)dw_GetAllIvar;
 
+
+///获取对象的所有方法
++(NSArray *)dw_GetAllMethods;
+
 ///根据字典设置模型
 /*
  dictionary     数据源字典
