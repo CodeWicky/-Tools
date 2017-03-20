@@ -155,8 +155,8 @@
 -(void)addArcWithStartPoint:(CGPoint)startP endPoint:(CGPoint)endP radius:(CGFloat)radius clockwise:(BOOL)clockwise moreThanHalf:(BOOL)moreThanHalf
 {
     CGPoint center = [self getCenterFromFirstPoint:startP secondPoint:endP radius:radius clockwise:clockwise moreThanhalf:moreThanHalf];
-    CGFloat startA = [self getAngleFromFirstPoint:center secondP:startP clockwise:clockwise moreThanHalf:moreThanHalf];
-    CGFloat endA = [self getAngleFromFirstPoint:center secondP:endP clockwise:clockwise moreThanHalf:moreThanHalf];
+    CGFloat startA = [self getAngleFromFirstPoint:center secondP:startP];
+    CGFloat endA = [self getAngleFromFirstPoint:center secondP:endP];
     [self addArcWithCenter:center radius:radius startAngle:startA endAngle:endA clockwise:clockwise];
 }
 
@@ -265,13 +265,13 @@ static inline CGFloat deltaSinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloa
     ///获取相似三角形相似比例
     CGFloat scale = sqrt((pow(radius, 2) - (pow(centerX, 2) + pow(centerY, 2))) / (pow(centerX, 2) + pow(centerY, 2)));
     scale = round6f(scale);
-        if (clockwise != moreThanHalf) {
-            return CGPointMake(centerX + centerY * scale + firstP.x, - centerY + centerX * scale + firstP.y);
-        }
-        else
-        {
-            return CGPointMake(centerX - centerY * scale + firstP.x, - centerY - centerX * scale + firstP.y);
-        }
+    if (clockwise != moreThanHalf) {
+        return CGPointMake(centerX + centerY * scale + firstP.x, - centerY + centerX * scale + firstP.y);
+    }
+    else
+    {
+        return CGPointMake(centerX - centerY * scale + firstP.x, - centerY - centerX * scale + firstP.y);
+    }
 }
 
 ///保留6位小数
@@ -282,29 +282,27 @@ CGFloat round6f(CGFloat x){
 ///获取第二点相对第一点的角度
 -(CGFloat)getAngleFromFirstPoint:(CGPoint)firstP
                          secondP:(CGPoint)secondP
-                       clockwise:(BOOL)clockwise
-                    moreThanHalf:(BOOL)moreThanHalf
 {
     CGFloat deltaX = secondP.x - firstP.x;
     CGFloat deltaY = secondP.y - firstP.y;
     deltaX = round6f(deltaX);
     deltaY = round6f(deltaY);
-    if (deltaY > 0) {
-        return atan(deltaY / deltaX);
+    if (deltaX > 0) {
+        if (deltaY >= 0) {
+            return atanf(deltaY / deltaX);
+        }
+        return M_PI * 2 + atanf(deltaY / deltaX);
     }
-    if (deltaY == 0) {
-        if (deltaX >= 0) {
-            return 0;
+    if (deltaX == 0) {
+        if (deltaY >= 0) {
+            return M_PI_2;
         }
         else
         {
-            return M_PI;
+            return M_PI_2 * 3;
         }
     }
-    else
-    {
-        return atan(deltaY / deltaX) + ((clockwise != moreThanHalf)?M_PI:0);
-    }
+    return atanf(deltaY / deltaX) + M_PI;
 }
 
 @end
