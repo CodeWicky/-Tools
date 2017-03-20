@@ -153,7 +153,9 @@ typedef NS_ENUM(NSUInteger, DWWebImageCacheType) {///缓存数据类型
 ///图片下载器
 @property (nonatomic ,strong) DWWebImageDownloader * donwloader;
 
+///下载任务是否完成
 @property (nonatomic , assign, getter=isFinished) BOOL finished;
+
 ///以url及session下载图片
 -(instancetype)initWithUrl:(NSString *)url session:(NSURLSession *)session;
 
