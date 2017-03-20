@@ -148,6 +148,10 @@ block();\
     if (error) {///移除任务
         [self removeOperationByUrl:sender.userInfo[@"url"]];
         [self removeCacheByUrl:sender.userInfo[@"url"]];
+    } else {
+        NSString * url = sender.userInfo[@"url"];
+        DWWebImageOperation * operation = self.operations[url];///取出下载任务
+        operation.finished = YES;
     }
 }
 
@@ -341,7 +345,7 @@ static DWWebImageManager * mgr = nil;
 
 #pragma mark --- DWWebImageOperation ---
 @implementation DWWebImageOperation
-
+@synthesize finished = _finished;
 -(instancetype)initWithUrl:(NSString *)url session:(NSURLSession *)session
 {
     self = [super init];
@@ -362,6 +366,12 @@ static DWWebImageManager * mgr = nil;
 {
     [super cancel];
     [self.donwloader cancel];
+}
+
+-(void)setFinished:(BOOL)finished {
+    [self willChangeValueForKey:@"isFinished"];
+    _finished = finished;
+    [self didChangeValueForKey:@"isFinished"];
 }
 
 @end

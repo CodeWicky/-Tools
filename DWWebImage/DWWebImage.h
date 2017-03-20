@@ -15,6 +15,9 @@
  
  version 1.0.1
  添加断言
+ 
+ version 1.0.2
+ 下载完成后修改operation为finish状态
  */
 
 
@@ -150,6 +153,7 @@ typedef NS_ENUM(NSUInteger, DWWebImageCacheType) {///缓存数据类型
 ///图片下载器
 @property (nonatomic ,strong) DWWebImageDownloader * donwloader;
 
+@property (nonatomic , assign, getter=isFinished) BOOL finished;
 ///以url及session下载图片
 -(instancetype)initWithUrl:(NSString *)url session:(NSURLSession *)session;
 
