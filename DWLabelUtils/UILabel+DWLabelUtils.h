@@ -16,6 +16,9 @@
  
  version 1.0.1
  提供文本显示内距
+ 
+ version 1.0.2
+ 解决与TextField英文显示的冲突
  */
 
 #import <UIKit/UIKit.h>

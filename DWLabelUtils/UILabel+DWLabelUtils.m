@@ -23,7 +23,13 @@
 
 -(void)dw_drawTextInRect:(CGRect)rect
 {
+    NSLog(@"---text:%@-----%@",self.text,NSStringFromCGRect(rect));
+    if ([NSStringFromClass(self.class) isEqualToString:@"UITextFieldLabel"]) {///解决textField显示冲突
+        [self dw_drawTextInRect:rect];
+        return;
+    }
     CGRect frame = [self textRectForBounds:rect limitedToNumberOfLines:self.numberOfLines];
+    NSLog(@"text::::%@---%@",self.text,NSStringFromCGRect(frame));
     [self dw_drawTextInRect:frame];
 }
 
@@ -36,10 +42,10 @@
             origin.y = self.textInset.top;
             break;
         case DWTextVerticalAlignmentBottom:
-            origin.y = self.bounds.size.height - self.textInset.bottom - rect.size.height;
+            origin.y = bounds.size.height - self.textInset.bottom - rect.size.height;
             break;
         default:
-            origin.y = (self.bounds.size.height - self.textInset.top - self.textInset.bottom) / 2.0 - rect.size.height / 2.0 + self.textInset.top;
+            origin.y = (bounds.size.height - self.textInset.top - self.textInset.bottom) / 2.0 - rect.size.height / 2.0 + self.textInset.top;
             break;
     }
     rect.origin = origin;
