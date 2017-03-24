@@ -30,6 +30,15 @@ block();\
 dispatch_async(dispatch_get_main_queue(),block);\
 }
 
+///改变属性是否需要动画
+#define TransactionWithAnimation(animated,animation) \
+[CATransaction begin];\
+if (!animated) {\
+[CATransaction setAnimationDuration:0];\
+}\
+animation();\
+[CATransaction commit];\
+
 ///版本判断
 #define SYSTEM_VERSION_EQUAL_TO(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
 #define SYSTEM_VERSION_GREATER_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
