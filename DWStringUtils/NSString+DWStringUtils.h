@@ -6,7 +6,7 @@
 //  Copyright © 2017年 Wicky. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface NSString (DWStringUtils)
 ///生成由N个元字符串组成的字符串
