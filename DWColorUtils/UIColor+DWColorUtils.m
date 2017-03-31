@@ -31,6 +31,11 @@
     string = [string stringByReplacingOccurrencesOfString:@"#" withString:@""];
     string = [string stringByReplacingOccurrencesOfString:@"0x" withString:@""];
     string = [string stringByReplacingOccurrencesOfString:@"0X" withString:@""];
+    NSInteger delta = string.length - 4;
+    while (delta < 0) {
+        string = [NSString stringWithFormat:@"0%@",string];
+        delta = string.length - 4;
+    }
     NSString * red = [string substringToIndex:2];
     NSString * green = [string substringWithRange:NSMakeRange(2, 2)];
     NSString * blue = [string substringFromIndex:4];
