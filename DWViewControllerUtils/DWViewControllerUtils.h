@@ -19,6 +19,8 @@
 
 @interface UINavigationController (DWNavigationUtils)
 
+@property (nonatomic ,assign) BOOL useAlphaNavBarHandler;
+
 
 /**
  根据条件进行控制器推进
@@ -43,10 +45,14 @@
  */
 -(void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated conditionPresentVC:(UIViewController *)presentVC conditionBlock:(BOOL (^)())condition;
 
+-(void)handleNavigationBarAlphaTo:(CGFloat)alpha;
+
 @end
 
 @interface UIViewController (DWNavigationUtils)
 
+///导航透明度
+@property (nonatomic ,assign) CGFloat navigationBarAlpha;
 
 /**
  移除模态界面并按需显示正确控制器

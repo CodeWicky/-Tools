@@ -6,6 +6,14 @@
 //  Copyright © 2016年 Wicky. All rights reserved.
 //
 
+/**
+ DWImageUtils
+ 图片工具类，提供常用图片扩展方法
+ 
+ version 1.0.0
+ 按功能分类扩展
+ */
+
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
@@ -14,11 +22,12 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
     DWContentModeScaleAspectFill,//填充模式
     DWContentModeScaleToFill//拉伸模式
 };
-@interface UIImage (DWImageUtils)
+
+@interface UIImage (DWImageInstanceUtils)
 
 /**
  高性能按图片名称检索本地图片
-
+ 
  @param name 图片文件名
  @return 图片实例
  */
@@ -26,11 +35,72 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
 
 /**
  高性能返回无延迟立即解压的图片实例
-
+ 
  @param url 图片路径，本地网络均可
  @return 图片实例
  */
 +(UIImage *)dw_ImageWithUrl:(NSURL *)url;
+
+@end
+
+@interface UIImage (DWImageBase64Utils)
+
+///转换图片为Base64字符串
+-(NSString *)dw_ImageToBase64String;
+
+///Base64转换为图片
++ (UIImage *)dw_ImageWithBase64String:(NSString *)base64String;
+
+@end
+
+@interface UIImage (DWImageColorUtils)
+
+///取图片某点颜色
+/**
+ point:取色点
+ 
+ 注:以图片自身宽高作为坐标系
+ */
+-(UIColor *)dw_ColorAtPoint:(CGPoint)point;
+
+///按给定颜色生层图片
++(UIImage *)dw_ImageWithColor:(UIColor *)color;
+
+///以灰色空间生成图片
+-(UIImage *)dw_ConvertToGrayImage;
+
+///生成图片的反色图片对象
+-(UIImage *)dw_ConvertToReversedColor;
+
+///以给定颜色生成图像剪影
+-(UIImage *)dw_ConvertToSketchWithColor:(UIColor *)color;
+
+/**
+ 生成处理每像素颜色后的图片
+ 
+ @param handler 处理回调
+ pixel为每一像素指向的内存指针
+ x为横坐标
+ y为纵坐标
+ @return 处理后的图片
+ 
+ eg:
+ 将图片有效像素点转换为红色
+ [self dw_ConvertImageWithPixelHandler:^(UInt8 *pixel, int x, int y) {
+ UInt8 alpha = * (pixel + 3);
+ if (alpha) {
+ *pixel = 255;
+ *(pixel + 1) = 0;
+ *(pixel + 2) = 0;
+ }
+ }];
+ 
+ */
+-(UIImage *)dw_ConvertImageWithPixelHandler:(void(^)(UInt8 * pixel,int x,int y))handler;
+
+@end
+
+@interface UIImage (DWImageClipUtils)
 
 ///获取带圆角的图片
 /*
@@ -58,64 +128,15 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
  */
 -(UIImage *)dw_ClipImageWithPath:(UIBezierPath *)path mode:(DWContentMode)mode;
 
-///按给定颜色生层图片
-+(UIImage *)dw_ImageWithColor:(UIColor *)color;
+@end
+
+@interface UIImage (DWImageTransformUtils)
 
 ///获取旋转角度的图片
 /**
  注:角度计数单位为弧度制
  */
 -(UIImage *)dw_RotateImageWithAngle:(CGFloat)angle;
-
-///以灰色空间生成图片
--(UIImage *)dw_ConvertToGrayImage;
-
-///生成图片的反色图片对象
--(UIImage *)dw_ConvertToReversedColor;
-
-///以给定颜色生成图像剪影
--(UIImage *)dw_ConvertToSketchWithColor:(UIColor *)color;
-
-/**
- 生成处理每像素颜色后的图片
-
- @param handler 处理回调
- pixel为每一像素指向的内存指针
- x为横坐标
- y为纵坐标
- @return 处理后的图片
- 
- eg:
- 将图片有效像素点转换为红色
- [self dw_ConvertImageWithPixelHandler:^(UInt8 *pixel, int x, int y) {
- UInt8 alpha = * (pixel + 3);
- if (alpha) {
- *pixel = 255;
- *(pixel + 1) = 0;
- *(pixel + 2) = 0;
- }
- }];
- 
- */
--(UIImage *)dw_ConvertImageWithPixelHandler:(void(^)(UInt8 * pixel,int x,int y))handler;
-
-///取图片某点颜色
-/**
- point:取色点
- 
- 注:以图片自身宽高作为坐标系
- */
--(UIColor *)dw_ColorAtPoint:(CGPoint)point;
-
-///转换图片为Base64字符串
--(NSString *)dw_ImageToBase64String;
-
-///Base64转换为图片
-+ (UIImage *)dw_ImageWithBase64String:(NSString *)base64String;
-
-#pragma mark ---以下代码来自网络---
-///纠正图片方向
--(UIImage *)dw_FixOrientation;
 
 ///按给定的方向旋转图片
 -(UIImage*)dw_RotateWithOrient:(UIImageOrientation)orient;
@@ -126,14 +147,21 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
 ///水平翻转
 -(UIImage *)dw_FlipHorizontal;
 
-///截取当前image对象rect区域内的图像
--(UIImage *)dw_SubImageWithRect:(CGRect)rect;
-
 ///压缩图片至指定尺寸
 -(UIImage *)dw_RescaleImageToSize:(CGSize)size;
 
 ///压缩图片至指定像素
 -(UIImage *)dw_RescaleImageToPX:(CGFloat )toPX;
+
+///纠正图片方向
+-(UIImage *)dw_FixOrientation;
+
+@end
+
+@interface UIImage (DWImageCanvasUtils)
+
+///截取当前image对象rect区域内的图像
+-(UIImage *)dw_SubImageWithRect:(CGRect)rect;
 
 ///在指定的size里面生成一个平铺的图片
 -(UIImage *)dw_GetTiledImageWithSize:(CGSize)size;
@@ -143,4 +171,5 @@ typedef NS_ENUM(NSInteger,DWContentMode)//图片填充模式
 
 ///将两个图片生成一张图片
 +(UIImage*)dw_MergeImage:(UIImage*)firstImage withImage:(UIImage*)secondImage;
+
 @end

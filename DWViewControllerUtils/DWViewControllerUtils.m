@@ -72,12 +72,78 @@
 
 -(void)setConditionedVCToPush:(UIViewController *)conditionedVCToPush
 {
-    objc_setAssociatedObject(self, @selector(conditionedVCToPush), conditionedVCToPush, OBJC_ASSOCIATION_RETAIN);
+    objc_setAssociatedObject(self, @selector(conditionedVCToPush), conditionedVCToPush, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+-(CGFloat)navigationBarAlpha {
+    return [objc_getAssociatedObject(self, _cmd) floatValue];
+}
+
+-(void)setNavigationBarAlpha:(CGFloat)navigationBarAlpha {
+    objc_setAssociatedObject(self, @selector(navigationBarAlpha), @(navigationBarAlpha), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self.navigationController handleNavigationBarAlphaTo:navigationBarAlpha];
 }
 
 @end
 
 @implementation UINavigationController (DWNavigationUtils)
+
++(void)load
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        SEL originSel = NSSelectorFromString(@"_updateInteractiveTransition:");
+        SEL destinationSel = @selector(dw_swizzled_updateInteractiveTransition:);
+        Method originMethod = class_getInstanceMethod(self, originSel);
+        Method destinationMethod = class_getInstanceMethod(self, destinationSel);
+        method_exchangeImplementations(originMethod, destinationMethod);
+    });
+}
+
+-(void)dw_swizzled_updateInteractiveTransition:(CGFloat)percentComplete {
+    [self dw_swizzled_updateInteractiveTransition:percentComplete];
+    id coordinator = self.topViewController.transitionCoordinator;
+    if (!coordinator) {
+        return;
+    }
+//    UIViewController * fromVC = coordinator.
+    if (self.useAlphaNavBarHandler) {
+        ///TODO:处理透明度
+        NSLog(@"you need something to do here");
+    }
+}
+
+-(void)handleNavigationBarAlphaTo:(CGFloat)alpha {
+    //    navigationBar.value(forKey: "_barBackgroundView") as AnyObject
+    UIView * barBackgroundView = [self.navigationBar valueForKey:@"_barBackgroundView"];
+//    let backgroundImageView = barBackgroundView.value(forKey: "_backgroundImageView") as? UIImageView
+    UIImageView * backgroundImageView = [barBackgroundView valueForKey:@"_backgroundImageView"];
+//    if navigationBar.isTranslucent {
+    if (self.navigationBar.isTranslucent) {
+//        if backgroundImageView != nil && backgroundImageView!.image != nil {
+        if (backgroundImageView && backgroundImageView.image) {
+//            (barBackgroundView as! UIView).alpha = alpha
+            backgroundImageView.alpha = alpha;
+//        }else{
+        } else {
+            UIView * backgroundEffectView = [barBackgroundView valueForKey:@"_backgroundEffectView"];
+//            if let backgroundEffectView = barBackgroundView.value(forKey: "_backgroundEffectView") as? UIView {
+            if (backgroundEffectView) {
+//                backgroundEffectView.alpha = alpha
+                backgroundEffectView.alpha = alpha;
+            }
+        }
+    }else{
+//        (barBackgroundView as! UIView).alpha = alpha
+        barBackgroundView.alpha = alpha;
+    }
+    UIView * shadowView = [barBackgroundView valueForKey:@"_shadowView"];
+//    if let shadowView = barBackgroundView.value(forKey: "_shadowView") as? UIView {
+    if (shadowView) {
+//        shadowView.alpha = alpha
+        shadowView.alpha = alpha;
+    }
+}
 
 -(void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated conditionBlock:(BOOL(^)())condition conditionHandler:(void(^)())handler {
     if (!condition || !handler) {
@@ -104,6 +170,14 @@
         }
         [self presentViewController:presentVC animated:YES completion:nil];
     }];
+}
+
+-(BOOL)useAlphaNavBarHandler {
+    return [objc_getAssociatedObject(self, _cmd) boolValue];
+}
+
+-(void)setUseAlphaNavBarHandler:(BOOL)useAlphaNavBarHandler {
+    objc_setAssociatedObject(self, @selector(useAlphaNavBarHandler), @(useAlphaNavBarHandler), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

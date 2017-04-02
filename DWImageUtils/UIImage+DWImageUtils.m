@@ -8,7 +8,8 @@
 
 #import "UIImage+DWImageUtils.h"
 #import <ImageIO/ImageIO.h>
-@implementation UIImage (DWImageUtils)
+
+@implementation UIImage (DWImageInstanceUtils)
 
 +(UIImage *)dw_ImageNamed:(NSString *)name
 {
@@ -32,6 +33,188 @@
     CFRelease(source);
     return image;
 }
+
+@end
+
+@implementation UIImage (DWImageBase64Utils)
+
+-(NSString *)dw_ImageToBase64String
+{
+    NSData *imageData = nil;
+    NSString *mimeType = nil;
+    
+    if ([self imageHasAlpha]) {
+        imageData = UIImagePNGRepresentation(self);
+        mimeType = @"image/png";
+    } else {
+        imageData = UIImageJPEGRepresentation(self, 1.0f);
+        mimeType = @"image/jpeg";
+    }
+    return [NSString stringWithFormat:@"data:%@;base64,%@", mimeType,
+            [imageData base64EncodedStringWithOptions: 0]];
+}
+
++ (UIImage *)dw_ImageWithBase64String:(NSString *)base64String
+{
+    NSURL *url = [NSURL URLWithString: base64String];
+    NSData *data = [NSData dataWithContentsOfURL: url];
+    UIImage *image = [UIImage imageWithData: data];
+    
+    return image;
+}
+
+-(BOOL)imageHasAlpha
+{
+    CGImageAlphaInfo alpha = CGImageGetAlphaInfo(self.CGImage);
+    return (alpha == kCGImageAlphaFirst ||
+            alpha == kCGImageAlphaLast ||
+            alpha == kCGImageAlphaPremultipliedFirst ||
+            alpha == kCGImageAlphaPremultipliedLast);
+}
+
+@end
+
+@implementation UIImage (DWImageColorUtils)
+
+-(UIColor *)dw_ColorAtPoint:(CGPoint)point;
+{
+    if (!CGRectContainsPoint(CGRectMake(0.0f, 0.0f, self.size.width, self.size.height), point))
+    {
+        return nil;
+    }
+    
+    NSInteger pointX = trunc(point.x);
+    NSInteger pointY = trunc(point.y);
+    CGImageRef cgImage = self.CGImage;
+    NSUInteger width = self.size.width;
+    NSUInteger height = self.size.height;
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    int bytesPerPixel = 4;
+    int bytesPerRow = bytesPerPixel * 1;
+    NSUInteger bitsPerComponent = 8;
+    unsigned char pixelData[4] = { 0, 0, 0, 0 };
+    
+    ///创建1*1画布
+    CGContextRef context = CGBitmapContextCreate(pixelData,1,1,bitsPerComponent,bytesPerRow,colorSpace,kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    CGColorSpaceRelease(colorSpace);
+    CGContextSetBlendMode(context, kCGBlendModeCopy);
+    
+    CGContextTranslateCTM(context, -pointX, pointY-(CGFloat)height);
+    ///绘图
+    CGContextDrawImage(context, CGRectMake(0.0f, 0.0f, (CGFloat)width, (CGFloat)height), cgImage);
+    CGContextRelease(context);
+    
+    ///取色
+    CGFloat red   = (CGFloat)pixelData[0] / 255.0f;
+    CGFloat green = (CGFloat)pixelData[1] / 255.0f;
+    CGFloat blue  = (CGFloat)pixelData[2] / 255.0f;
+    CGFloat alpha = (CGFloat)pixelData[3] / 255.0f;
+    return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
+}
+
++(UIImage *)dw_ImageWithColor:(UIColor *)color
+{
+    CGRect rect=CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
+-(UIImage *)dw_ConvertToGrayImage
+{
+    size_t width = self.size.width;
+    size_t height = self.size.height;
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
+    CGContextRef context = CGBitmapContextCreate(nil,width,height,8,0,colorSpace,kCGImageAlphaNone);
+    CGColorSpaceRelease(colorSpace);
+    
+    if (context == NULL)
+    {
+        return nil;
+    }
+    
+    CGContextDrawImage(context,CGRectMake(0, 0, width, height), self.CGImage);
+    CGImageRef contextRef = CGBitmapContextCreateImage(context);
+    UIImage *grayImage = [UIImage imageWithCGImage:contextRef];
+    CGContextRelease(context);
+    CGImageRelease(contextRef);
+    
+    return grayImage;
+}
+
+-(UIImage *)dw_ConvertToReversedColor {
+    return [self dw_ConvertImageWithPixelHandler:^(UInt8 *pixel, int x, int y) {
+        UInt8 alpha = * (pixel + 3);
+        if (alpha) {
+            *pixel = 255 - *pixel;
+            *(pixel + 1) = 255 - *(pixel + 1);
+            *(pixel + 2) = 255 - *(pixel + 2);
+        }
+    }];
+}
+
+-(UIImage *)dw_ConvertToSketchWithColor:(UIColor *)color {
+    NSInteger numComponents = CGColorGetNumberOfComponents(color.CGColor);
+    NSInteger red , green , blue;
+    red = green = blue = 0;
+    if (numComponents == 4)
+    {
+        const CGFloat *components = CGColorGetComponents(color.CGColor);
+        red = components[0] * 255;
+        green = components[1] * 255;
+        blue = components[2] * 255;
+    }
+    return [self dw_ConvertImageWithPixelHandler:^(UInt8 *pixel, int x, int y) {
+        UInt8 alpha = * (pixel + 3);
+        if (alpha) {
+            *pixel = red;
+            *(pixel + 1) = green;
+            *(pixel + 2) = blue;
+        }
+    }];
+}
+
+-(UIImage *)dw_ConvertImageWithPixelHandler:(void (^)(UInt8 *, int, int))handler {
+    if (!handler) {
+        return self;
+    }
+    size_t width = self.size.width;
+    size_t height = self.size.height;
+    size_t bitsPerComponent = CGImageGetBitsPerComponent(self.CGImage);
+    size_t bitsPerPixel = CGImageGetBitsPerPixel(self.CGImage);
+    size_t bytesPerRow = CGImageGetBytesPerRow(self.CGImage);
+    CGColorSpaceRef colorSpace = CGImageGetColorSpace(self.CGImage);
+    CGBitmapInfo bitmapInfo = CGImageGetBitmapInfo(self.CGImage);
+    bool shouldInterpolate = CGImageGetShouldInterpolate(self.CGImage);
+    CGColorRenderingIntent intent = CGImageGetRenderingIntent(self.CGImage);
+    CGDataProviderRef provider = CGImageGetDataProvider(self.CGImage);
+    CFDataRef data = CGDataProviderCopyData(provider);
+    UInt8 * buffer = (UInt8 *)CFDataGetBytePtr(data);
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            UInt8 * pixel = buffer + y * bytesPerRow + x * 4;
+            handler(pixel,x,y);
+        }
+    }
+    CFDataRef reverseData = CFDataCreate(NULL, buffer, CFDataGetLength(data));
+    CGDataProviderRef reverseProvider = CGDataProviderCreateWithCFData(reverseData);
+    CGImageRef reverseCGImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpace, bitmapInfo, reverseProvider, NULL, shouldInterpolate, intent);
+    UIImage * reverseImage = [UIImage imageWithCGImage:reverseCGImage];
+    CGImageRelease(reverseCGImage);
+    CGDataProviderRelease(reverseProvider);
+    CFRelease(reverseData);
+    CFRelease(data);
+    return reverseImage;
+}
+
+@end
+
+@implementation UIImage (DWImageClipUtils)
 
 -(UIImage *)dw_CornerRadius:(CGFloat)radius withWidth:(CGFloat)width contentMode:(DWContentMode)mode
 {
@@ -134,17 +317,9 @@
     return newImage;
 }
 
-+(UIImage *)dw_ImageWithColor:(UIColor *)color
-{
-    CGRect rect=CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
-    UIGraphicsBeginImageContext(rect.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(context, [color CGColor]);
-    CGContextFillRect(context, rect);
-    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return newImage;
-}
+@end
+
+@implementation UIImage (DWImageTransformUtils)
 
 -(UIImage *)dw_RotateImageWithAngle:(CGFloat)angle
 {
@@ -168,237 +343,6 @@
     UIGraphicsEndImageContext();
     
     return newImage;
-}
-
--(UIImage *)dw_ConvertToGrayImage
-{
-    size_t width = self.size.width;
-    size_t height = self.size.height;
-    
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
-    CGContextRef context = CGBitmapContextCreate(nil,width,height,8,0,colorSpace,kCGImageAlphaNone);
-    CGColorSpaceRelease(colorSpace);
-    
-    if (context == NULL)
-    {
-        return nil;
-    }
-    
-    CGContextDrawImage(context,CGRectMake(0, 0, width, height), self.CGImage);
-    CGImageRef contextRef = CGBitmapContextCreateImage(context);
-    UIImage *grayImage = [UIImage imageWithCGImage:contextRef];
-    CGContextRelease(context);
-    CGImageRelease(contextRef);
-    
-    return grayImage;
-}
-
--(UIImage *)dw_ConvertToReversedColor {
-    return [self dw_ConvertImageWithPixelHandler:^(UInt8 *pixel, int x, int y) {
-        UInt8 alpha = * (pixel + 3);
-        if (alpha) {
-            *pixel = 255 - *pixel;
-            *(pixel + 1) = 255 - *(pixel + 1);
-            *(pixel + 2) = 255 - *(pixel + 2);
-        }
-    }];
-}
-
--(UIImage *)dw_ConvertToSketchWithColor:(UIColor *)color {
-    NSInteger numComponents = CGColorGetNumberOfComponents(color.CGColor);
-    NSInteger red , green , blue;
-    red = green = blue = 0;
-    if (numComponents == 4)
-    {
-        const CGFloat *components = CGColorGetComponents(color.CGColor);
-        red = components[0] * 255;
-        green = components[1] * 255;
-        blue = components[2] * 255;
-    }
-    return [self dw_ConvertImageWithPixelHandler:^(UInt8 *pixel, int x, int y) {
-        UInt8 alpha = * (pixel + 3);
-        if (alpha) {
-            *pixel = red;
-            *(pixel + 1) = green;
-            *(pixel + 2) = blue;
-        }
-    }];
-}
-
--(UIImage *)dw_ConvertImageWithPixelHandler:(void (^)(UInt8 *, int, int))handler {
-    if (!handler) {
-        return self;
-    }
-    size_t width = self.size.width;
-    size_t height = self.size.height;
-    size_t bitsPerComponent = CGImageGetBitsPerComponent(self.CGImage);
-    size_t bitsPerPixel = CGImageGetBitsPerPixel(self.CGImage);
-    size_t bytesPerRow = CGImageGetBytesPerRow(self.CGImage);
-    CGColorSpaceRef colorSpace = CGImageGetColorSpace(self.CGImage);
-    CGBitmapInfo bitmapInfo = CGImageGetBitmapInfo(self.CGImage);
-    bool shouldInterpolate = CGImageGetShouldInterpolate(self.CGImage);
-    CGColorRenderingIntent intent = CGImageGetRenderingIntent(self.CGImage);
-    CGDataProviderRef provider = CGImageGetDataProvider(self.CGImage);
-    CFDataRef data = CGDataProviderCopyData(provider);
-    UInt8 * buffer = (UInt8 *)CFDataGetBytePtr(data);
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            UInt8 * pixel = buffer + y * bytesPerRow + x * 4;
-            handler(pixel,x,y);
-        }
-    }
-    CFDataRef reverseData = CFDataCreate(NULL, buffer, CFDataGetLength(data));
-    CGDataProviderRef reverseProvider = CGDataProviderCreateWithCFData(reverseData);
-    CGImageRef reverseCGImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpace, bitmapInfo, reverseProvider, NULL, shouldInterpolate, intent);
-    UIImage * reverseImage = [UIImage imageWithCGImage:reverseCGImage];
-    CGImageRelease(reverseCGImage);
-    CGDataProviderRelease(reverseProvider);
-    CFRelease(reverseData);
-    CFRelease(data);
-    return reverseImage;
-}
-
--(UIColor *)dw_ColorAtPoint:(CGPoint)point;
-{
-    if (!CGRectContainsPoint(CGRectMake(0.0f, 0.0f, self.size.width, self.size.height), point))
-    {
-        return nil;
-    }
-    
-    NSInteger pointX = trunc(point.x);
-    NSInteger pointY = trunc(point.y);
-    CGImageRef cgImage = self.CGImage;
-    NSUInteger width = self.size.width;
-    NSUInteger height = self.size.height;
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    int bytesPerPixel = 4;
-    int bytesPerRow = bytesPerPixel * 1;
-    NSUInteger bitsPerComponent = 8;
-    unsigned char pixelData[4] = { 0, 0, 0, 0 };
-    
-    ///创建1*1画布
-    CGContextRef context = CGBitmapContextCreate(pixelData,1,1,bitsPerComponent,bytesPerRow,colorSpace,kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-    CGColorSpaceRelease(colorSpace);
-    CGContextSetBlendMode(context, kCGBlendModeCopy);
-    
-    CGContextTranslateCTM(context, -pointX, pointY-(CGFloat)height);
-    ///绘图
-    CGContextDrawImage(context, CGRectMake(0.0f, 0.0f, (CGFloat)width, (CGFloat)height), cgImage);
-    CGContextRelease(context);
-    
-    ///取色
-    CGFloat red   = (CGFloat)pixelData[0] / 255.0f;
-    CGFloat green = (CGFloat)pixelData[1] / 255.0f;
-    CGFloat blue  = (CGFloat)pixelData[2] / 255.0f;
-    CGFloat alpha = (CGFloat)pixelData[3] / 255.0f;
-    return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
-}
-
--(NSString *)dw_ImageToBase64String
-{
-    NSData *imageData = nil;
-    NSString *mimeType = nil;
-    
-    if ([self imageHasAlpha]) {
-        imageData = UIImagePNGRepresentation(self);
-        mimeType = @"image/png";
-    } else {
-        imageData = UIImageJPEGRepresentation(self, 1.0f);
-        mimeType = @"image/jpeg";
-    }
-    return [NSString stringWithFormat:@"data:%@;base64,%@", mimeType,
-            [imageData base64EncodedStringWithOptions: 0]];
-}
-
-+ (UIImage *)dw_ImageWithBase64String:(NSString *)base64String
-{
-    NSURL *url = [NSURL URLWithString: base64String];
-    NSData *data = [NSData dataWithContentsOfURL: url];
-    UIImage *image = [UIImage imageWithData: data];
-    
-    return image;
-}
-
--(UIImage *)dw_FixOrientation
-{
-    if (self.imageOrientation == UIImageOrientationUp) return self;
-    
-    // We need to calculate the proper transformation to make the image upright.
-    // We do it in 2 steps: Rotate if Left/Right/Down, and then flip if Mirrored.
-    CGAffineTransform transform = CGAffineTransformIdentity;
-    
-    switch (self.imageOrientation)
-    {
-        case UIImageOrientationDown:
-        case UIImageOrientationDownMirrored:
-            transform = CGAffineTransformTranslate(transform, self.size.width, self.size.height);
-            transform = CGAffineTransformRotate(transform, M_PI);
-            break;
-            
-        case UIImageOrientationLeft:
-        case UIImageOrientationLeftMirrored:
-            transform = CGAffineTransformTranslate(transform, self.size.width, 0);
-            transform = CGAffineTransformRotate(transform, M_PI_2);
-            break;
-            
-        case UIImageOrientationRight:
-        case UIImageOrientationRightMirrored:
-            transform = CGAffineTransformTranslate(transform, 0, self.size.height);
-            transform = CGAffineTransformRotate(transform, -M_PI_2);
-            break;
-        case UIImageOrientationUp:
-        case UIImageOrientationUpMirrored:
-            break;
-    }
-    
-    switch (self.imageOrientation)
-    {
-        case UIImageOrientationUpMirrored:
-        case UIImageOrientationDownMirrored:
-            transform = CGAffineTransformTranslate(transform, self.size.width, 0);
-            transform = CGAffineTransformScale(transform, -1, 1);
-            break;
-            
-        case UIImageOrientationLeftMirrored:
-        case UIImageOrientationRightMirrored:
-            transform = CGAffineTransformTranslate(transform, self.size.height, 0);
-            transform = CGAffineTransformScale(transform, -1, 1);
-            break;
-        case UIImageOrientationUp:
-        case UIImageOrientationDown:
-        case UIImageOrientationLeft:
-        case UIImageOrientationRight:
-            break;
-    }
-    
-    // Now we draw the underlying CGImage into a new context, applying the transform
-    // calculated above.
-    CGContextRef ctx = CGBitmapContextCreate(NULL, self.size.width, self.size.height,
-                                             CGImageGetBitsPerComponent(self.CGImage), 0,
-                                             CGImageGetColorSpace(self.CGImage),
-                                             CGImageGetBitmapInfo(self.CGImage));
-    CGContextConcatCTM(ctx, transform);
-    
-    switch (self.imageOrientation)
-    {
-        case UIImageOrientationLeft:
-        case UIImageOrientationLeftMirrored:
-        case UIImageOrientationRight:
-        case UIImageOrientationRightMirrored:
-            CGContextDrawImage(ctx, CGRectMake(0,0,self.size.height,self.size.width), self.CGImage);
-            break;
-            
-        default:
-            CGContextDrawImage(ctx, CGRectMake(0,0,self.size.width,self.size.height), self.CGImage);
-            break;
-    }
-    
-    CGImageRef cgimg = CGBitmapContextCreateImage(ctx);
-    UIImage *img = [UIImage imageWithCGImage:cgimg];
-    CGContextRelease(ctx);
-    CGImageRelease(cgimg);
-    
-    return img;
 }
 
 ///按给定的方向旋转图片
@@ -503,18 +447,6 @@
     return [self dw_RotateWithOrient:UIImageOrientationUpMirrored];
 }
 
-#pragma mark - 截取当前image对象rect区域内的图像
-- (UIImage *)dw_SubImageWithRect:(CGRect)rect
-{
-    CGImageRef newImageRef = CGImageCreateWithImageInRect(self.CGImage, rect);
-    
-    UIImage *newImage = [UIImage imageWithCGImage:newImageRef];
-    
-    CGImageRelease(newImageRef);
-    
-    return newImage;
-}
-
 #pragma mark - 压缩图片至指定尺寸
 - (UIImage *)dw_RescaleImageToSize:(CGSize)size
 {
@@ -555,6 +487,114 @@
     }
     
     return [self dw_RescaleImageToSize:size];
+}
+
+
+
+-(UIImage *)dw_FixOrientation
+{
+    if (self.imageOrientation == UIImageOrientationUp) return self;
+    
+    // We need to calculate the proper transformation to make the image upright.
+    // We do it in 2 steps: Rotate if Left/Right/Down, and then flip if Mirrored.
+    CGAffineTransform transform = CGAffineTransformIdentity;
+    
+    switch (self.imageOrientation)
+    {
+        case UIImageOrientationDown:
+        case UIImageOrientationDownMirrored:
+            transform = CGAffineTransformTranslate(transform, self.size.width, self.size.height);
+            transform = CGAffineTransformRotate(transform, M_PI);
+            break;
+            
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+            transform = CGAffineTransformTranslate(transform, self.size.width, 0);
+            transform = CGAffineTransformRotate(transform, M_PI_2);
+            break;
+            
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            transform = CGAffineTransformTranslate(transform, 0, self.size.height);
+            transform = CGAffineTransformRotate(transform, -M_PI_2);
+            break;
+        case UIImageOrientationUp:
+        case UIImageOrientationUpMirrored:
+            break;
+    }
+    
+    switch (self.imageOrientation)
+    {
+        case UIImageOrientationUpMirrored:
+        case UIImageOrientationDownMirrored:
+            transform = CGAffineTransformTranslate(transform, self.size.width, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+            
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRightMirrored:
+            transform = CGAffineTransformTranslate(transform, self.size.height, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+        case UIImageOrientationUp:
+        case UIImageOrientationDown:
+        case UIImageOrientationLeft:
+        case UIImageOrientationRight:
+            break;
+    }
+    
+    // Now we draw the underlying CGImage into a new context, applying the transform
+    // calculated above.
+    CGContextRef ctx = CGBitmapContextCreate(NULL, self.size.width, self.size.height,
+                                             CGImageGetBitsPerComponent(self.CGImage), 0,
+                                             CGImageGetColorSpace(self.CGImage),
+                                             CGImageGetBitmapInfo(self.CGImage));
+    CGContextConcatCTM(ctx, transform);
+    
+    switch (self.imageOrientation)
+    {
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            CGContextDrawImage(ctx, CGRectMake(0,0,self.size.height,self.size.width), self.CGImage);
+            break;
+            
+        default:
+            CGContextDrawImage(ctx, CGRectMake(0,0,self.size.width,self.size.height), self.CGImage);
+            break;
+    }
+    
+    CGImageRef cgimg = CGBitmapContextCreateImage(ctx);
+    UIImage *img = [UIImage imageWithCGImage:cgimg];
+    CGContextRelease(ctx);
+    CGImageRelease(cgimg);
+    
+    return img;
+}
+
+///交换宽和高
+static inline CGRect swapWidthAndHeight(CGRect rect)
+{
+    CGFloat swap = rect.size.width;
+    rect.size.width = rect.size.height;
+    rect.size.height = swap;
+    return rect;
+}
+@end
+
+@implementation UIImage (DWImageCanvasUtils)
+
+#pragma mark - 截取当前image对象rect区域内的图像
+- (UIImage *)dw_SubImageWithRect:(CGRect)rect
+{
+    CGImageRef newImageRef = CGImageCreateWithImageInRect(self.CGImage, rect);
+    
+    UIImage *newImage = [UIImage imageWithCGImage:newImageRef];
+    
+    CGImageRelease(newImageRef);
+    
+    return newImage;
 }
 
 #pragma mark - 指定大小生成一个平铺的图片
@@ -600,23 +640,5 @@
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
-}
-
--(BOOL)imageHasAlpha
-{
-    CGImageAlphaInfo alpha = CGImageGetAlphaInfo(self.CGImage);
-    return (alpha == kCGImageAlphaFirst ||
-            alpha == kCGImageAlphaLast ||
-            alpha == kCGImageAlphaPremultipliedFirst ||
-            alpha == kCGImageAlphaPremultipliedLast);
-}
-
-///交换宽和高
-static inline CGRect swapWidthAndHeight(CGRect rect)
-{
-    CGFloat swap = rect.size.width;
-    rect.size.width = rect.size.height;
-    rect.size.height = swap;
-    return rect;
 }
 @end
