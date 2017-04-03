@@ -13,13 +13,17 @@
  version 1.0.0
  提供条件跳转api
  多层级dismiss闪烁问题需处理
+ 
+ version 1.0.1
+ 提供导航栏透明度自动自动设置方法
  */
 
 #import <UIKit/UIKit.h>
 
-@interface UINavigationController (DWNavigationUtils)
+@interface UINavigationController (DWNavigationUtils)<UINavigationBarDelegate>
 
-@property (nonatomic ,assign) BOOL useAlphaNavBarHandler;
+///是否使用透明导航栏自动处理
+@property (nonatomic ,assign) BOOL dw_AutomaticallyHandleNavBarAlpha;
 
 
 /**
@@ -45,17 +49,30 @@
  */
 -(void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated conditionPresentVC:(UIViewController *)presentVC conditionBlock:(BOOL (^)())condition;
 
--(void)handleNavigationBarAlphaTo:(CGFloat)alpha;
+
+/**
+ 改变当前navgationBar透明度
+
+ @param alpha 目标透明度
+ @param animated 是否动画展示
+ @param duration 若需动画展示的动画时间，指定值需大于0，否则使用系统默认动画时间
+ */
+-(void)handleNavigationBarAlphaTo:(CGFloat)alpha animated:(BOOL)animated animationDuration:(CGFloat)duration;
 
 @end
 
 @interface UIViewController (DWNavigationUtils)
 
-///导航透明度
+///当前控制器对应导航栏透明度
+/**
+ 注：设置本属性并不会立即更新当前导航栏透明度，当导航控制器push或pop时导航栏会改变至此透明度。
+ 若想立即改变当前navigationBar透明度，请调用UINavigationController中提供的
+ -handleNavigationBarAlphaTo:animated:animationDuration:
+ */
 @property (nonatomic ,assign) CGFloat navigationBarAlpha;
 
 /**
- 移除模态界面并按需显示正确控制器
+ 模态返回值条件控制器
 
  @param animated 是否需要动画
  @param completion 移除结束后回调
