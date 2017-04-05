@@ -182,7 +182,6 @@
     Method originMethod = class_getInstanceMethod(self, selA);
     Method destinationMethod = class_getInstanceMethod(self, selB);
     method_exchangeImplementations(originMethod, destinationMethod);
-    
 }
 
 ///交换侧滑返回方法，以实时更改导航栏透明度
