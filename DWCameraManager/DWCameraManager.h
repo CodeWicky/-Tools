@@ -27,6 +27,14 @@
  连拍支持
  照片方向修正
  
+ version 1.0.2
+ 连拍修正
+ 照片、视频方向修正
+ 
+ version 1.0.3
+ 连拍模式文件名修复
+ 连拍修正
+ 
  */
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
@@ -118,6 +126,12 @@ typedef NS_ENUM(NSUInteger, DWCameraResolutionLevel) {///分辨率
 ///正在录制
 @property (nonatomic ,assign ,readonly ,getter = isCapturing) BOOL capturing;
 
+///正在拍照
+@property (nonatomic ,assign ,readonly ,getter = isTakingPhoto) BOOL takingPhoto;
+
+///正在连拍
+@property (nonatomic ,assign ,readonly ,getter = isQuickShoting) BOOL quickShoting;
+
 ///自动加入相册，DWCaptureTypeVideo、DWCaptureTypeMovie有效
 @property (nonatomic ,assign) BOOL autoAddToLibrary;
 
@@ -177,7 +191,7 @@ typedef NS_ENUM(NSUInteger, DWCameraResolutionLevel) {///分辨率
  1.对于重复文件名均会自动校正，以防止文件覆盖
  2.以单例类的闪光灯模式进行拍照
  */
--(void)takePhotoWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName completion:(void(^)(UIImage * photo))completion;
+-(void)takePhotoWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName completion:(void(^)(UIImage * photo,NSString * fileName))completion;
 
 
 /**
@@ -191,7 +205,7 @@ typedef NS_ENUM(NSUInteger, DWCameraResolutionLevel) {///分辨率
  注：
  1.对于重复文件名均会自动校正，以防止文件覆盖
  */
--(void)takePhotoWithWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName flashMdoe:(AVCaptureFlashMode)flashMode completion:(void (^)(UIImage * photo))completion;
+-(void)takePhotoWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName flashMdoe:(AVCaptureFlashMode)flashMode completion:(void (^)(UIImage * photo,NSString * fileName))completion;
 
 
 
@@ -205,7 +219,7 @@ typedef NS_ENUM(NSUInteger, DWCameraResolutionLevel) {///分辨率
  @param currentPhoto 每张照片完成回调
  @param completion 连拍完成回调
  */
--(void)quickShotWithCount:(NSUInteger)count saveFolderPath:(NSString *)savePath fileName:(NSString *)fileName flashMode:(AVCaptureFlashMode)flashMode currentPhoto:(void(^)(UIImage * photo,NSUInteger idx))currentPhoto completion:(void (^)(NSArray <UIImage *>* photos))completion;
+-(void)quickShotWithCount:(NSUInteger)count saveFolderPath:(NSString *)savePath fileName:(NSString *)fileName flashMode:(AVCaptureFlashMode)flashMode currentPhoto:(void(^)(UIImage * photo,NSString * fileName,NSUInteger idx))currentPhoto completion:(void (^)(NSArray <UIImage *>* photos))completion;
 
 
 /**
@@ -217,7 +231,7 @@ typedef NS_ENUM(NSUInteger, DWCameraResolutionLevel) {///分辨率
  @param currentPhoto 每张照片完成回调
  @param completion 连拍完成回调
  */
--(void)startQuickShotWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName flashMode:(AVCaptureFlashMode)flashMode currentPhoto:(void(^)(UIImage * photo,NSUInteger idx))currentPhoto completion:(void (^)(NSArray <UIImage *>* photos))completion;
+-(void)startQuickShotWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName flashMode:(AVCaptureFlashMode)flashMode currentPhoto:(void(^)(UIImage * photo,NSString * fileName,NSUInteger idx))currentPhoto completion:(void (^)(NSArray <UIImage *>* photos))completion;
 
 ///结束快速连拍（与-startQuickShotWithSaveFolderPath:fileName:flashMode:currentPhoto:completion:配合使用）
 -(void)stopQuickShot;

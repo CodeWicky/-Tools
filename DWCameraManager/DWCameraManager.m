@@ -11,6 +11,12 @@
 #import <Photos/PHPhotoLibrary.h>
 #import <UIKit/UIKit.h>
 
+#define SafeStatus \
+if (!self.actived || self.isTakingPhoto || self.isCapturing) return;
+
+#define SafeQuickShotTakingPhoto \
+if (self.isQuickShoting && !self.quickShotTakingPhoto) return;
+
 @interface DWCameraManager ()<AVCaptureFileOutputRecordingDelegate>
 {
     dispatch_queue_t sessionQueue;///统一串行队列
@@ -64,8 +70,11 @@
 ///连拍需要停止
 @property (nonatomic ,assign) BOOL quickShotNeedStop;
 
-//当前图像方向
-@property (nonatomic ,assign) UIImageOrientation currentImageOri;
+///连拍构成的拍摄
+@property (nonatomic ,assign) BOOL quickShotTakingPhoto;
+
+///需要连拍张数
+@property (nonatomic ,assign) NSUInteger targetQuickShotCount;
 
 @end
 
@@ -96,19 +105,17 @@
     }
     [CATransaction begin];
     if (interfaceOrientation == UIInterfaceOrientationLandscapeRight) {
-        self.currentImageOri = UIImageOrientationUp;
-        self.videoConn.videoOrientation = AVCaptureVideoOrientationLandscapeRight;
-    }else if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft){
-        self.currentImageOri = UIImageOrientationDown;
         self.videoConn.videoOrientation = AVCaptureVideoOrientationLandscapeLeft;
-        
+        self.photoConn.videoOrientation = AVCaptureVideoOrientationLandscapeLeft;
+    }else if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft){
+        self.videoConn.videoOrientation = AVCaptureVideoOrientationLandscapeRight;
+        self.photoConn.videoOrientation = AVCaptureVideoOrientationLandscapeRight;
     }else if (interfaceOrientation == UIDeviceOrientationPortrait){
-        self.currentImageOri = UIImageOrientationRight;
         self.videoConn.videoOrientation = AVCaptureVideoOrientationPortrait;
-        
+        self.photoConn.videoOrientation = AVCaptureVideoOrientationPortrait;
     }else if (interfaceOrientation == UIDeviceOrientationPortraitUpsideDown){
-        self.currentImageOri = UIImageOrientationLeft;
         self.videoConn.videoOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
+        self.photoConn.videoOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
     }
     [CATransaction commit];
 }
@@ -140,18 +147,18 @@
     });
 }
 
--(void)takePhotoWithWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName flashMdoe:(AVCaptureFlashMode)flashMode completion:(void (^)(UIImage *))completion {
-    if (!self.actived) {
-        return;
-    }
+-(void)takePhotoWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName flashMdoe:(AVCaptureFlashMode)flashMode completion:(void (^)(UIImage *,NSString *))completion {
+    if (!self.actived) return;
+    if (self.isTakingPhoto || self.isCapturing) return;
+    if (self.isQuickShoting && !self.quickShotTakingPhoto) return;
+    if (!self.quickShotTakingPhoto) _takingPhoto = YES;
+    
+    NSLog(@"%@",fileName);
+    
     savePath = [self handleSavePath:savePath];
     fileName = [self handleFileName:fileName extention:@"jpg" atPath:savePath];
     dispatch_async(sessionQueue, ^{
         NSLog(@"begin");
-        // Update the orientation on the still image output video connection before capturing.
-        AVCaptureConnection * connection = [self.photoOutput connectionWithMediaType:AVMediaTypeVideo];
-        connection.videoOrientation = self.videoLayer.connection.videoOrientation;
-        
         if (self.takingPhotoBlock) {
             __weak typeof(self)weakSelf = self;
             self.takingPhotoBlock(weakSelf, fileName);
@@ -162,12 +169,11 @@
         [self setFlashMode:flashMode forDevice:device];
         
         // Capture a still image.
-        [self.photoOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
+        [self.photoOutput captureStillImageAsynchronouslyFromConnection:self.photoConn completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
             if (imageDataSampleBuffer)
             {
                 NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
                 UIImage *image = [[UIImage alloc] initWithData:imageData];
-                image = [[UIImage alloc]initWithCGImage:image.CGImage scale:1.0 orientation:self.currentImageOri];
                 if (self.autoAddToLibrary) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"
@@ -178,46 +184,62 @@
                     [UIImageJPEGRepresentation(image, 1.0) writeToFile:[NSString stringWithFormat:@"%@/%@",savePath,fileName] atomically:YES];
                 }
                 if (completion) {
-                    completion(image);
+                    completion(image,fileName);
                 }
+                _takingPhoto = NO;
             }
         }];
     });
 }
 
--(void)takePhotoWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName completion:(void (^)(UIImage *))completion {
-    [self takePhotoWithWithSaveFolderPath:savePath fileName:fileName flashMdoe:self.flashMode completion:completion];
+-(void)takePhotoWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName completion:(void (^)(UIImage *,NSString *))completion {
+    [self takePhotoWithSaveFolderPath:savePath fileName:fileName flashMdoe:self.flashMode completion:completion];
 }
 
 -(void)takePhotoWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName {
     [self takePhotoWithSaveFolderPath:savePath fileName:fileName completion:nil];
 }
 
--(void)quickShotWithCount:(NSUInteger)count saveFolderPath:(NSString *)savePath fileName:(NSString *)fileName flashMode:(AVCaptureFlashMode)flashMode currentPhoto:(void (^)(UIImage * , NSUInteger))currentPhoto completion:(void (^)(NSArray<UIImage *> *))completion {
+-(void)quickShotWithCount:(NSUInteger)count saveFolderPath:(NSString *)savePath fileName:(NSString *)fileName flashMode:(AVCaptureFlashMode)flashMode currentPhoto:(void (^)(UIImage * ,NSString *, NSUInteger))currentPhoto completion:(void (^)(NSArray<UIImage *> *))completion {
+    if (!self.actived) return;
+    if (self.isTakingPhoto || self.isCapturing || self.isQuickShoting) return;
+    _quickShoting = YES;
+    savePath = [self handleSavePath:savePath];
+    fileName = [self handleFileName:fileName extention:@"jpg" atPath:savePath];
+    NSLog(@"save Path:%@",savePath);
     __block NSUInteger idx = 0;
     NSMutableArray * photos = [NSMutableArray array];
     dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, sessionQueue);
     dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC, 0 * NSEC_PER_SEC);
     dispatch_source_set_event_handler(timer, ^{
-        [self takePhotoWithWithSaveFolderPath:savePath fileName:fileName flashMdoe:flashMode completion:^(UIImage * photo) {
-            idx++;
+        self.quickShotTakingPhoto = YES;
+        NSString * fullFillName = fixString(fileName, (int)idx);
+        idx++;
+        [self takePhotoWithSaveFolderPath:savePath fileName:fullFillName flashMdoe:flashMode completion:^(UIImage * photo,NSString * fileName) {
             if (currentPhoto) {
-                currentPhoto(photo,idx);
+                currentPhoto(photo,fileName,photos.count);
             }
             [photos addObject:photo];
-            if (idx == count || self.quickShotNeedStop) {
+            if (photos.count == self.targetQuickShotCount) {
                 self.quickShotNeedStop = NO;
+                self.targetQuickShotCount = -1;
                 if (completion) {
                     completion(photos);
                 }
-                dispatch_source_cancel(timer);
             }
         }];
+        if (idx == count || self.quickShotNeedStop) {
+            self.quickShotNeedStop = NO;
+            self.targetQuickShotCount = idx;
+            _quickShoting = NO;
+            dispatch_source_cancel(timer);
+        }
+        self.quickShotTakingPhoto = NO;
     });
     dispatch_resume(timer);
 }
 
--(void)startQuickShotWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName flashMode:(AVCaptureFlashMode)flashMode currentPhoto:(void (^)(UIImage *, NSUInteger))currentPhoto completion:(void (^)(NSArray<UIImage *> *))completion {
+-(void)startQuickShotWithSaveFolderPath:(NSString *)savePath fileName:(NSString *)fileName flashMode:(AVCaptureFlashMode)flashMode currentPhoto:(void (^)(UIImage *, NSString *,NSUInteger))currentPhoto completion:(void (^)(NSArray<UIImage *> *))completion {
     [self quickShotWithCount:MAXFLOAT saveFolderPath:savePath fileName:fileName flashMode:flashMode currentPhoto:currentPhoto completion:completion];
 }
 
@@ -349,14 +371,16 @@ static DWCameraManager * manager = nil;
 
 -(NSString *)handleFileName:(NSString *)fileName extention:(NSString *)extention atPath:(NSString *)path {
     NSString * fileFullName = [self handleFileName:fileName extention:extention];
-    if (![self.fileMgr fileExistsAtPath:[NSString stringWithFormat:@"%@/%@",fileFullName,path]]) {
+    if (![self.fileMgr fileExistsAtPath:[NSString stringWithFormat:@"%@/%@",path,fileFullName]]) {
         return fileFullName;
     }
     if (fileName.length) {
-        int i = 0;
+        int i = -1;
+        NSString * fileExtention = [fileName pathExtension];
+        NSString * pureFileName = [fileName stringByDeletingPathExtension];
         do {
-            fileName = [NSString stringWithFormat:@"%@_%2d",fileName,i];
-            fileFullName = [self handleFileName:fileName extention:extention];
+            i++;
+            fileFullName = [[NSString stringWithFormat:@"%@_%02d",pureFileName,i] stringByAppendingPathExtension:fileExtention];
         } while ([self.fileMgr fileExistsAtPath:[NSString stringWithFormat:@"%@/%@",path,fileFullName]]);
     } else {
         do {
@@ -374,6 +398,14 @@ static DWCameraManager * manager = nil;
             return @"mov";
     }
 }
+
+static inline NSString * fixString(NSString * str ,int i) {
+    NSString * extention = [str pathExtension];
+    NSString * pureStr = [str stringByDeletingPathExtension];
+    pureStr = [pureStr stringByAppendingString:[NSString stringWithFormat:@"_%02d",i]];
+    return [pureStr stringByAppendingPathExtension:extention];
+}
+
 
 #pragma mark --- 设置闪光灯 ---
 -(void)setFlashMode:(AVCaptureFlashMode)flashMode forDevice:(AVCaptureDevice *)device
@@ -503,6 +535,7 @@ static inline NSString * levelString(DWCameraResolutionLevel level) {
     }
 }
 
+#pragma mark --- 设备属性修改 ---
 -(void)changeDeviceProperty:(AVCaptureDevice *)device withBlock:(void(^)(AVCaptureDevice * device))block {
     if (!block) {
         return;
@@ -519,7 +552,6 @@ static inline NSString * levelString(DWCameraResolutionLevel level) {
     if (!_videoLayer) {
         _videoLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.captureSession];
         _videoLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-//        [[_videoLayer connection] setVideoOrientation:AVCaptureVideoOrientationPortrait];
     }
     if (self.mediaType & DWCaptureTypeVideo) {
         return _videoLayer;
