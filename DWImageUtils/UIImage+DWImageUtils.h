@@ -12,6 +12,10 @@
  
  version 1.0.0
  按功能分类扩展
+ 
+ version 1.0.1
+ 修复部分绘制模糊问题
+ 修复subRect中因scale原因导致图片切割错误
  */
 
 #import <UIKit/UIKit.h>

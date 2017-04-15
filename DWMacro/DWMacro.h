@@ -66,6 +66,29 @@
 ///选项栏高度
 #define DWHeightOfTabBar 49
 
+///以point和size生成Frame
+#define CGRectMakeWithPointAndSize(point,size) (CGRect){point, size};
+
+/****** 沙盒相关 ******/
+///沙盒主路径
+#define DWHomeDir NSHomeDirectory()
+
+///沙盒Documents路径
+#define DWDocumentsDir [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject]
+
+///沙盒Library路径
+#define DWLibraryDir [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) firstObject]
+
+///沙盒Prefenreces路径
+#define DWPrefenencesDir [DWLibraryDir stringByAppendingPathComponent:@"Preferences"]
+
+///沙盒Caches路径
+#define DWCachesDir [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject]
+
+///沙盒Tmp路径
+#define DWTmpDir NSTemporaryDirectory()
+
+
 
 //MARK: - Additional Function
 

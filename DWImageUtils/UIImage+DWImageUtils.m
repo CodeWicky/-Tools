@@ -407,7 +407,7 @@
             return self;
     }
     
-    UIGraphicsBeginImageContext(bnds.size);
+    UIGraphicsBeginImageContextWithOptions(bnds.size, NO, [UIScreen mainScreen].scale);
     CGContextRef ctxt = UIGraphicsGetCurrentContext();
     
     switch (orient)
@@ -452,7 +452,7 @@
 {
     CGRect rect = (CGRect){CGPointZero, size};
     
-    UIGraphicsBeginImageContext(rect.size);
+    UIGraphicsBeginImageContextWithOptions(size, NO, [UIScreen mainScreen].scale);
     
     [self drawInRect:rect];
     
@@ -586,14 +586,13 @@ static inline CGRect swapWidthAndHeight(CGRect rect)
 @implementation UIImage (DWImageCanvasUtils)
 
 #pragma mark - 截取当前image对象rect区域内的图像
-- (UIImage *)dw_SubImageWithRect:(CGRect)rect
-{
-    CGImageRef newImageRef = CGImageCreateWithImageInRect(self.CGImage, rect);
-    
-    UIImage *newImage = [UIImage imageWithCGImage:newImageRef];
-    
+- (UIImage *)dw_SubImageWithRect:(CGRect)rect {
+    ///防止处理过image的scale不为1情况rect错误
+    CGFloat scale = self.scale;
+    CGRect scaleRect = CGRectMake(rect.origin.x * scale, rect.origin.y * scale, rect.size.width * scale, rect.size.height * scale);
+    CGImageRef newImageRef = CGImageCreateWithImageInRect(self.CGImage, scaleRect);
+    UIImage *newImage = [[UIImage imageWithCGImage:newImageRef] dw_RescaleImageToSize:rect.size];
     CGImageRelease(newImageRef);
-    
     return newImage;
 }
 
@@ -603,24 +602,16 @@ static inline CGRect swapWidthAndHeight(CGRect rect)
     UIView *tempView = [[UIView alloc] init];
     tempView.bounds = (CGRect){CGPointZero, size};
     tempView.backgroundColor = [UIColor colorWithPatternImage:self];
-    
-    UIGraphicsBeginImageContext(size);
-    [tempView.layer renderInContext:UIGraphicsGetCurrentContext()];
-    UIImage *bgImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return bgImage;
+    return [UIImage dw_ImageFromView:tempView];
 }
 
 #pragma mark - UIView转化为UIImage
 +(UIImage *)dw_ImageFromView:(UIView *)view
 {
-    CGFloat scale = [UIScreen mainScreen].scale;
-    UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, scale);
+    UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, [UIScreen mainScreen].scale);
     [view.layer renderInContext:UIGraphicsGetCurrentContext()];
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-    
     return image;
 }
 
@@ -634,7 +625,7 @@ static inline CGRect swapWidthAndHeight(CGRect rect)
     CGFloat secondWidth = CGImageGetWidth(secondImageRef);
     CGFloat secondHeight = CGImageGetHeight(secondImageRef);
     CGSize mergedSize = CGSizeMake(MAX(firstWidth, secondWidth), MAX(firstHeight, secondHeight));
-    UIGraphicsBeginImageContext(mergedSize);
+    UIGraphicsBeginImageContextWithOptions(mergedSize, NO, [UIScreen mainScreen].scale);
     [firstImage drawInRect:CGRectMake(0, 0, firstWidth, firstHeight)];
     [secondImage drawInRect:CGRectMake(0, 0, secondWidth, secondHeight)];
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
