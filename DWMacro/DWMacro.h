@@ -67,7 +67,7 @@
 #define DWHeightOfTabBar 49
 
 ///以point和size生成Frame
-#define CGRectMakeWithPointAndSize(point,size) (CGRect){point, size};
+#define CGRectMakeWithPointAndSize(point,size) (CGRect){point, size}
 
 /****** 沙盒相关 ******/
 ///沙盒主路径
