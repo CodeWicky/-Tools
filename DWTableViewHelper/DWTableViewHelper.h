@@ -51,8 +51,10 @@
 -(void)dw_TableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath;
 -(CGFloat)dw_TableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section;
 -(UIView *)dw_TableView:(__kindof UITableView *)tableView viewForHeaderInSection:(NSInteger)section;
+-(NSString *)dw_TableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section;
 -(CGFloat)dw_TableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section;
 -(UIView *)dw_TableView:(__kindof UITableView *)tableView viewForFooterInSection:(NSInteger)section;
+-(NSString *)dw_TableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section;
 -(void)dw_TableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath;
 -(CGFloat)dw_TableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath;
 -(UITableViewCell *)dw_TableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
@@ -60,6 +62,7 @@
 -(NSInteger)dw_NumberOfSectionsInTableView:(UITableView *)tableView;
 -(void)dw_ScrollViewDidScroll:(UIScrollView *)scrollView;
 -(UITableViewCellEditingStyle)dw_TableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath;
+-(NSArray<NSString *> *)dw_SectionIndexTitlesForTableView:(UITableView *)tableView;
 @end
 
 #pragma mark --- cell 基础属性协议---

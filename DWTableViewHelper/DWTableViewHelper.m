@@ -209,6 +209,7 @@ static UIImage * ImageNull = nil;
     }
 }
 
+#pragma mark --- delegate Map Start ---
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (DWRespond) {
@@ -330,10 +331,16 @@ static UIImage * ImageNull = nil;
     return 0.01;
 }
 
--(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-{
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     if (DWRespond) {
         return [DWDelegate dw_TableView:tableView viewForHeaderInSection:section];
+    }
+    return nil;
+}
+
+-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if (DWRespond) {
+        return [DWDelegate dw_TableView:tableView titleForHeaderInSection:section];
     }
     return nil;
 }
@@ -357,6 +364,13 @@ static UIImage * ImageNull = nil;
     return nil;
 }
 
+-(NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+    if (DWRespond) {
+        return [DWDelegate dw_TableView:tableView titleForFooterInSection:section];
+    }
+    return nil;
+}
+
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     DWRespondTo(MYFParas(scrollView,nil));
@@ -368,6 +382,15 @@ static UIImage * ImageNull = nil;
     }
     return UITableViewCellEditingStyleDelete | UITableViewCellEditingStyleInsert;
 }
+
+-(NSArray<NSString *> *)sectionIndexTitlesForTableView:(UITableView *)tableView {
+    if (DWRespond) {
+        return [DWDelegate dw_SectionIndexTitlesForTableView:tableView];
+    }
+    return nil;
+}
+
+#pragma mark --- delegate Map End ---
 
 -(void)setDataSource:(NSArray<DWTableViewHelperModel *> *)dataSource
 {

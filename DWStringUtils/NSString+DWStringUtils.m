@@ -11,10 +11,7 @@
 @implementation NSString (DWStringUtils)
 +(NSString *)stringWithMetaString:(NSString *)metaString count:(NSUInteger)count
 {
-    NSString * string = [NSString stringWithFormat:@"%.0f",pow(10, count)];
-    string = [string substringFromIndex:1];
-    string = [string stringByReplacingOccurrencesOfString:@"0" withString:metaString];
-    return string;
+    return [@"" stringByPaddingToLength:(metaString.length * count) withString:metaString startingAtIndex:0];
 }
 
 -(CGSize)stringSizeWithFont:(UIFont *)font widthLimit:(CGFloat)widthLimit heightLimit:(CGFloat)heightLimit
@@ -43,5 +40,29 @@
     NSString * pureStr = [self stringByDeletingPathExtension];
     pureStr = [pureStr stringByAppendingString:[NSString stringWithFormat:@"_%02lu",idx]];
     return [pureStr stringByAppendingPathExtension:extention];
+}
+
+-(NSString *)dw_TransferChineseToPinYinWithWhiteSpace:(BOOL)needWhiteSpace {
+    NSMutableString *mutableString = [NSMutableString stringWithString:self];
+    CFStringTransform((CFMutableStringRef)mutableString, NULL, kCFStringTransformToLatin, false);
+    NSString * pinyin = [mutableString stringByFoldingWithOptions:NSDiacriticInsensitiveSearch locale:[NSLocale currentLocale]];
+    if (!needWhiteSpace) {
+        pinyin = [pinyin stringByReplacingOccurrencesOfString:@" " withString:@""];
+    }
+    return pinyin;
+}
+
+-(NSArray<NSTextCheckingResult *> *)dw_RangesConfirmToPattern:(NSString *)pattern {
+    NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:nil];
+    return [regex matchesInString:self options:0 range:NSMakeRange(0, self.length)];
+}
+
+-(NSArray<NSString *> *)dw_SubStringConfirmToPattern:(NSString *)pattern {
+    NSArray * ranges = [self dw_RangesConfirmToPattern:pattern];
+    NSMutableArray * strings = [NSMutableArray array];
+    for (NSTextCheckingResult * result in ranges) {
+        [strings addObject:[self substringWithRange:result.range]];
+    }
+    return strings;
 }
 @end

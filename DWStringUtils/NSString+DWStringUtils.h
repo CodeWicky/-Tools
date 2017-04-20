@@ -16,6 +16,9 @@
  提供以指定长度生成随机字符串的api
  提供文件名序数修复api
  
+ version 1.0.1
+ 添加汉字转拼音api
+ 添加正则匹配结果api
  */
 
 #import <UIKit/UIKit.h>
@@ -38,4 +41,13 @@
 
 ///给文件名添加序数（文件名重复时使用）
 -(NSString *)dw_FixFileNameStringWithIndex:(NSUInteger)idx;
+
+///汉字转拼音（是否需要空格）
+-(NSString *)dw_TransferChineseToPinYinWithWhiteSpace:(BOOL)needWhiteSpace;
+
+///返回整串字符串中符合正则的结果集
+-(NSArray <NSTextCheckingResult *> *)dw_RangesConfirmToPattern:(NSString *)pattern;
+
+///符合正则的子串集
+-(NSArray <NSString *> *)dw_SubStringConfirmToPattern:(NSString *)pattern;
 @end
