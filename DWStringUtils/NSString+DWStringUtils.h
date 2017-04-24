@@ -19,11 +19,18 @@
  version 1.0.1
  添加汉字转拼音api
  添加正则匹配结果api
+ 
+ version 1.0.2
+ 添加数组按拼音排序方法
  */
 
 #import <UIKit/UIKit.h>
 
 @interface NSString (DWStringUtils)
+
+///转拼音后的字符串
+@property (nonatomic ,copy) NSString * pinyinString;
+
 ///生成由N个元字符串组成的字符串
 /**
  metaString     元字符串，组成字符串的元素
@@ -50,4 +57,7 @@
 
 ///符合正则的子串集
 -(NSArray <NSString *> *)dw_SubStringConfirmToPattern:(NSString *)pattern;
+
+///将数组内字符串以拼音排序
++(NSMutableArray *)dw_SortedStringsInPinyin:(NSArray <NSString *>*)strings;
 @end
