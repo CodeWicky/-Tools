@@ -109,7 +109,7 @@
 
 #pragma mark --- tool method ---
 ///将中文与英文以空格分开
--(NSMutableString *)fixStringToSeperateChineseAndLetter{
+-(NSMutableString *)fixStringToSeperateChineseAndLetter {
     NSMutableString * newString = [NSMutableString stringWithString:self];
     NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:@"[\\u4E00-\\u9FA5]+" options:0 error:nil];
     ///获取匹配结果
