@@ -251,7 +251,7 @@ static UIImage * ImageNull = nil;
         return nil;
     }
     if (!cellClass) {
-        NSAssert(NO, @"cannot load a cellClass from cellClassStr,check the cellClassStr you have set");
+        NSAssert(NO, @"cannot load a cellClass from %@,check the cellClassStr you have set",model.cellClassStr.length?model.cellClassStr:self.cellClassStr);
         return nil;
     }
     __kindof DWTableViewHelperCell * cell = [tableView dequeueReusableCellWithIdentifier:cellIDTemp];
@@ -635,6 +635,7 @@ static UIImage * defaultUnselectIcon = nil;
 {
     self.multipleSelectionBackgroundView = [UIView new];
     self.selectedBackgroundView = [UIView new];
+    self.selectionStyle = UITableViewCellSelectionStyleNone;
 }
 
 -(void)setupConstraints

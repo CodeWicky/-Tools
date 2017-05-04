@@ -38,6 +38,9 @@
  
  version 1.0.8
  补充组头视图、尾视图行高代理映射并简化代理链
+ 
+ version 1.0.9
+ cell基类添加父类实现强制调用宏、断言中给出未能加载的cell类名
  */
 
 #import <UIKit/UIKit.h>
@@ -197,8 +200,11 @@
 @property (nonatomic ,strong)__kindof DWTableViewHelperModel * model;
 
 ///设置子视图
--(void)setupUI;
+-(void)setupUI NS_REQUIRES_SUPER;
 
 ///设置子视图约束
--(void)setupConstraints;
+-(void)setupConstraints NS_REQUIRES_SUPER;
+
+///设置数据模型
+-(void)setModel:(__kindof DWTableViewHelperModel *)model NS_REQUIRES_SUPER;
 @end
