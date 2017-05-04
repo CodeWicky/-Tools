@@ -6,6 +6,10 @@
 //  Copyright © 2017年 Wicky. All rights reserved.
 //
 
+/**
+ 提供数据模型
+ */
+
 #import <UIKit/UIKit.h>
 #import <AddressBook/AddressBook.h>
 
@@ -106,8 +110,10 @@
 
 #pragma mark --- 存取用属性 ---
 ///原始对象
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
 @property (nonatomic ,assign) ABRecordRef originRecord;
-
+#pragma clang diagnostic pop
 ///唯一标识
 @property (nonatomic ,assign) int32_t recordID;
 
@@ -117,36 +123,49 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"
 
+///以ABRecord实例化方法
 -(instancetype)initWithABRecord:(ABRecordRef)ABRecord;
 
+///将模型转化为ABRecord对象
 -(void)transferToABRecordWithCompletion:(void(^)(ABRecordRef aRecord))completion;
 #pragma clang diagnostic pop
 
+///重置联系人更新状态
+/**
+ 注：
+ 模型属性发生改变时，会改变对应的ABRecord对象，此时模型会被标记为需要更新状态
+ */
 -(void)setUpdated;
+
 @end
 
 @interface DWContactLabelModel : NSObject
 
+///标签名
 @property (nonatomic ,copy) NSString * label;
 
+///标签值
 @property (nonatomic ,strong) id labelValue;
 
 @end
 
 @interface DWContactLabelStringModel : DWContactLabelModel
 
+///字符串类型标签值
 @property (nonatomic ,strong) NSString * labelValue;
 
 @end
 
 @interface DWContactLabelDictionaryModel : DWContactLabelModel
 
+///字典类型标签值
 @property (nonatomic ,strong) NSDictionary * labelValue;
 
 @end
 
 @interface DWContactLabelDateModel : DWContactLabelModel
 
+///日期类型标签值
 @property (nonatomic ,strong) NSDate * labelValue;
 
 @end

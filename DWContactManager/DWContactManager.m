@@ -43,6 +43,9 @@ static DWContactManager * manager = nil;
         // 3.创建通讯录进行授权
         ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, NULL);
         ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
+            if (error) {
+                NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
+            }
             authorized(granted);
         });
     } else if (status == kABAuthorizationStatusAuthorized) {
@@ -158,7 +161,12 @@ static DWContactManager * manager = nil;
     __block BOOL success = NO;
     self.isChangingAB = YES;
     [personModel transferToABRecordWithCompletion:^(ABRecordRef aRecord) {
-        success = ABAddressBookAddRecord(self.addressBook, aRecord, nil);
+        CFErrorRef error = NULL;
+        success = ABAddressBookAddRecord(self.addressBook, aRecord, &error);
+        if (error) {
+            NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
+            CFRelease(error);
+        }
         self.isChangingAB = NO;
     }];
     return success;
@@ -171,7 +179,12 @@ static DWContactManager * manager = nil;
     BOOL success = NO;
     self.isChangingAB = YES;
     if (personModel.originRecord) {
-        success = ABAddressBookRemoveRecord(self.addressBook, personModel.originRecord, nil);
+        CFErrorRef error = NULL;
+        success = ABAddressBookRemoveRecord(self.addressBook, personModel.originRecord, &error);
+        if (error) {
+            NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
+            CFRelease(error);
+        }
         self.isChangingAB = NO;
     }
     return success;
@@ -191,7 +204,13 @@ static DWContactManager * manager = nil;
     if (self.isChangingAB) {
         return NO;
     }
-    return ABAddressBookSave(self.addressBook, nil);
+    CFErrorRef error = NULL;
+    BOOL success = ABAddressBookSave(self.addressBook, &error);
+    if (error) {
+        NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
+        CFRelease(error);
+    }
+    return success;
 }
 
 -(void)dropAddressBookChange {
@@ -381,7 +400,12 @@ static DWContactManager * manager = nil;
 #pragma mark --- overwrite ---
 -(ABAddressBookRef)addressBook {
     if (!_addressBook) {
-        _addressBook = ABAddressBookCreateWithOptions(NULL, NULL);
+        CFErrorRef error = NULL;
+        _addressBook = ABAddressBookCreateWithOptions(NULL, &error);
+        if (error) {
+            NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
+            CFRelease(error);
+        }
     }
     return _addressBook;
 }

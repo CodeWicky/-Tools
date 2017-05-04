@@ -6,6 +6,22 @@
 //  Copyright © 2017年 Wicky. All rights reserved.
 //
 
+/**
+ DWContactManager
+ 通讯录操作工具类
+ 为通讯录授权及增删改查提供便捷方法
+ 提供更贴近中国人姓名的排序方式
+ 
+ version 1.0.0
+ 提供权限获取接口
+ 提供获取全部联系人接口
+ 提供联系人分组排序接口
+ 提供姓名多音字配置接口
+ 提供友好错误信息
+ 
+ */
+
+
 #import <Foundation/Foundation.h>
 #import "DWContactModel.h"
 
