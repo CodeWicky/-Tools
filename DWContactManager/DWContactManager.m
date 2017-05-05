@@ -376,6 +376,22 @@ static DWContactManager * manager = nil;
     }
 }
 
+-(void)createAddressBook {
+    CFErrorRef error = NULL;
+    _addressBook = ABAddressBookCreateWithOptions(NULL, &error);
+    if (error) {
+        NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
+        CFRelease(error);
+    } else {
+        ABAddressBookRegisterExternalChangeCallback(_addressBook, ContactChangeCallBack, nil);
+    }
+}
+
+void ContactChangeCallBack(ABAddressBookRef addressBook,CFDictionaryRef info,void *context) {
+    [manager setNeedsRefetch];
+    [manager fetchSortedContactsInGroupWitnCompletion:nil];
+}
+
 #pragma mark --- singleton ---
 +(instancetype)shareManager {
     static dispatch_once_t onceToken;
@@ -398,19 +414,25 @@ static DWContactManager * manager = nil;
 }
 
 #pragma mark --- overwrite ---
+-(instancetype)init {
+    if (self = [super init]) {
+        [self createAddressBook];
+    }
+    return self;
+}
+
+-(void)dealloc {
+    ABAddressBookUnregisterExternalChangeCallback(_addressBook, ContactChangeCallBack, nil);
+}
+
+#pragma mark --- setter/getter ---
 -(ABAddressBookRef)addressBook {
     if (!_addressBook) {
-        CFErrorRef error = NULL;
-        _addressBook = ABAddressBookCreateWithOptions(NULL, &error);
-        if (error) {
-            NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
-            CFRelease(error);
-        }
+        [self createAddressBook];
     }
     return _addressBook;
 }
 
-#pragma mark --- setter/getter ---
 -(NSMutableDictionary *)correctPinYin {
     if (!_correctPinYin) {
         NSString * path = [[NSBundle mainBundle] pathForResource:@"DWContactManagerResource" ofType:@"bundle"];
