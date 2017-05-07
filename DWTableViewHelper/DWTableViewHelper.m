@@ -7,7 +7,6 @@
 //
 
 #import "DWTableViewHelper.h"
-#import <objc/runtime.h>
 
 #define SeperatorColor [UIColor lightGrayColor]
 
