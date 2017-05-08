@@ -99,6 +99,7 @@ static DWContactManager * manager = nil;
 }
 
 -(void)setNeedsRefetch {
+    [self createAddressBook];
     self.allContacts = nil;
     self.sortedContacts = nil;
     self.sortedKeys = nil;
