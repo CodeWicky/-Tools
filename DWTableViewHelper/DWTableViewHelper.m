@@ -7,6 +7,7 @@
 //
 
 #import "DWTableViewHelper.h"
+#import <objc/runtime.h>
 
 #define SeperatorColor [UIColor lightGrayColor]
 
@@ -763,7 +764,7 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
         NSArray<NSLayoutConstraint *> *edgeConstraints;
         if (isSystemVersionEqualOrGreaterThen10_2) {
             ///为了避免冲突，修改优先级为optional
-            widthConstraint.priority = UILayoutPriorityRequired - 1;
+             widthConstraint.priority = UILayoutPriorityRequired - 1;
             
             ///添加4个约束
             NSLayoutConstraint *leftConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:cell attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
@@ -854,15 +855,18 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
         id animation = nil;
         if (DWDelegate && [DWDelegate respondsToSelector:@selector(dw_TableView:showAnimationWithCell:forRowAtIndexPath:)]) {
             animation = [DWDelegate dw_TableView:tableView showAnimationWithCell:cell forRowAtIndexPath:indexPath];
-            if (!animation) {
-                animation = self.cellShowAnimation;
-            }
-            if (animation) {
-                if ([animation isKindOfClass:[CAAnimation class]]) {
-                    [cell.layer addAnimation:animation forKey:@"animation"];
-                } else if ([animation isKindOfClass:NSClassFromString(@"DWAnimationAbstraction")]) {
-                    [animation performSelector:@selector(start)];
-                }
+        }
+        if (!animation) {
+            animation = self.cellShowAnimation;
+        }
+        if (animation) {
+            if ([animation isKindOfClass:[CAAnimation class]]) {
+                [cell.layer addAnimation:animation forKey:@"animation"];
+            } else if ([animation isKindOfClass:NSClassFromString(@"DWAnimationAbstraction")]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+                [animation performSelector:NSSelectorFromString(@"startAnimationWithContent:") withObject:cell];
+#pragma clang diagnostic pop
             }
         }
     }

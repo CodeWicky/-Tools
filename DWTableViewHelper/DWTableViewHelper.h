@@ -56,6 +56,9 @@
  添加屏幕判断，当位置方向时，默认返回竖屏
  额外补充动画代理、支持CAAnimation及DWAnimation
  
+ version 1.1.2
+ 展示动画逻辑修改，DWAnimation动画展示方法替换
+ 
  */
 
 #import <UIKit/UIKit.h>
