@@ -149,3 +149,54 @@ static inline void sortHeap (NSMutableArray * arr,DWComparator comparator) {
 }
 
 @end
+
+@implementation NSArray (DWArrayKeyPathUtils)
+
+-(id)dw_GetObjectWithKeyPath:(NSString *)path action:(DWArrayKeyPathActionType)action {
+    if (action == DWArrayKeyPathActionTypeUnionInArray || action == DWArrayKeyPathActionTypeDistinctUnionInArray) {
+        BOOL isArray = YES;
+        for (id obj in self) {
+            if (![obj isKindOfClass:[NSArray class]]) {
+                isArray = NO;
+            }
+        }
+        if (!isArray) {
+            NSAssert(NO, @"to use %ld action you should make sure the array is made up of NSArray",action);
+            return nil;
+        }
+    }
+    NSString * actionStr = StringFromAction(action);
+    if (!actionStr.length) {
+        NSAssert(NO, @"cannot perform an action on %ld",action);
+        return nil;
+    }
+    if (!path.length) {
+        path = @"self";
+    }
+    return [self valueForKeyPath:[NSString stringWithFormat:@"%@%@",actionStr,path]];
+}
+
+static inline NSString * StringFromAction(DWArrayKeyPathActionType action) {
+    switch (action) {
+        case DWArrayKeyPathActionTypeSum:
+            return @"@sum.";
+        case DWArrayKeyPathActionTypeAverage:
+            return @"@avg.";
+        case DWArrayKeyPathActionTypeMaximum:
+            return @"@max.";
+        case DWArrayKeyPathActionTypeMinimum:
+            return @"@min.";
+        case DWArrayKeyPathActionTypeUnion:
+            return @"@unionOfObjects.";
+        case DWArrayKeyPathActionTypeDistinctUnion:
+            return @"@distinctUnionOfObjects.";
+        case DWArrayKeyPathActionTypeUnionInArray:
+            return @"@unionOfArrays.";
+        case DWArrayKeyPathActionTypeDistinctUnionInArray:
+            return @"@distinctUnionOfArrays.";
+        default:
+            return nil;
+    }
+}
+
+@end
