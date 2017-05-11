@@ -7,6 +7,7 @@
 //
 
 #import "UIBezierPath+DWPathUtils.h"
+#import <CoreText/CoreText.h>
 
 @implementation DWPathMaker
 
@@ -123,7 +124,7 @@
 }
 
 @end
-@implementation UIBezierPath (DWPathUtils)
+@implementation UIBezierPath (DWPathMakerUtils)
 
 +(instancetype)bezierPathWithPathMaker:(void (^)(DWPathMaker *maker))pathMaker
 {
@@ -178,6 +179,73 @@
         [self addLineToPoint:CGPointMake(originPoint.x + step, originPoint.y - deltaSinValueWith(deltaX, A, Omega, Phi, K, step))];
     }
 }
+
+static inline CGFloat deltaSinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K ,CGFloat step){
+    return sinValueWith(x, A, Omega, Phi, K) - sinValueWith(x - step, A, Omega, Phi, K);
+}
+
+///根据两点、半径、顺逆时针获取圆心
+-(CGPoint)getCenterFromFirstPoint:(CGPoint)firstP
+                      secondPoint:(CGPoint)secondP
+                           radius:(CGFloat)radius
+                        clockwise:(BOOL)clockwise
+                     moreThanhalf:(BOOL)moreThanHalf
+{
+    CGFloat centerX = 0.5 * secondP.x - 0.5 * firstP.x;
+    CGFloat centerY = 0.5 * firstP.y - 0.5 * secondP.y;
+    centerX = round6f(centerX);
+    centerY = round6f(centerY);
+    radius = round6f(radius);
+    ///获取相似三角形相似比例
+    CGFloat scale = sqrt((pow(radius, 2) - (pow(centerX, 2) + pow(centerY, 2))) / (pow(centerX, 2) + pow(centerY, 2)));
+    scale = round6f(scale);
+    if (clockwise != moreThanHalf) {
+        return CGPointMake(centerX + centerY * scale + firstP.x, - centerY + centerX * scale + firstP.y);
+    }
+    else
+    {
+        return CGPointMake(centerX - centerY * scale + firstP.x, - centerY - centerX * scale + firstP.y);
+    }
+}
+
+static inline CGFloat sinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K){
+    return A * sinf(Omega * x + Phi) + K;
+}
+
+///保留6位小数
+CGFloat round6f(CGFloat x){
+    return roundf(x * 1000000) / 1000000.0;
+}
+
+///获取第二点相对第一点的角度
+-(CGFloat)getAngleFromFirstPoint:(CGPoint)firstP
+                         secondP:(CGPoint)secondP
+{
+    CGFloat deltaX = secondP.x - firstP.x;
+    CGFloat deltaY = secondP.y - firstP.y;
+    deltaX = round6f(deltaX);
+    deltaY = round6f(deltaY);
+    if (deltaX > 0) {
+        if (deltaY >= 0) {
+            return atanf(deltaY / deltaX);
+        }
+        return M_PI * 2 + atanf(deltaY / deltaX);
+    }
+    if (deltaX == 0) {
+        if (deltaY >= 0) {
+            return M_PI_2;
+        }
+        else
+        {
+            return M_PI_2 * 3;
+        }
+    }
+    return atanf(deltaY / deltaX) + M_PI;
+}
+
+@end
+
+@implementation UIBezierPath (DWPathTransformUtils)
 
 -(void)dw_MirrorAxis:(DWPathUtilsMirrorAxis)axis inBounds:(CGRect)bounds
 {
@@ -242,67 +310,51 @@
     [self dw_TranslatePathWithOffsetX:-self.bounds.origin.x offsetY:-self.bounds.origin.y];
 }
 
-static inline CGFloat sinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K){
-    return A * sinf(Omega * x + Phi) + K;
-}
+@end
 
-static inline CGFloat deltaSinValueWith(CGFloat x,CGFloat A,CGFloat Omega,CGFloat Phi,CGFloat K ,CGFloat step){
-    return sinValueWith(x, A, Omega, Phi, K) - sinValueWith(x - step, A, Omega, Phi, K);
-}
+@implementation UIBezierPath (DWCharacterPathUtils)
 
-///根据两点、半径、顺逆时针获取圆心
--(CGPoint)getCenterFromFirstPoint:(CGPoint)firstP
-                      secondPoint:(CGPoint)secondP
-                           radius:(CGFloat)radius
-                        clockwise:(BOOL)clockwise
-                     moreThanhalf:(BOOL)moreThanHalf
-{
-    CGFloat centerX = 0.5 * secondP.x - 0.5 * firstP.x;
-    CGFloat centerY = 0.5 * firstP.y - 0.5 * secondP.y;
-    centerX = round6f(centerX);
-    centerY = round6f(centerY);
-    radius = round6f(radius);
-    ///获取相似三角形相似比例
-    CGFloat scale = sqrt((pow(radius, 2) - (pow(centerX, 2) + pow(centerY, 2))) / (pow(centerX, 2) + pow(centerY, 2)));
-    scale = round6f(scale);
-    if (clockwise != moreThanHalf) {
-        return CGPointMake(centerX + centerY * scale + firstP.x, - centerY + centerX * scale + firstP.y);
++(instancetype)bezierPathWithAttributeString:(NSAttributedString *)attrStr {
+    if (attrStr.length) {
+        UIBezierPath * path = [self bezierPathFrom:attrStr];
+        [path dw_MirrorAxis:DWPathUtilsMirrorAxisY inBounds:path.bounds];
+        return path;
     }
-    else
-    {
-        return CGPointMake(centerX - centerY * scale + firstP.x, - centerY - centerX * scale + firstP.y);
-    }
+    return nil;
 }
 
-///保留6位小数
-CGFloat round6f(CGFloat x){
-    return roundf(x * 1000000) / 1000000.0;
-}
-
-///获取第二点相对第一点的角度
--(CGFloat)getAngleFromFirstPoint:(CGPoint)firstP
-                         secondP:(CGPoint)secondP
-{
-    CGFloat deltaX = secondP.x - firstP.x;
-    CGFloat deltaY = secondP.y - firstP.y;
-    deltaX = round6f(deltaX);
-    deltaY = round6f(deltaY);
-    if (deltaX > 0) {
-        if (deltaY >= 0) {
-            return atanf(deltaY / deltaX);
-        }
-        return M_PI * 2 + atanf(deltaY / deltaX);
-    }
-    if (deltaX == 0) {
-        if (deltaY >= 0) {
-            return M_PI_2;
-        }
-        else
-        {
-            return M_PI_2 * 3;
+//绘制笔迹
++(UIBezierPath *)bezierPathFrom:(NSAttributedString *)attrString {
+    CGMutablePathRef letters = CGPathCreateMutable();
+    CTLineRef line = CTLineCreateWithAttributedString((CFAttributedStringRef)attrString);
+    CFArrayRef runArray = CTLineGetGlyphRuns(line);
+    
+    // for each run
+    for (CFIndex runIndex = 0; runIndex < CFArrayGetCount(runArray); runIndex++) {
+        // Get Font for this run
+        CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runArray, runIndex);
+        CTFontRef runFont = CFDictionaryGetValue(CTRunGetAttributes(run), kCTFontAttributeName);
+        
+        // for each GLyph in run
+        for (CFIndex runGlyphIndex = 0; runGlyphIndex < CTRunGetGlyphCount(run); runGlyphIndex++) {
+            // get Glyph & Glyph-data
+            CFRange thisGlyphRange = CFRangeMake(runGlyphIndex, 1);
+            CGGlyph glyph;
+            CGPoint position;
+            CTRunGetGlyphs(run, thisGlyphRange, &glyph);
+            CTRunGetPositions(run, thisGlyphRange, &position);
+            // Get path of outline
+            CGPathRef letter = CTFontCreatePathForGlyph(runFont, glyph, NULL);
+            CGAffineTransform t = CGAffineTransformMakeTranslation(position.x, position.y);
+            CGPathAddPath(letters, &t, letter);
+            CGPathRelease(letter);
         }
     }
-    return atanf(deltaY / deltaX) + M_PI;
+    CFRelease(line);
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    [path moveToPoint:CGPointZero];
+    [path appendPath:[UIBezierPath bezierPathWithCGPath:letters]];
+    return path;
 }
 
 @end

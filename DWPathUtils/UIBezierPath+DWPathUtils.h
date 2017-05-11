@@ -20,6 +20,9 @@
  
  version 1.0.2
  添加正弦曲线绘制api，修复计算角度的api错误
+ 
+ version 1.0.3
+ 添加文字转换path方法
  */
 
 #import <UIKit/UIKit.h>
@@ -123,7 +126,7 @@ typedef NS_ENUM(NSUInteger, DWPathUtilsMirrorAxis) {
 
 @end
 
-@interface UIBezierPath (DWPathUtils)
+@interface UIBezierPath (DWPathMakerUtils)
 
 ///以block形式生成自定义的贝塞尔曲线（移动点、添加直线、圆弧、贝塞尔曲线、闭合曲线）
 +(instancetype)bezierPathWithPathMaker:(void(^)(DWPathMaker * maker))pathMaker;
@@ -154,6 +157,10 @@ typedef NS_ENUM(NSUInteger, DWPathUtilsMirrorAxis) {
  */
 -(void)addSinWithA:(CGFloat)A Omega:(CGFloat)Omega Phi:(CGFloat)Phi K:(CGFloat)K deltaX:(CGFloat)deltaX;
 
+@end
+
+@interface UIBezierPath (DWPathTransformUtils)
+
 ///使path以指定bounds的指定轴线做镜像
 -(void)dw_MirrorAxis:(DWPathUtilsMirrorAxis)axis inBounds:(CGRect)bounds;
 
@@ -171,4 +178,10 @@ typedef NS_ENUM(NSUInteger, DWPathUtilsMirrorAxis) {
 
 ///移动path回到原点
 -(void)dw_PathOriginToZero;
+@end
+
+@interface UIBezierPath (DWCharacterPathUtils)
+
++(instancetype)bezierPathWithAttributeString:(NSAttributedString *)attrStr;
+
 @end
