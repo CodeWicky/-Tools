@@ -71,3 +71,57 @@
 }
 
 @end
+
+@implementation UITableView (DWTableViewIndexPathUtils)
+
+-(NSInteger)dw_DistanceBetweenIndexPathA:(NSIndexPath *)idxPA indexPathB:(NSIndexPath *)idxPB {
+    if (self.dataSource == nil) {
+        NSAssert(NO, @"you dataSource is nil so we can't calculate the distance.");
+        return -1;
+    }
+    if (![self dw_IsValidIndexPath:idxPA] || ![self dw_IsValidIndexPath:idxPB]) {
+        NSAssert(NO, @"the indexPath you sent is not valid.you should check them.");
+        return -1;
+    }
+    if ([idxPA isEqual:idxPB]) {
+        return 0;
+    }
+    NSInteger sectionDelta = idxPB.section - idxPA.section;
+    if (sectionDelta > 0) {
+        return [self calculateDistanceWithLessSectionIdxP:idxPA greaterSectionIdxP:idxPB];
+    } else if (sectionDelta < 0) {
+        return [self calculateDistanceWithLessSectionIdxP:idxPB greaterSectionIdxP:idxPA];
+    } else {
+        return (NSInteger)ABS(idxPA.row - idxPB.row);
+    }
+}
+
+-(BOOL)dw_IsValidIndexPath:(NSIndexPath *)idxP {
+    if (self.dataSource == nil) {
+        NSAssert(NO, @"you dataSource is nil so we can't calculate the distance.");
+        return NO;
+    }
+    if (idxP.section >= [self.dataSource numberOfSectionsInTableView:self]) {
+        return NO;
+    }
+    if (idxP.row >= [self.dataSource tableView:self numberOfRowsInSection:idxP.section]) {
+        return NO;
+    }
+    return YES;
+}
+
+-(NSUInteger)calculateDistanceWithLessSectionIdxP:(NSIndexPath *)idxPA greaterSectionIdxP:(NSIndexPath *)idxPB {
+    NSUInteger distance = 0;
+    NSInteger row = idxPA.row + 1;
+    NSInteger section = idxPA.section;
+    while (section < idxPB.section) {
+        distance += ([self.dataSource tableView:self numberOfRowsInSection:section]) - row;
+        section ++;
+        row = 0;
+    }
+    distance += (idxPB.row + 1);
+    return distance;
+}
+
+
+@end

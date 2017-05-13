@@ -27,7 +27,7 @@
 
 /****** 错误相关 ******/
 ///快速生成error对象
-#define DWErrorWithDescription(aCode,desc) ([NSError errorWithDomain:@"com.Wicky.DWWebImage" code:aCode userInfo:@{NSLocalizedDescriptionKey:desc}])
+#define DWErrorWithDescription(aCode,desc) ([NSError errorWithDomain:@"com.Wicky.DWError" code:aCode userInfo:@{NSLocalizedDescriptionKey:desc}])
 
 /****** 颜色相关 ******/
 ///快速以rgba生成UIColor对象
@@ -42,6 +42,16 @@
 /****** 字符串相关 ******/
 ///快速返回字符串高度
 #define DWStringHeight(string,widthLimit,font) ([string boundingRectWithSize:CGSizeMake(widthLimit, MAXFLOAT) options: NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size.height)
+
+///快速返回字符串宽度
+#define DWStringWidth(string,font) \
+({\
+UILabel * label = [[UILabel alloc] initWithFrame:CGRectZero];\
+label.font = font;\
+label.text = string;\
+[label sizeToFit];\
+label.bounds.size.width;\
+})
 
 /****** 图片相关 ******/
 ///快速返回图片，png需文件全名

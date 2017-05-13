@@ -13,6 +13,9 @@
  
  version 1.0.0
  提供占位图、刷新列表扩展方法、占位图显隐相关api
+ 
+ version 1.0.1
+ 提供indexPath计算api
  */
 
 #import <UIKit/UIKit.h>
@@ -33,4 +36,24 @@
 
 ///隐藏占位图
 -(void)hidePlaceHolderView;
+
+@end
+
+@interface UITableView (DWTableViewIndexPathUtils)
+
+/**
+ 计算两个idxP之间的距离
+
+ @param idxPA 第一个indexPath
+ @param idxPB 第二个indexPath
+ @return 距离
+ 
+ 注：
+ 距离有效值为非负数。
+ 返回-1说明无法完成计算，检验idxP的合法性及dataSource的有效性
+ */
+-(NSInteger)dw_DistanceBetweenIndexPathA:(NSIndexPath *)idxPA indexPathB:(NSIndexPath *)idxPB;
+
+///计算idxP是否合法
+-(BOOL)dw_IsValidIndexPath:(NSIndexPath *)idxP;
 @end
