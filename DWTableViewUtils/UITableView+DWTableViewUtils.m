@@ -92,7 +92,7 @@
     } else if (sectionDelta < 0) {
         return [self calculateDistanceWithLessSectionIdxP:idxPB greaterSectionIdxP:idxPA];
     } else {
-        return (NSInteger)ABS(idxPA.row - idxPB.row);
+        return labs(idxPA.row - idxPB.row);
     }
 }
 
