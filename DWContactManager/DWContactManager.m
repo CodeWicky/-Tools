@@ -297,6 +297,13 @@ static DWContactManager * manager = nil;
             }
         }];
     }
+    ///去除连续空格
+    regex = [NSRegularExpression regularExpressionWithPattern:@"[\\s]{2,}" options:0 error:nil];
+    ranges = [regex matchesInString:newString options:0 range:NSMakeRange(0, newString.length)];
+    [ranges enumerateObjectsUsingBlock:^(NSTextCheckingResult * obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSRange range = obj.range;
+        [newString replaceCharactersInRange:range withString:@" "];
+    }];
     return [newString copy];
 }
 

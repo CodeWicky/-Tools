@@ -41,6 +41,9 @@
 
 @interface UITableView (DWTableViewIndexPathUtils)
 
+///计算总项目数
+-(NSUInteger)dw_TotalItems;
+
 /**
  计算两个idxP之间的距离
 
@@ -56,4 +59,16 @@
 
 ///计算idxP是否合法
 -(BOOL)dw_IsValidIndexPath:(NSIndexPath *)idxP;
+
+
+/**
+ 计算目标idxP周围指定个数的idxPs数组
+
+ @param idxP 目标idxP
+ @param isNext 顺序查找还是逆序查找
+ @param count 指定个数
+ @param step 步长（若小于1将被转化为1）
+ @return 结果数组
+ */
+-(NSArray <NSIndexPath *>*)dw_IndexPathsAroundIndexPath:(NSIndexPath *)idxP nextOrPreivious:(BOOL)isNext count:(NSUInteger)count step:(NSInteger)step;
 @end

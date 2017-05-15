@@ -52,12 +52,7 @@
 
 -(BOOL)calculateHasData
 {
-    NSInteger sections = [self.dataSource numberOfSectionsInTableView:self];
-    NSInteger dataCounts = 0;
-    for (int i = 0; i < sections; i++) {
-        dataCounts += [self.dataSource tableView:self numberOfRowsInSection:i];
-    }
-    return dataCounts > 0 ? YES : NO;
+    return [self dw_TotalItems] > 0 ? YES : NO;
 }
 
 -(void)setPlaceHolderView:(UIView *)placeHolderView
@@ -101,10 +96,10 @@
         NSAssert(NO, @"you dataSource is nil so we can't calculate the distance.");
         return NO;
     }
-    if (idxP.section >= [self.dataSource numberOfSectionsInTableView:self]) {
+    if (idxP.section >= self.numberOfSections) {
         return NO;
     }
-    if (idxP.row >= [self.dataSource tableView:self numberOfRowsInSection:idxP.section]) {
+    if (idxP.row >= [self numberOfRowsInSection:idxP.section]) {
         return NO;
     }
     return YES;
@@ -115,7 +110,7 @@
     NSInteger row = idxPA.row + 1;
     NSInteger section = idxPA.section;
     while (section < idxPB.section) {
-        distance += ([self.dataSource tableView:self numberOfRowsInSection:section]) - row;
+        distance += ([self numberOfRowsInSection:section]) - row;
         section ++;
         row = 0;
     }
@@ -123,5 +118,65 @@
     return distance;
 }
 
+-(NSUInteger)dw_TotalItems {
+    NSInteger sections = self.numberOfSections;
+    NSInteger itemsCount = 0;
+    for (int i = 0; i < sections; i++) {
+        itemsCount += [self numberOfRowsInSection:i];
+    }
+    return itemsCount;
+}
 
+-(NSArray <NSIndexPath *>*)dw_IndexPathsAroundIndexPath:(NSIndexPath *)idxP nextOrPreivious:(BOOL)isNext count:(NSUInteger)count step:(NSInteger)step {
+    
+    if (count == 0) {
+        return nil;
+    }
+    
+    if (step > [self dw_TotalItems]) {
+        return nil;
+    }
+    
+    if (step < 1) {
+        step = 1;
+    }
+    
+    NSInteger section = idxP.section;
+    NSInteger row = idxP.row;
+    section = section < self.numberOfSections ? section :self.numberOfSections;
+    row = row <= [self numberOfRowsInSection:section] ? row :[self numberOfRowsInSection:section];
+    
+    NSInteger fator = isNext ? 1 : -1;
+    
+    NSMutableArray * arr = [NSMutableArray array];
+    do {
+        row += step * fator;
+        if (row >= 0 && row < [self numberOfRowsInSection:section]) {
+            [arr addObject:[NSIndexPath indexPathForRow:row inSection:section]];
+        } else {
+        HandleSection:
+            section += fator;
+            if (section < 0 || section >= self.numberOfSections) {
+                break;
+            } else {
+                if (row < 0) {
+                    row += [self numberOfRowsInSection:section];
+                    if (row < 0) {
+                        goto HandleSection;
+                    } else {
+                        [arr addObject:[NSIndexPath indexPathForRow:row inSection:section]];
+                    }
+                } else {
+                    row -= [self numberOfRowsInSection:section - 1];
+                    if (row >= [self numberOfRowsInSection:section]) {
+                        goto HandleSection;
+                    } else {
+                        [arr addObject:[NSIndexPath indexPathForRow:row inSection:section]];
+                    }
+                }
+            }
+        }
+    } while (arr.count < count);
+    return arr.copy;
+}
 @end
