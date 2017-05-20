@@ -99,14 +99,14 @@
 @property (nonatomic ,copy) NSString * fullName;
 
 #pragma mark --- 排序用属性 ---
-///拼音按字分组
+///姓名按最小单位分组后转为拼音
 @property (nonatomic ,strong) NSArray<NSString *> * pinYinArray;
 
-///转换后可用于排序拼音字符串（英文名称以处理过）
-@property (nonatomic ,copy) NSString * pinYinString;
+///姓名按最小单位分组
+@property (nonatomic ,strong) NSArray * wordArray;
 
-///用来排序的姓名字符串
-@property (nonatomic ,copy) NSString * nameSortString;
+///转换后可用于全名拼音（英文名称以处理过）
+@property (nonatomic ,copy) NSString * pinYinString;
 
 #pragma mark --- 存取用属性 ---
 ///原始对象

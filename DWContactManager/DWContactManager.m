@@ -134,11 +134,9 @@ static DWContactManager * manager = nil;
             NSString * nameString = [NSString stringWithFormat:@"%@%@%@",model.familyName?:@"",model.middleName?:@"",model.givenName?:@""];
             NSString * firstChar = nil;
             if (nameString.length) {
-                model.nameSortString = nameString;
-                NSString * newName = [self fixStringToSeperateChineseAndLetter:nameString];
-                NSString * pinYin = [self transferChineseToPinYin:newName];
-                model.pinYinString = [self correctTheFirstNameWithChineseStr:nameString PinYinString:pinYin];
-                model.pinYinArray = [model.pinYinString componentsSeparatedByString:@" "];
+                model.wordArray = [self createWordArrayByString:nameString];
+                model.pinYinArray = [self createPinyinArrayByString:nameString];
+                model.pinYinString = [self createPinyinStringWithPinyinArray:model.pinYinArray];;
                 firstChar = [self firstCapitalCharOfString:model.pinYinString];
             }
             if (!firstChar) {
@@ -222,7 +220,6 @@ static DWContactManager * manager = nil;
 }
 
 #pragma mark --- tool method ---
-
 ///同分组按拼音/汉字排序
 -(void)sortGroupContacts:(NSMutableDictionary *)groupContacts {
     for (NSMutableArray * arr in groupContacts.allValues) {
@@ -233,23 +230,28 @@ static DWContactManager * manager = nil;
 ///按拼音/汉字排序指定范围联系人
 -(void)sortContacts:(NSMutableArray *)contacts {
     [contacts sortUsingComparator:^NSComparisonResult(DWContactModel * obj1, DWContactModel * obj2) {
-        NSArray <NSString *>* arr1 = obj1.pinYinArray;
-        NSArray <NSString *>* arr2 = obj2.pinYinArray;
-        NSUInteger minL = MIN(arr1.count, arr2.count);
+        if ([obj1.fullName isEqualToString:obj2.fullName]) {
+            return NSOrderedSame;
+        }
+        NSArray <NSString *>* wordArr1 = obj1.wordArray;
+        NSArray <NSString *>* wordArr2 = obj2.wordArray;
+        NSArray <NSString *>* pinyinArr1 = obj1.pinYinArray;
+        NSArray <NSString *>* pinyinArr2 = obj2.pinYinArray;
+        NSUInteger minL = MIN(wordArr1.count, wordArr2.count);
         for (int i = 0; i < minL; i ++) {
-            NSComparisonResult result  = [arr1[i] caseInsensitiveCompare:arr2[i]];
+            NSComparisonResult result  = [pinyinArr1[i] caseInsensitiveCompare:pinyinArr2[i]];
             if (result != NSOrderedSame) {
                 return result;
             } else {
-                result = [[obj1.nameSortString substringWithRange:NSMakeRange(i, 1)] compare:[obj2.nameSortString substringWithRange:NSMakeRange(i, 1)]];
+                result = [wordArr1[i] compare:wordArr2[i]];
                 if (result != NSOrderedSame) {
                     return result;
                 }
             }
         }
-        if (arr1.count < arr2.count) {
+        if (wordArr1.count < wordArr2.count) {
             return NSOrderedAscending;
-        } else if (arr1.count > arr2.count) {
+        } else if (wordArr1.count > wordArr2.count) {
             return NSOrderedDescending;
         } else {
             return NSOrderedSame;
@@ -276,85 +278,69 @@ static DWContactManager * manager = nil;
     return [mutableString stringByFoldingWithOptions:NSDiacriticInsensitiveSearch locale:[NSLocale currentLocale]];
 }
 
-///将中文与英文以空格分开
--(NSString *)fixStringToSeperateChineseAndLetter:(NSString *)string {
-    NSMutableString * newString = [NSMutableString stringWithString:string];
-    NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:@"[\\u4E00-\\u9FA5]+" options:0 error:nil];
-    ///获取匹配结果
-    NSArray * ranges = [regex matchesInString:newString options:0 range:NSMakeRange(0, newString.length)];
-    NSRange first = ((NSTextCheckingResult *)ranges.firstObject).range;
-    if (first.length != newString.length) {
-        [ranges enumerateObjectsWithOptions:(NSEnumerationReverse) usingBlock:^(NSTextCheckingResult * obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSRange range = obj.range;
-            if (range.location + range.length == newString.length) {
-                [newString insertString:@" " atIndex:range.location];
-            } else
-                if (range.location == 0) {
-                [newString insertString:@" " atIndex:range.length];
-            } else {
-                [newString insertString:@" " atIndex:(range.location + range.length)];
-                [newString insertString:@" " atIndex:range.location];
-            }
+///将字符串按最小单位分组（中文以字为单位，英文以此为单位）
+-(NSArray *)createWordArrayByString:(NSString *)string {
+    NSArray * array;
+    if (string.length) {
+        NSMutableArray * temp = [NSMutableArray array];
+        [string enumerateSubstringsInRange:NSMakeRange(0, string.length) options:NSStringEnumerationByWords usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
+            [temp addObject:substring];
         }];
+        array = [temp copy];
     }
-    ///去除连续空格
-    regex = [NSRegularExpression regularExpressionWithPattern:@"[\\s]{2,}" options:0 error:nil];
-    ranges = [regex matchesInString:newString options:0 range:NSMakeRange(0, newString.length)];
-    [ranges enumerateObjectsUsingBlock:^(NSTextCheckingResult * obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSRange range = obj.range;
-        [newString replaceCharactersInRange:range withString:@" "];
-    }];
-    return [newString copy];
+    return array;
 }
 
-///姓氏多音字矫正
--(NSString *)correctTheFirstNameWithChineseStr:(NSString *)chinese PinYinString:(NSString *)pinyin {
+///将姓名多音字修正后以最小单位分组后转为拼音
+-(NSArray *)createPinyinArrayByString:(NSString *)string {
+    NSArray * array;
+    if (string.length) {
+        NSString * new = [self correctTheFirstNameWithChineseStr:string];
+        NSArray * words = [self createWordArrayByString:new];
+        if (words.count) {
+            NSMutableArray * temp = [NSMutableArray array];
+            [words enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                [temp addObject:[self transferChineseToPinYin:obj]];
+            }];
+            array = [temp copy];
+        }
+    }
+    return array;
+}
+
+-(NSString *)createPinyinStringWithPinyinArray:(NSArray *)array {
+    if (!array.count) {
+        return nil;
+    }
+    __block NSString * string = @"";
+    [array enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (idx == 0) {
+            string = [string stringByAppendingString:[NSString stringWithString:obj]];
+        } else {
+            string = [string stringByAppendingString:[NSString stringWithFormat:@" %@",obj]];
+        }
+    }];
+    return string;
+}
+
+///姓氏多音字替换为同音字，主要用于获取正确的pinyinArray
+-(NSString *)correctTheFirstNameWithChineseStr:(NSString *)chinese {
+    NSString * new = [NSString stringWithString:chinese];
     if (chinese.length >= 2) {///长度大于2考虑复姓
         NSString * firstChar = [chinese substringToIndex:1];
         NSString * firstTwoChar = [chinese substringToIndex:2];
         if (self.correctPinYin[firstTwoChar]) {///优先考虑复姓
-            ///移除原复姓拼音
-            NSMutableArray * arr = [pinyin componentsSeparatedByString:@" "].mutableCopy;
-            [arr removeObjectAtIndex:0];
-            [arr removeObjectAtIndex:0];
-            
-            ///拼接新拼音
-            pinyin = self.correctPinYin[firstTwoChar];
-            for (int i = 0; i < arr.count; i++) {
-                NSString * str = arr[i];
-                pinyin = [NSString stringWithFormat:@"%@%@",pinyin,str];
-                if (i < arr.count - 1) {///不是最后一个添加空格分隔
-                    pinyin = [NSString stringWithFormat:@"%@ ",pinyin];
-                }
-            }
+            [new stringByReplacingCharactersInRange:NSMakeRange(0, 2) withString:self.correctPinYin[firstTwoChar]];
         } else if (self.correctPinYin[firstChar]) {///单姓
-            NSMutableArray * arr = [pinyin componentsSeparatedByString:@" "].mutableCopy;
-            [arr removeObjectAtIndex:0];
-            pinyin = self.correctPinYin[firstChar];
-            for (int i = 0; i < arr.count; i++) {
-                NSString * str = arr[i];
-                pinyin = [NSString stringWithFormat:@"%@%@",pinyin,str];
-                if (i < arr.count - 1) {
-                    pinyin = [NSString stringWithFormat:@"%@ ",pinyin];
-                }
-            }
+            [new stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:self.correctPinYin[firstChar]];
         }
     } else if (chinese.length == 1) {///仅考虑单姓
         NSString * firstChar = [chinese substringToIndex:1];
         if (self.correctPinYin[firstChar]) {///单姓替换
-            NSMutableArray * arr = [pinyin componentsSeparatedByString:@" "].mutableCopy;
-            [arr removeObjectAtIndex:0];
-            pinyin = self.correctPinYin[firstChar];
-            for (int i = 0; i < arr.count; i++) {
-                NSString * str = arr[i];
-                pinyin = [NSString stringWithFormat:@"%@%@",pinyin,str];
-                if (i < arr.count - 1) {
-                    pinyin = [NSString stringWithFormat:@"%@ ",pinyin];
-                }
-            }
+            [new stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:self.correctPinYin[firstChar]];
         }
     }
-    return pinyin;
+    return new;
 }
 
 ///返回字符串的大写首字母

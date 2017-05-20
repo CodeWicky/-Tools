@@ -11,7 +11,9 @@
 
 @interface NSString ()
 
-@property (nonatomic ,strong) NSArray * pinyinArray;
+@property (nonatomic ,strong) NSArray * wordArray;
+
+@property (nonatomic ,copy) NSString * wordPinyin;
 
 @end
 
@@ -50,18 +52,20 @@
 }
 
 -(NSString *)dw_TransferChineseToPinYinWithWhiteSpace:(BOOL)needWhiteSpace {
-    NSMutableString * mutableString = nil;
-    if (needWhiteSpace) {
-        mutableString = [self fixStringToSeperateChineseAndLetter];
-    } else {
-        mutableString = [[NSMutableString alloc] initWithString:self];
+    if (!self.wordArray.count) {
+        return nil;
     }
-    CFStringTransform((CFMutableStringRef)mutableString, NULL, kCFStringTransformToLatin, false);
-    NSString * pinyin = [mutableString stringByFoldingWithOptions:NSDiacriticInsensitiveSearch locale:[NSLocale currentLocale]];
-    if (!needWhiteSpace) {
-        pinyin = [pinyin stringByReplacingOccurrencesOfString:@" " withString:@""];
-    }
-    return pinyin;
+    __block NSString * string = @"";
+    NSString * whiteSpace = needWhiteSpace ? @" " : @"";
+    [self.wordArray enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSString * pinyin = [obj transferWordToPinYin];
+        if (idx == 0) {
+             string = [string stringByAppendingString:[NSString stringWithString:pinyin]];
+        } else {
+            string = [string stringByAppendingString:[NSString stringWithFormat:@"%@%@",whiteSpace,pinyin]];
+        }
+    }];
+    return string;
 }
 
 -(NSArray<NSTextCheckingResult *> *)dw_RangesConfirmToPattern:(NSString *)pattern {
@@ -82,15 +86,21 @@
     NSMutableArray * newStrings = [NSMutableArray arrayWithArray:strings];
     ///按拼音/汉字排序指定范围联系人
     [newStrings sortUsingComparator:^NSComparisonResult(NSString * obj1, NSString * obj2) {
-        NSArray <NSString *>* arr1 = obj1.pinyinArray;
-        NSArray <NSString *>* arr2 = obj2.pinyinArray;
+        if ([obj1 isEqualToString:obj2]) {
+            return NSOrderedSame;
+        }
+        NSArray <NSString *>* arr1 = obj1.wordArray;
+        NSArray <NSString *>* arr2 = obj2.wordArray;
         NSUInteger minL = MIN(arr1.count, arr2.count);
         for (int i = 0; i < minL; i ++) {
-            NSComparisonResult result  = [arr1[i] caseInsensitiveCompare:arr2[i]];
+            if ([arr1[i] isEqualToString:arr2[i]]) {
+                continue;
+            }
+            NSComparisonResult result  = [[arr1[i] transferWordToPinYin]caseInsensitiveCompare:[arr2[i] transferWordToPinYin]];
             if (result != NSOrderedSame) {
                 return result;
             } else {
-                result = [[obj1 substringWithRange:NSMakeRange(i, 1)] compare:[obj2 substringWithRange:NSMakeRange(i, 1)]];
+                result = [arr1[i] compare:arr2[i]];
                 if (result != NSOrderedSame) {
                     return result;
                 }
@@ -108,28 +118,15 @@
 }
 
 #pragma mark --- tool method ---
-///将中文与英文以空格分开
--(NSMutableString *)fixStringToSeperateChineseAndLetter {
-    NSMutableString * newString = [NSMutableString stringWithString:self];
-    NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:@"[\\u4E00-\\u9FA5]+" options:0 error:nil];
-    ///获取匹配结果
-    NSArray * ranges = [regex matchesInString:newString options:0 range:NSMakeRange(0, newString.length)];
-    NSRange first = ((NSTextCheckingResult *)ranges.firstObject).range;
-    if (first.length != newString.length) {
-        [ranges enumerateObjectsWithOptions:(NSEnumerationReverse) usingBlock:^(NSTextCheckingResult * obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSRange range = obj.range;
-            if (range.location + range.length == newString.length) {
-                [newString insertString:@" " atIndex:range.location];
-            } else
-                if (range.location == 0) {
-                    [newString insertString:@" " atIndex:range.length];
-                } else {
-                    [newString insertString:@" " atIndex:(range.location + range.length)];
-                    [newString insertString:@" " atIndex:range.location];
-                }
-        }];
+-(NSString *)transferWordToPinYin {
+    if (self.wordPinyin) {
+        return self.wordPinyin;
     }
-    return newString;
+    NSMutableString * mutableString = [[NSMutableString alloc] initWithString:self];
+    CFStringTransform((CFMutableStringRef)mutableString, NULL, kCFStringTransformToLatin, false);
+    NSString * pinyin = [mutableString stringByFoldingWithOptions:NSDiacriticInsensitiveSearch locale:[NSLocale currentLocale]];
+    self.wordPinyin = pinyin;
+    return pinyin;
 }
 
 #pragma mark --- setter/getter ---
@@ -146,15 +143,31 @@
     return pinyin;
 }
 
--(void)setPinyinArray:(NSArray *)pinyinArray {
-    objc_setAssociatedObject(self, @selector(pinyinArray), pinyinArray, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+-(void)setWordPinyin:(NSString *)wordPinyin {
+    objc_setAssociatedObject(self, @selector(wordPinyin), wordPinyin, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
--(NSArray *)pinyinArray {
+-(NSString *)wordPinyin {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+-(void)setWordArray:(NSArray *)wordArray {
+    objc_setAssociatedObject(self, @selector(wordArray), wordArray, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+-(NSArray *)wordArray {
     NSArray * array = objc_getAssociatedObject(self, _cmd);
     if (!array) {
-        array = [self.pinyinString componentsSeparatedByString:@" "];
-        objc_setAssociatedObject(self, @selector(pinyinArray), array, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        if (self.length) {
+            NSMutableArray * temp = [NSMutableArray array];
+            [self enumerateSubstringsInRange:NSMakeRange(0, self.length) options:NSStringEnumerationByWords usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
+                [temp addObject:substring];
+            }];
+            array = [temp copy];
+        } else {
+            array = @[];
+        }
+        objc_setAssociatedObject(self, @selector(wordArray), array, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     return array;
 }
