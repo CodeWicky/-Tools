@@ -17,15 +17,10 @@
 
 @end
 
-@implementation NSString (DWStringUtils)
+@implementation NSString (DWStringTransferUtils)
 +(NSString *)stringWithMetaString:(NSString *)metaString count:(NSUInteger)count
 {
     return [@"" stringByPaddingToLength:(metaString.length * count) withString:metaString startingAtIndex:0];
-}
-
--(CGSize)stringSizeWithFont:(UIFont *)font widthLimit:(CGFloat)widthLimit heightLimit:(CGFloat)heightLimit
-{
-    return  [self boundingRectWithSize:CGSizeMake(widthLimit, heightLimit) options: NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
 }
 
 +(NSString *)stringWithRandomCharacterWithLength:(NSUInteger)length {
@@ -82,53 +77,6 @@
     return strings;
 }
 
-+(NSMutableArray *)dw_SortedStringsInPinyin:(NSArray<NSString *> *)strings {
-    NSMutableArray * newStrings = [NSMutableArray arrayWithArray:strings];
-    ///按拼音/汉字排序指定范围联系人
-    [newStrings sortUsingComparator:^NSComparisonResult(NSString * obj1, NSString * obj2) {
-        if ([obj1 isEqualToString:obj2]) {
-            return NSOrderedSame;
-        }
-        NSArray <NSString *>* arr1 = obj1.wordArray;
-        NSArray <NSString *>* arr2 = obj2.wordArray;
-        NSUInteger minL = MIN(arr1.count, arr2.count);
-        for (int i = 0; i < minL; i ++) {
-            if ([arr1[i] isEqualToString:arr2[i]]) {
-                continue;
-            }
-            NSComparisonResult result  = [[arr1[i] transferWordToPinYin]caseInsensitiveCompare:[arr2[i] transferWordToPinYin]];
-            if (result != NSOrderedSame) {
-                return result;
-            } else {
-                result = [arr1[i] compare:arr2[i]];
-                if (result != NSOrderedSame) {
-                    return result;
-                }
-            }
-        }
-        if (arr1.count < arr2.count) {
-            return NSOrderedAscending;
-        } else if (arr1.count > arr2.count) {
-            return NSOrderedDescending;
-        } else {
-            return NSOrderedSame;
-        }
-    }];
-    return newStrings;
-}
-
-#pragma mark --- tool method ---
--(NSString *)transferWordToPinYin {
-    if (self.wordPinyin) {
-        return self.wordPinyin;
-    }
-    NSMutableString * mutableString = [[NSMutableString alloc] initWithString:self];
-    CFStringTransform((CFMutableStringRef)mutableString, NULL, kCFStringTransformToLatin, false);
-    NSString * pinyin = [mutableString stringByFoldingWithOptions:NSDiacriticInsensitiveSearch locale:[NSLocale currentLocale]];
-    self.wordPinyin = pinyin;
-    return pinyin;
-}
-
 #pragma mark --- setter/getter ---
 -(void)setPinyinString:(NSString *)pinyinString {
     objc_setAssociatedObject(self, @selector(pinyinString), pinyinString, OBJC_ASSOCIATION_COPY_NONATOMIC);
@@ -171,4 +119,70 @@
     }
     return array;
 }
+
+#pragma mark --- tool method ---
+-(NSString *)transferWordToPinYin {
+    if (self.wordPinyin) {
+        return self.wordPinyin;
+    }
+    NSMutableString * mutableString = [[NSMutableString alloc] initWithString:self];
+    CFStringTransform((CFMutableStringRef)mutableString, NULL, kCFStringTransformToLatin, false);
+    NSString * pinyin = [mutableString stringByFoldingWithOptions:NSDiacriticInsensitiveSearch locale:[NSLocale currentLocale]];
+    self.wordPinyin = pinyin;
+    return pinyin;
+}
+
 @end
+
+@implementation NSString (DWStringSortUtils)
+
++(NSMutableArray *)dw_SortedStringsInPinyin:(NSArray<NSString *> *)strings {
+    NSMutableArray * newStrings = [NSMutableArray arrayWithArray:strings];
+    ///按拼音/汉字排序指定范围联系人
+    [newStrings sortUsingComparator:^NSComparisonResult(NSString * obj1, NSString * obj2) {
+        return [obj1 dw_ComparedInPinyinWithString:obj2];
+    }];
+    return newStrings;
+}
+
+-(NSComparisonResult)dw_ComparedInPinyinWithString:(NSString *)string {
+    if ([self isEqualToString:string]) {
+        return NSOrderedSame;
+    }
+    NSArray <NSString *>* arr1 = self.wordArray;
+    NSArray <NSString *>* arr2 = string.wordArray;
+    NSUInteger minL = MIN(arr1.count, arr2.count);
+    for (int i = 0; i < minL; i ++) {
+        if ([arr1[i] isEqualToString:arr2[i]]) {
+            continue;
+        }
+        NSComparisonResult result  = [[arr1[i] transferWordToPinYin]caseInsensitiveCompare:[arr2[i] transferWordToPinYin]];
+        if (result != NSOrderedSame) {
+            return result;
+        } else {
+            result = [arr1[i] compare:arr2[i]];
+            if (result != NSOrderedSame) {
+                return result;
+            }
+        }
+    }
+    if (arr1.count < arr2.count) {
+        return NSOrderedAscending;
+    } else if (arr1.count > arr2.count) {
+        return NSOrderedDescending;
+    } else {
+        return NSOrderedSame;
+    }
+}
+
+@end
+
+@implementation NSString (DWStringSizeUtils)
+
+-(CGSize)stringSizeWithFont:(UIFont *)font widthLimit:(CGFloat)widthLimit heightLimit:(CGFloat)heightLimit
+{
+    return  [self boundingRectWithSize:CGSizeMake(widthLimit, heightLimit) options: NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+}
+
+@end
+

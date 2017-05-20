@@ -22,11 +22,15 @@
  
  version 1.0.2
  添加数组按拼音排序方法
+ 
+ version 1.0.3
+ 结构修改
+ 拼音排序方法统一修改
  */
 
 #import <UIKit/UIKit.h>
 
-@interface NSString (DWStringUtils)
+@interface NSString (DWStringTransferUtils)
 
 ///转拼音后的字符串
 @property (nonatomic ,copy) NSString * pinyinString;
@@ -37,11 +41,6 @@
  count          元字符串的个数
  */
 +(NSString *)stringWithMetaString:(NSString *)metaString count:(NSUInteger)count;
-
-///根据字号及尺寸限制返回文本尺寸
--(CGSize)stringSizeWithFont:(UIFont *)font
-                 widthLimit:(CGFloat)widthLimit
-                heightLimit:(CGFloat)heightLimit;
 
 ///以长度生成随机字符串，字符串有大小写字母及数字组成
 +(NSString *)stringWithRandomCharacterWithLength:(NSUInteger)length;
@@ -58,6 +57,23 @@
 ///符合正则的子串集
 -(NSArray <NSString *> *)dw_SubStringConfirmToPattern:(NSString *)pattern;
 
+@end
+
+@interface NSString (DWStringSortUtils)
+
 ///将数组内字符串以拼音排序
 +(NSMutableArray *)dw_SortedStringsInPinyin:(NSArray <NSString *>*)strings;
+
+///返回以拼音比较的结果
+-(NSComparisonResult)dw_ComparedInPinyinWithString:(NSString *)string;
+
+@end
+
+@interface NSString (DWStringSizeUtils)
+
+///根据字号及尺寸限制返回文本尺寸
+-(CGSize)stringSizeWithFont:(UIFont *)font
+                 widthLimit:(CGFloat)widthLimit
+                heightLimit:(CGFloat)heightLimit;
+
 @end
