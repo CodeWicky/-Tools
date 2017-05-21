@@ -99,11 +99,8 @@
 @property (nonatomic ,copy) NSString * fullName;
 
 #pragma mark --- 排序用属性 ---
-///姓名按最小单位分组后转为拼音
-@property (nonatomic ,strong) NSArray<NSString *> * pinYinArray;
-
-///姓名按最小单位分组
-@property (nonatomic ,strong) NSArray * wordArray;
+///排序用姓名
+@property (nonatomic ,copy) NSString * nameSortString;
 
 ///转换后可用于全名拼音（英文名称以处理过）
 @property (nonatomic ,copy) NSString * pinYinString;

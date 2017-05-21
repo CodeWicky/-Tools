@@ -326,6 +326,7 @@ static inline void SetArrayWithProperty(ABRecordRef record,ABPropertyID property
     CFRelease(values);
     return arr;
 }
+
 @end
 
 @implementation DWContactLabelModel

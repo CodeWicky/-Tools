@@ -11,10 +11,6 @@
 
 @interface NSString ()
 
-@property (nonatomic ,strong) NSArray * wordArray;
-
-@property (nonatomic ,copy) NSString * wordPinyin;
-
 @end
 
 @implementation NSString (DWStringTransferUtils)
@@ -46,20 +42,24 @@
     return [pureStr stringByAppendingPathExtension:extention];
 }
 
--(NSString *)dw_TransferChineseToPinYinWithWhiteSpace:(BOOL)needWhiteSpace {
-    if (!self.wordArray.count) {
+-(NSString *)dw_TransferChineseToPinYinWithWhiteSpace:(BOOL)needWhiteSpace tone:(BOOL)tone {
+    if (!self.length) {
         return nil;
     }
     __block NSString * string = @"";
+    NSString * tempString = [NSString stringWithFormat:@"啊%@",self];//别问我为什么，我也不知道为什么第一个字是汉字第二个是单词遍历的时候不会分开，前面有两个字就没关系
     NSString * whiteSpace = needWhiteSpace ? @" " : @"";
-    [self.wordArray enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSString * pinyin = [obj transferWordToPinYin];
-        if (idx == 0) {
-             string = [string stringByAppendingString:[NSString stringWithString:pinyin]];
+    [tempString enumerateSubstringsInRange:NSMakeRange(0, tempString.length) options:(NSStringEnumerationByWords|NSStringEnumerationLocalized) usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
+        NSString * pinyin = [substring transferWordToPinYinWithTone:tone];
+        if (!string.length) {
+            string = [string stringByAppendingString:[NSString stringWithString:pinyin]];
         } else {
             string = [string stringByAppendingString:[NSString stringWithFormat:@"%@%@",whiteSpace,pinyin]];
         }
     }];
+    if ([string hasPrefix:@"a "]) {
+        string = [string substringFromIndex:2];
+    }
     return string;
 }
 
@@ -85,50 +85,18 @@
 -(NSString *)pinyinString {
     NSString * pinyin = objc_getAssociatedObject(self, _cmd);
     if (!pinyin) {
-        pinyin = [self dw_TransferChineseToPinYinWithWhiteSpace:YES];
+        pinyin = [self dw_TransferChineseToPinYinWithWhiteSpace:YES tone:YES];
         objc_setAssociatedObject(self, @selector(pinyinString), pinyin, OBJC_ASSOCIATION_COPY_NONATOMIC);
     }
     return pinyin;
 }
 
--(void)setWordPinyin:(NSString *)wordPinyin {
-    objc_setAssociatedObject(self, @selector(wordPinyin), wordPinyin, OBJC_ASSOCIATION_COPY_NONATOMIC);
-}
-
--(NSString *)wordPinyin {
-    return objc_getAssociatedObject(self, _cmd);
-}
-
--(void)setWordArray:(NSArray *)wordArray {
-    objc_setAssociatedObject(self, @selector(wordArray), wordArray, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
--(NSArray *)wordArray {
-    NSArray * array = objc_getAssociatedObject(self, _cmd);
-    if (!array) {
-        if (self.length) {
-            NSMutableArray * temp = [NSMutableArray array];
-            [self enumerateSubstringsInRange:NSMakeRange(0, self.length) options:NSStringEnumerationByWords usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
-                [temp addObject:substring];
-            }];
-            array = [temp copy];
-        } else {
-            array = @[];
-        }
-        objc_setAssociatedObject(self, @selector(wordArray), array, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    return array;
-}
-
 #pragma mark --- tool method ---
--(NSString *)transferWordToPinYin {
-    if (self.wordPinyin) {
-        return self.wordPinyin;
-    }
+-(NSString *)transferWordToPinYinWithTone:(BOOL)tone {
     NSMutableString * mutableString = [[NSMutableString alloc] initWithString:self];
     CFStringTransform((CFMutableStringRef)mutableString, NULL, kCFStringTransformToLatin, false);
-    NSString * pinyin = [mutableString stringByFoldingWithOptions:NSDiacriticInsensitiveSearch locale:[NSLocale currentLocale]];
-    self.wordPinyin = pinyin;
+    NSStringCompareOptions toneOption = tone ?NSCaseInsensitiveSearch:NSDiacriticInsensitiveSearch;
+    NSString * pinyin = [mutableString stringByFoldingWithOptions:toneOption locale:[NSLocale currentLocale]];
     return pinyin;
 }
 
@@ -140,39 +108,13 @@
     NSMutableArray * newStrings = [NSMutableArray arrayWithArray:strings];
     ///按拼音/汉字排序指定范围联系人
     [newStrings sortUsingComparator:^NSComparisonResult(NSString * obj1, NSString * obj2) {
-        return [obj1 dw_ComparedInPinyinWithString:obj2];
+        return [obj1 dw_ComparedInPinyinWithString:obj2 considerTone:YES];
     }];
     return newStrings;
 }
 
--(NSComparisonResult)dw_ComparedInPinyinWithString:(NSString *)string {
-    if ([self isEqualToString:string]) {
-        return NSOrderedSame;
-    }
-    NSArray <NSString *>* arr1 = self.wordArray;
-    NSArray <NSString *>* arr2 = string.wordArray;
-    NSUInteger minL = MIN(arr1.count, arr2.count);
-    for (int i = 0; i < minL; i ++) {
-        if ([arr1[i] isEqualToString:arr2[i]]) {
-            continue;
-        }
-        NSComparisonResult result  = [[arr1[i] transferWordToPinYin]caseInsensitiveCompare:[arr2[i] transferWordToPinYin]];
-        if (result != NSOrderedSame) {
-            return result;
-        } else {
-            result = [arr1[i] compare:arr2[i]];
-            if (result != NSOrderedSame) {
-                return result;
-            }
-        }
-    }
-    if (arr1.count < arr2.count) {
-        return NSOrderedAscending;
-    } else if (arr1.count > arr2.count) {
-        return NSOrderedDescending;
-    } else {
-        return NSOrderedSame;
-    }
+-(NSComparisonResult)dw_ComparedInPinyinWithString:(NSString *)string considerTone:(BOOL)tone {
+    return [self localizedCompare:string];
 }
 
 @end

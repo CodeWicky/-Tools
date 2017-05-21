@@ -26,6 +26,8 @@
  version 1.0.3
  结构修改
  拼音排序方法统一修改
+ 转换时音调支持
+ 排序时音调支持
  */
 
 #import <UIKit/UIKit.h>
@@ -48,8 +50,15 @@
 ///给文件名添加序数（文件名重复时使用）
 -(NSString *)dw_FixFileNameStringWithIndex:(NSUInteger)idx;
 
-///汉字转拼音（是否需要空格）
--(NSString *)dw_TransferChineseToPinYinWithWhiteSpace:(BOOL)needWhiteSpace;
+/**
+ 汉字转拼音
+
+ @param needWhiteSpace 是否需要空格间隔
+ @param tone           是否需要音调
+
+ @return 转换后用拼音
+ */
+-(NSString *)dw_TransferChineseToPinYinWithWhiteSpace:(BOOL)needWhiteSpace tone:(BOOL)tone;
 
 ///返回整串字符串中符合正则的结果集
 -(NSArray <NSTextCheckingResult *> *)dw_RangesConfirmToPattern:(NSString *)pattern;
@@ -64,8 +73,15 @@
 ///将数组内字符串以拼音排序
 +(NSMutableArray *)dw_SortedStringsInPinyin:(NSArray <NSString *>*)strings;
 
-///返回以拼音比较的结果
--(NSComparisonResult)dw_ComparedInPinyinWithString:(NSString *)string;
+/**
+ 返回以拼音比较的结果
+
+ @param string 被比较的字符串
+ @param tone   是否考虑音调
+
+ @return 比较结果
+ */
+-(NSComparisonResult)dw_ComparedInPinyinWithString:(NSString *)string considerTone:(BOOL)tone;
 
 @end
 
