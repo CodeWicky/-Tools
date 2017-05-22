@@ -319,6 +319,20 @@
 
 @end
 
+
+/**
+ 绘图基本思路
+ 1.确定画布尺寸（画布尺寸为图片变换后的脏尺寸）
+ 2.开启上下文，取到画布（开启画布注意scale，否则retina屏幕失真）
+ 3.坐标系移至画布中心并做垂直镜像（系统坐标与屏幕坐标转换）
+ 4.根据需求变换坐标系（由于第三步做过垂直镜像，旋转角度此时逆正顺负）
+ 5.绘制图片（原点为图片 X = -0.5W，Y = -0.5H，W = W，H = H，其中W、H为原始图片宽和高）
+ 6.从画布取出图片并关闭画布（防止内存泄漏）
+ 
+ 出去第4步，其他步骤相对固定。
+ 
+ 另外，如果坐标系不需变换，建议使用-drawInRect：（见压缩图片api，更加简洁）
+ */
 @implementation UIImage (DWImageTransformUtils)
 
 -(UIImage *)dw_RotateImageWithAngle:(CGFloat)angle
@@ -348,91 +362,62 @@
 ///按给定的方向旋转图片
 -(UIImage*)dw_RotateWithOrient:(UIImageOrientation)orient
 {
+    if (orient == UIImageOrientationUp) {
+        return self;
+    }
     CGRect bnds = CGRectZero;
-    CGRect rect = CGRectZero;
-    CGAffineTransform tran = CGAffineTransformIdentity;
-    
-    rect.size = self.size;
-    
-    bnds = rect;
-    
-    switch (orient)
-    {
-        case UIImageOrientationUp:
-            return self;
-            
-        case UIImageOrientationUpMirrored:
-            tran = CGAffineTransformMakeTranslation(rect.size.width, 0.0);
-            tran = CGAffineTransformScale(tran, -1.0, 1.0);
-            break;
-            
-        case UIImageOrientationDown:
-            tran = CGAffineTransformMakeTranslation(rect.size.width,
-                                                    rect.size.height);
-            tran = CGAffineTransformRotate(tran, M_PI);
-            break;
-            
-        case UIImageOrientationDownMirrored:
-            tran = CGAffineTransformMakeTranslation(0.0, rect.size.height);
-            tran = CGAffineTransformScale(tran, 1.0, -1.0);
-            break;
-            
+    bnds.size = self.size;
+    switch (orient) {///矫正画布尺寸
         case UIImageOrientationLeft:
-            bnds = swapWidthAndHeight(bnds);
-            tran = CGAffineTransformMakeTranslation(0.0, rect.size.width);
-            tran = CGAffineTransformRotate(tran, 3.0 * M_PI / 2.0);
-            break;
-            
         case UIImageOrientationLeftMirrored:
-            bnds = swapWidthAndHeight(bnds);
-            tran = CGAffineTransformMakeTranslation(rect.size.height,
-                                                    rect.size.width);
-            tran = CGAffineTransformScale(tran, -1.0, 1.0);
-            tran = CGAffineTransformRotate(tran, 3.0 * M_PI / 2.0);
-            break;
-            
         case UIImageOrientationRight:
-            bnds = swapWidthAndHeight(bnds);
-            tran = CGAffineTransformMakeTranslation(rect.size.height, 0.0);
-            tran = CGAffineTransformRotate(tran, M_PI / 2.0);
-            break;
-            
         case UIImageOrientationRightMirrored:
             bnds = swapWidthAndHeight(bnds);
-            tran = CGAffineTransformMakeScale(-1.0, 1.0);
-            tran = CGAffineTransformRotate(tran, M_PI / 2.0);
             break;
-            
         default:
-            return self;
+            break;
     }
-    
+    ///开启画布
     UIGraphicsBeginImageContextWithOptions(bnds.size, NO, [UIScreen mainScreen].scale);
-    CGContextRef ctxt = UIGraphicsGetCurrentContext();
-    
-    switch (orient)
-    {
-        case UIImageOrientationLeft:
+    CGContextRef bitmap = UIGraphicsGetCurrentContext();
+    ///移动原点至图片中心并矫正坐标系
+    CGContextTranslateCTM(bitmap, bnds.size.width/2.0, bnds.size.height/2.0);
+    CGContextScaleCTM(bitmap, 1.0, -1.0);
+    ///坐标系变换
+    switch (orient) {///处理镜像
+        case UIImageOrientationUpMirrored:
+        case UIImageOrientationDown://因为上下镜像时本身会镜像，所以此处Down做镜像而不是DownMirrored
         case UIImageOrientationLeftMirrored:
-        case UIImageOrientationRight:
         case UIImageOrientationRightMirrored:
-            CGContextScaleCTM(ctxt, -1.0, 1.0);
-            CGContextTranslateCTM(ctxt, -rect.size.height, 0.0);
+            CGContextScaleCTM(bitmap, -1.0, 1.0);
             break;
-            
         default:
-            CGContextScaleCTM(ctxt, 1.0, -1.0);
-            CGContextTranslateCTM(ctxt, 0.0, -rect.size.height);
+            break;
+    }
+    switch (orient) {///处理方向
+        case UIImageOrientationDown:
+        case UIImageOrientationDownMirrored:
+            CGContextScaleCTM(bitmap, 1.0, -1.0);
+            break;
+        case UIImageOrientationLeft:
+        case UIImageOrientationRightMirrored://因为上文做过镜像，所以此处处理方向时镜像需交换
+            CGContextRotateCTM(bitmap, -M_PI_2);
+            break;
+        case UIImageOrientationRight:
+        case UIImageOrientationLeftMirrored:
+            CGContextRotateCTM(bitmap, M_PI_2);
+            break;
+        default:
             break;
     }
     
-    CGContextConcatCTM(ctxt, tran);
-    CGContextDrawImage(UIGraphicsGetCurrentContext(), rect, self.CGImage);
-    
-    UIImage* copy  = UIGraphicsGetImageFromCurrentImageContext();
+    ///绘制图片
+    CGContextDrawImage(bitmap, CGRectMake(-self.size.width / 2, -self.size.height / 2, self.size.width, self.size.height), [self CGImage]);
+    ///生成图片
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
-    return copy;
+    return newImage;
 }
 
 /** 垂直翻转 */
