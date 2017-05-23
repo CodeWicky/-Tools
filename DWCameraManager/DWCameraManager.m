@@ -8,7 +8,6 @@
 
 #import "DWCameraManager.h"
 #import <AssetsLibrary/AssetsLibrary.h>
-#import <Photos/PHPhotoLibrary.h>
 #import <UIKit/UIKit.h>
 
 #define SafeStatus \
@@ -21,6 +20,9 @@ if (self.isQuickShoting && !self.quickShotTakingPhoto) return;
 {
     dispatch_queue_t sessionQueue;///统一串行队列
 }
+
+///输出视图层
+@property (nonatomic ,strong) AVCaptureVideoPreviewLayer * videoLayer;
 
 ///捕捉实例
 @property (nonatomic ,strong) AVCaptureSession * captureSession;
@@ -104,19 +106,7 @@ if (self.isQuickShoting && !self.quickShotTakingPhoto) return;
         return;
     }
     [CATransaction begin];
-    if (interfaceOrientation == UIInterfaceOrientationLandscapeRight) {
-        self.videoConn.videoOrientation = AVCaptureVideoOrientationLandscapeLeft;
-        self.photoConn.videoOrientation = AVCaptureVideoOrientationLandscapeLeft;
-    }else if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft){
-        self.videoConn.videoOrientation = AVCaptureVideoOrientationLandscapeRight;
-        self.photoConn.videoOrientation = AVCaptureVideoOrientationLandscapeRight;
-    }else if (interfaceOrientation == UIDeviceOrientationPortrait){
-        self.videoConn.videoOrientation = AVCaptureVideoOrientationPortrait;
-        self.photoConn.videoOrientation = AVCaptureVideoOrientationPortrait;
-    }else if (interfaceOrientation == UIDeviceOrientationPortraitUpsideDown){
-        self.videoConn.videoOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
-        self.photoConn.videoOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
-    }
+    [[self.videoLayer connection] setVideoOrientation:(AVCaptureVideoOrientation)interfaceOrientation];
     [CATransaction commit];
 }
 
@@ -549,12 +539,17 @@ static inline NSString * levelString(DWCameraResolutionLevel level) {
 
 #pragma mark --- setter/getter ---
 -(AVCaptureVideoPreviewLayer *)videoLayer {
-    if (!_videoLayer) {
-        _videoLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.captureSession];
-        _videoLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    return (AVCaptureVideoPreviewLayer *)self.videoView.layer;
+}
+
+-(DWCameraManagerView *)videoView {
+    if (!_videoView) {
+        _videoView = [DWCameraManagerView new];
+        _videoView.session = self.captureSession;
+        ((AVCaptureVideoPreviewLayer *)_videoView.layer).videoGravity = AVLayerVideoGravityResizeAspectFill;
     }
     if (self.mediaType & DWCaptureTypeVideo) {
-        return _videoLayer;
+        return _videoView;
     }
     return nil;
 }
@@ -823,16 +818,25 @@ static inline NSString * levelString(DWCameraResolutionLevel level) {
 }
 
 -(AVCaptureConnection *)videoConn {
-    if (!_videoConn) {
-        _videoConn = [self.videoOutput connectionWithMediaType:AVMediaTypeVideo];
-    }
-    return _videoConn;
+    return [self.videoOutput connectionWithMediaType:AVMediaTypeVideo];
 }
 
 -(AVCaptureConnection *)photoConn {
-    if (!_photoConn) {
-        _photoConn = [self.photoOutput connectionWithMediaType:AVMediaTypeVideo];
-    }
-    return _photoConn;
+    return [self.photoOutput connectionWithMediaType:AVMediaTypeVideo];
+}
+@end
+
+@implementation DWCameraManagerView
+
++(Class)layerClass {
+    return [AVCaptureVideoPreviewLayer class];
+}
+
+-(AVCaptureSession *)session {
+    return ((AVCaptureVideoPreviewLayer *)self.layer).session;
+}
+
+-(void)setSession:(AVCaptureSession *)session {
+    ((AVCaptureVideoPreviewLayer *)self.layer).session = session;
 }
 @end

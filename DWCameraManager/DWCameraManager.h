@@ -35,6 +35,11 @@
  连拍模式文件名修复
  连拍修正
  
+ version 1.0.4
+ 视图除数层改为UIView子类
+ 屏幕旋转方向bug修复
+ 镜像bug修复
+ 
  */
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
@@ -70,10 +75,11 @@ typedef NS_ENUM(NSUInteger, DWCameraResolutionLevel) {///分辨率
     DWCameraResolutionLevelPhoto,///全分辨率（最高）
 };
 
+@class DWCameraManagerView;
 @interface DWCameraManager : NSObject
 
 ///输出视图层
-@property (nonatomic ,strong) AVCaptureVideoPreviewLayer * videoLayer;
+@property (nonatomic ,strong) DWCameraManagerView * videoView;
 
 ///开始捕捉回调
 @property (nonatomic ,copy) void (^startCaptureBlock)(DWCameraManager * mgr,NSString * fileName);
@@ -284,5 +290,11 @@ typedef NS_ENUM(NSUInteger, DWCameraResolutionLevel) {///分辨率
 
 ///按设备坐标对焦及曝光
 - (void)focusWithMode:(AVCaptureFocusMode)focusMode exposeWithMode:(AVCaptureExposureMode)exposureMode atDevicePoint:(CGPoint)point monitorSubjectAreaChange:(BOOL)monitorSubjectAreaChange;
+
+@end
+
+@interface DWCameraManagerView : UIView
+
+@property (nonatomic ,strong) AVCaptureSession * session;
 
 @end
