@@ -132,3 +132,7 @@ typedef NS_ENUM(NSUInteger, DWArrayKeyPathActionType) {
 -(id)dw_GetObjectWithKeyPath:(NSString *)path action:(DWArrayKeyPathActionType)action;
 
 @end
+
+@interface NSArray (DWArrayLogUtils)
+
+@end

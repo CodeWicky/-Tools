@@ -8,6 +8,7 @@
 
 #import "DWContactManager.h"
 #import <AddressBook/AddressBook.h>
+#import "NSString+DWStringUtils.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"
@@ -229,7 +230,7 @@ static DWContactManager * manager = nil;
 ///按拼音/汉字排序指定范围联系人
 -(void)sortContacts:(NSMutableArray *)contacts {
     [contacts sortUsingComparator:^NSComparisonResult(DWContactModel * obj1, DWContactModel * obj2) {
-        return [obj1.nameSortString localizedCompare:obj2.nameSortString];
+        return [obj1.nameSortString dw_ComparedInPinyinWithString:obj2.nameSortString];
     }];
 }
 
@@ -368,6 +369,10 @@ void ContactChangeCallBack(ABAddressBookRef addressBook,CFDictionaryRef info,voi
 -(void)dealloc {
     ABAddressBookUnregisterExternalChangeCallback(_addressBook, ContactChangeCallBack, nil);
 }
+
+#pragma mark --- inline method ---
+
+
 
 #pragma mark --- setter/getter ---
 -(ABAddressBookRef)addressBook {

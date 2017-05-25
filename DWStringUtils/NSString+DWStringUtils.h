@@ -28,6 +28,9 @@
  拼音排序方法统一修改
  转换时音调支持
  排序时音调支持
+ 
+ version 1.0.4
+ 再次更改中文排序算法，改为逐字比较。
  */
 
 #import <UIKit/UIKit.h>
@@ -66,6 +69,12 @@
 ///符合正则的子串集
 -(NSArray <NSString *> *)dw_SubStringConfirmToPattern:(NSString *)pattern;
 
+///将字符串分割成词（中文汉字为最小单位，英文单词为最小单位）
+-(NSArray *)dw_TrimStringToWord;
+
+///判断字符串是否是中文
+-(BOOL)dw_StringIsChinese;
+
 @end
 
 @interface NSString (DWStringSortUtils)
@@ -82,6 +91,15 @@
  @return 比较结果
  */
 -(NSComparisonResult)dw_ComparedInPinyinWithString:(NSString *)string considerTone:(BOOL)tone;
+
+
+/**
+ 返回考虑音调的拼音比较结果
+
+ @param string 被比较的字符串
+ @return 比较结果
+ */
+-(NSComparisonResult)dw_ComparedInPinyinWithString:(NSString *)string;
 
 @end
 

@@ -200,3 +200,19 @@ static inline NSString * StringFromAction(DWArrayKeyPathActionType action) {
 }
 
 @end
+
+@implementation NSArray (DWArrayLogUtils)
+
+-(NSString *)descriptionWithLocale:(id)locale
+{
+    NSMutableString *string=[[NSMutableString alloc]init];
+    [string appendString:@"("];
+    
+    for (id obj in self) {//self就是当前可变数组,遍历数组中的对象拼接成新的字符串返回
+        [string appendFormat:@"\n\t%@",obj];
+    }
+    [string appendString:@"\n)"];
+    return string;
+}
+
+@end
