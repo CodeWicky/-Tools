@@ -64,16 +64,22 @@ static DWContactManager * manager = nil;
             }
             return;
         }
-        NSArray * array = (__bridge_transfer NSArray *)ABAddressBookCopyArrayOfAllPeople(self.addressBook);
-        NSMutableArray <DWContactModel *>* contacts = [NSMutableArray array];
-        for (int i = 0;i < array.count;i++) {
-            [contacts addObject:[[DWContactModel alloc] initWithABRecord:(ABRecordRef)array[i]]];
-        }
-        self.allContacts = contacts;
+        self.allContacts = [self getAllContacts];
         if (completion) {
             completion(self.allContacts);
         }
     }
+}
+
+-(NSMutableArray *)fetctAllContacts {
+    if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) {
+        return nil;
+    }
+    if (self.allContacts) {
+        return self.allContacts;
+    }
+    self.allContacts = [self getAllContacts];
+    return self.allContacts;
 }
 
 -(void)fetchSortedContactsInGroupWitnCompletion:(void(^)(NSMutableDictionary * sortedContacts,NSArray * sortedKeys))completion {
@@ -87,9 +93,7 @@ static DWContactManager * manager = nil;
         ///分组并配置排序信息
         [self seperateContactsToGroup:allContacts completion:^(NSMutableDictionary *contactsInGroup) {
             ///将分组内联系人按拼音、姓名排序
-            [self sortGroupContacts:contactsInGroup];
-            self.sortedContacts = contactsInGroup;
-            self.sortedKeys = [self sortedKeyInGroup:self.sortedContacts];
+            [self sortContactsInGroup:contactsInGroup];
             if (completion) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     completion(self.sortedContacts,self.sortedKeys);
@@ -97,6 +101,18 @@ static DWContactManager * manager = nil;
             }
         }];
     }];
+}
+
+-(NSDictionary *)fetchSortedContactsInGroup {
+    if (!self.sortedContacts || !self.sortedKeys) {
+        NSMutableArray * contacts = [self fetctAllContacts];
+        NSMutableDictionary * contactsInGroup = [self seperateContactsToGroup:contacts];
+        [self sortContactsInGroup:contactsInGroup];
+    }
+    if (self.sortedContacts && self.sortedKeys) {
+        return @{@"sortedContacts":self.sortedContacts,@"sortedKeys":self.sortedKeys};
+    }
+    return nil;
 }
 
 -(void)setNeedsRefetch {
@@ -116,13 +132,27 @@ static DWContactManager * manager = nil;
     }
 }
 
+-(NSArray *)filterAllContactsWithCondition:(BOOL (^)(DWContactModel *))condition {
+    if (!self.allContacts) {
+        [self fetctAllContacts];
+    }
+    return [self filterContacts:self.allContacts condition:condition];
+}
+
+
 -(void)sortContacts:(NSArray *)contacts completion:(void (^)(NSArray *))completion {
     NSMutableArray * contactsM = [NSMutableArray arrayWithArray:contacts];
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        [self sortContacts:contactsM];
+        [self sortContactsArray:contactsM];
         completion ? completion([contactsM copy]) : nil;
     });
 }
+-(NSArray *)sortContacts:(NSArray *)contacts {
+    NSMutableArray * contactsM = [NSMutableArray arrayWithArray:contacts];
+    [self sortContactsArray:contactsM];
+    return [contactsM copy];
+}
+
 
 ///姓名分组
 -(void)seperateContactsToGroup:(NSArray *)contacts completion:(void(^)(NSMutableDictionary * contactsInGroup))completion {
@@ -152,6 +182,31 @@ static DWContactManager * manager = nil;
         completion(dicG);
     });
 }
+
+-(NSMutableDictionary *)seperateContactsToGroup:(NSArray *)contacts {
+    NSMutableDictionary * dicG = [NSMutableDictionary dictionary];
+    for (DWContactModel * model in contacts) {
+        NSString * nameString = [NSString stringWithFormat:@"%@%@%@",model.familyName?:@"",model.middleName?:@"",model.givenName?:@""];
+        NSString * firstChar = nil;
+        if (nameString.length) {
+            model.nameSortString = [self correctTheFirstNameWithChineseStr:nameString];
+            model.pinYinString = [self createPinyinString:model.nameSortString];
+            firstChar = [self firstCapitalCharOfString:model.pinYinString];
+        }
+        if (!firstChar) {
+            firstChar = @"#";
+        }
+        NSMutableArray * arr = dicG[firstChar];
+        if (!arr) {
+            arr = [NSMutableArray array];
+            dicG[firstChar] = arr;
+        }
+        [arr addObject:model];
+    }
+    return dicG;
+}
+
+
 
 -(BOOL)addNewContact:(DWContactModel *)personModel {
     if (self.isChangingAB) {
@@ -220,15 +275,32 @@ static DWContactManager * manager = nil;
 }
 
 #pragma mark --- tool method ---
+///获取联系人
+-(NSMutableArray *)getAllContacts {
+    NSArray * array = (__bridge_transfer NSArray *)ABAddressBookCopyArrayOfAllPeople(self.addressBook);
+    NSMutableArray <DWContactModel *>* contacts = [NSMutableArray array];
+    for (int i = 0;i < array.count;i++) {
+        [contacts addObject:[[DWContactModel alloc] initWithABRecord:(ABRecordRef)array[i]]];
+    }
+    return contacts;
+}
+
+///排序分组联系人
+-(void)sortContactsInGroup:(NSMutableDictionary *)contactsInGroup {
+    [self sortGroupContacts:contactsInGroup];
+    self.sortedContacts = contactsInGroup;
+    self.sortedKeys = [self sortedKeyInGroup:self.sortedContacts];
+}
+
 ///同分组按拼音/汉字排序
 -(void)sortGroupContacts:(NSMutableDictionary *)groupContacts {
     for (NSMutableArray * arr in groupContacts.allValues) {
-        [self sortContacts:arr];
+        [self sortContactsArray:arr];
     }
 }
 
 ///按拼音/汉字排序指定范围联系人
--(void)sortContacts:(NSMutableArray *)contacts {
+-(void)sortContactsArray:(NSMutableArray *)contacts {
     [contacts sortUsingComparator:^NSComparisonResult(DWContactModel * obj1, DWContactModel * obj2) {
         return [obj1.nameSortString dw_ComparedInPinyinWithString:obj2.nameSortString];
     }];
@@ -318,6 +390,19 @@ static DWContactManager * manager = nil;
         completion ? completion(temp) : nil;
     } else {
         completion ? completion(nil) : nil;
+    }
+}
+-(NSArray *)filterContacts:(NSArray *)contacts condition:(BOOL (^)(DWContactModel *))condition {
+    if (contacts.count) {
+        NSMutableArray * temp = [NSMutableArray array];
+        for (DWContactModel * personModel in self.allContacts) {
+            if (condition(personModel)) {
+                [temp addObject:personModel];
+            }
+        }
+        return temp;
+    } else {
+        return nil;
     }
 }
 

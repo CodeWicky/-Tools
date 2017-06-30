@@ -27,6 +27,9 @@
  
  version 1.0.3
  按姓名拼音排序算法重构，杜绝崩溃可能，返回绝对顺序。
+ 
+ version 1.0.4
+ 提供同步接口
  */
 
 
@@ -43,9 +46,11 @@
 
 ///获取全部联系人
 -(void)fetchAllContactsWithCompletion:(void(^)(NSMutableArray * allContacts))completion;
+-(NSMutableArray *)fetctAllContacts;
 
 ///获取全部联系人后分组并排序
 -(void)fetchSortedContactsInGroupWitnCompletion:(void(^)(NSMutableDictionary * sortedContacts,NSArray * sortedKeys))completion;
+-(NSDictionary *)fetchSortedContactsInGroup;
 
 ///
 
@@ -56,6 +61,7 @@
  @param completion 过滤后结果回调
  */
 -(void)filterAllContactsWithCondition:(BOOL (^)(DWContactModel *))condition completion:(void (^)(NSArray *))completion;
+-(NSArray *)filterAllContactsWithCondition:(BOOL(^)(DWContactModel *))condition;
 
 /**
  若要重新获取通讯录，先行调用此方法
@@ -64,15 +70,24 @@
 
 ///按姓名、拼音排序指定联系人数组
 -(void)sortContacts:(NSArray *)contacts completion:(void(^)(NSArray * sortedResults))completion;
+-(NSArray *)sortContacts:(NSArray *)contacts;
 
 ///将指定联系人数组按首字母分组
 -(void)seperateContactsToGroup:(NSArray *)contacts completion:(void(^)(NSMutableDictionary * contactsInGroup))completion;
+/**
+ 将指定联系人数组按首字母分组
+
+ @param contacts 待分组的联系人数组
+ @return 返回字典，排好序的分组键名为sortedContacts，分组中排好序的索引键名为sortedKeys
+ */
+-(NSMutableDictionary *)seperateContactsToGroup:(NSArray *)contacts;
 
 ///首字母排序
 -(NSArray *)sortedKeyInGroup:(NSMutableDictionary *)group;
 
 ///以条件过滤指定数组内的联系人
 -(void)filterContacts:(NSArray *)contacts condition:(BOOL (^)(DWContactModel *))condition completion:(void (^)(NSArray *))completion;
+-(NSArray *)filterContacts:(NSArray *)contacts condition:(BOOL(^)(DWContactModel *))condition;
 
 /**
  下列方法将操作系统联系人，添加、修改、删除联系人修改后会影响重新搜索联系人的结果，但不实际更改系统同学录，只有调用保存联系人变化方法后才会同步至系统通讯录。保存通讯录之前调用丢弃联系人变化方法可放弃改变。但调用保存联系人变化方法后，所有联系人变化将同步至系统通讯录，此时调用丢弃变化也不能恢复

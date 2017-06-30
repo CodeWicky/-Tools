@@ -40,8 +40,9 @@
 
 -(void)dw_blockBtnAction:(UIButton *)sender
 {
+    __weak typeof(self)weakSelf = self;
     if (self.actionBlock) {
-        self.actionBlock(self);
+        self.actionBlock(weakSelf);
     }
 }
 
