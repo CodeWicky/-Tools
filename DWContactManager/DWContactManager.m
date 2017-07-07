@@ -331,7 +331,7 @@ static DWContactManager * manager = nil;
         return nil;
     }
     __block NSString * string = @"";
-    NSString * tempString = [NSString stringWithFormat:@"啊%@",aString];//别问我为什么，我也不知道为什么第一个字是汉字第二个是单词遍历的时候不会分开，前面有两个字就没关系
+    NSString * tempString = [NSString stringWithFormat:@"啊啊%@",aString];//别问我为什么，我也不知道为什么第一个字是汉字第二个是单词遍历的时候不会分开，前面有两个字就没关系
     [tempString enumerateSubstringsInRange:NSMakeRange(0, tempString.length) options:(NSStringEnumerationByWords|NSStringEnumerationLocalized) usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
         NSString * pinyin = [self transferChineseToPinYin:substring];
         if (!string.length) {
@@ -340,8 +340,8 @@ static DWContactManager * manager = nil;
             string = [string stringByAppendingString:[NSString stringWithFormat:@" %@",pinyin]];
         }
     }];
-    if ([string hasPrefix:@"a "]) {
-        string = [string substringFromIndex:2];
+    if ([string hasPrefix:@"a a "]) {
+        string = [string substringFromIndex:4];
     }
     return string;
 }
