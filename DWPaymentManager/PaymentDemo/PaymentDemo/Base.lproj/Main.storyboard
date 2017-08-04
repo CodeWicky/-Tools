@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4fs-MA-sw0">
+                                <rect key="frame" x="164" y="318" width="46" height="30"/>
+                                <state key="normal" title="支付宝"/>
+                                <connections>
+                                    <action selector="alipay:" destination="BYZ-38-t0r" eventType="touchUpInside" id="7e1-5q-vNO"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d45-cs-hfp">
+                                <rect key="frame" x="164.5" y="238" width="46" height="30"/>
+                                <state key="normal" title="广银联"/>
+                                <connections>
+                                    <action selector="unionPay:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Qsq-in-d63"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ezK-Li-S7c">
+                                <rect key="frame" x="171.5" y="398" width="31" height="30"/>
+                                <state key="normal" title="微信"/>
+                                <connections>
+                                    <action selector="weixinPay:" destination="BYZ-38-t0r" eventType="touchUpInside" id="uZ9-2A-3oe"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="4fs-MA-sw0" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="Xjj-Pr-kuK"/>
+                            <constraint firstItem="ezK-Li-S7c" firstAttribute="top" secondItem="4fs-MA-sw0" secondAttribute="bottom" constant="50" id="ZTY-gU-VIz"/>
+                            <constraint firstItem="ezK-Li-S7c" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="gNg-w1-5Gb"/>
+                            <constraint firstItem="d45-cs-hfp" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="jLU-cv-P3s"/>
+                            <constraint firstItem="4fs-MA-sw0" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="r92-Yu-IKV"/>
+                            <constraint firstItem="4fs-MA-sw0" firstAttribute="top" secondItem="d45-cs-hfp" secondAttribute="bottom" constant="50" id="rbT-uf-EDQ"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>
