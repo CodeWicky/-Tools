@@ -40,6 +40,6 @@
 /**
  注册SDK
  */
-+(void)registIfNeed;
++(void)registIfNeedWithConfig:(DWPaymentConfig *)config;
 
 @end

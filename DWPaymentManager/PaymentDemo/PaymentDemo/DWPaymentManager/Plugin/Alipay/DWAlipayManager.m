@@ -20,7 +20,30 @@ static DWAlipayManager * manager = nil;
     [[AlipaySDK defaultService] payOrder:orderInfo fromScheme:appScheme callback:^(NSDictionary *resultDic) {
         PaymentCompletion completion = [DWAlipayManager shareManager].paymentCompletion;
         if (completion) {
-            completion(DWPaymentTypeAlipay,resultDic);
+            NSString * statusCode = resultDic[@"resultStatus"];
+            PayStatus status = PayStatusFail;
+            NSString * payCode = nil;
+            NSString * payMsg = nil;
+            if ([statusCode isEqualToString:@"9000"]) {
+                status = PayStatusSuccess;
+            } else if ([statusCode isEqualToString:@"8000"] || [statusCode isEqualToString:@"6004"]) {
+                status = PayStatusPending;
+            } else if ([statusCode isEqualToString:@"6001"] || [statusCode isEqualToString:@"5000"]) {
+                status = PayStatusCancel;
+            }
+            NSString * jsonStr = resultDic[@"result"];
+            NSDictionary * result = nil;
+            if (jsonStr.length) {
+                NSData * jsonData = [jsonStr dataUsingEncoding:NSUTF8StringEncoding];
+                NSDictionary * dic = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:nil];
+                result = dic[@"alipay_trade_app_pay_response"];
+                payCode = result[@"code"];
+                payMsg = result[@"sub_msg"];
+            } else {
+                payCode = statusCode;
+                payMsg = resultDic[@"memo"];
+            }
+            completion(DWPaymentTypeAlipay,status,payCode,payMsg,result);
         }
     }];
 }
@@ -50,7 +73,7 @@ static DWAlipayManager * manager = nil;
     }];
 }
 
-+(void)registIfNeed {
++(void)registIfNeedWithConfig:(DWPaymentConfig *)config {
     ///Nothing To Do.
 }
 

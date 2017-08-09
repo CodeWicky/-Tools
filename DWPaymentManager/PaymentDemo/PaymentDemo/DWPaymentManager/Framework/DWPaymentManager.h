@@ -25,6 +25,9 @@
  模块化结构，代码入侵性更小，通用性更强
  提供正式、测试环境标志符 DevEvn 。根据情况做不同配置即可。
  
+ version 1.0.1
+ 注册方法改造，提供注册模型类
+ 支付完成回调统一，整合现有支付方式支付结果
  */
 
 #import "DWPaymentHeader.h"
@@ -35,10 +38,16 @@
  以下API为注册几个支付渠道的通用配置，写在-application:didFinishLaunchingWithOptions:中即可
  */
 
+
 /**
  注册支付管理类
+
+ @param configs 各支付渠道注册所需配置模型
+ 
+ 注：
+ 当前状态下，仅微信支付需要注册AppID
  */
-+(void)registPaymentManager;
++(void)registPaymentManagerWithConfigs:(NSArray <DWPaymentConfig *>*)configs;
 
 #pragma mark --- 支付入口 ---
 /**

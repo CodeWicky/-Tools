@@ -28,19 +28,37 @@
 
 #pragma mark --- interface method ---
 
-+(void)registPaymentManager {
++(void)registPaymentManagerWithConfigs:(NSArray<DWPaymentConfig *> *)configs {
+    [configs enumerateObjectsUsingBlock:^(DWPaymentConfig * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        switch (obj.payType) {
+            case DWPaymentTypeAlipay:
+            {
 #if __has_include("DWAlipayManager.h")
-    [DWAlipayManager registIfNeed];
+                [DWAlipayManager registIfNeedWithConfig:obj];
 #endif
+                break;
+            }
+            case DWPaymentTypeUnionPay:
+            {
 #if __has_include("DWUnionPayManager.h")
-    [DWUnionPayManager registIfNeed];
+                [DWUnionPayManager registIfNeedWithConfig:obj];
 #endif
+                break;
+            }
+            case DWPaymentTypeWeiXin:
+            {
 #if __has_include("DWWeiXinManager.h")
-    [DWWeiXinManager registIfNeed];
+                [DWWeiXinManager registIfNeedWithConfig:obj];
 #endif
+                break;
+            }
+            default:
+                break;
+        }
+    }];
 }
 
-+(void)payWithOrderInfo:(id)orderInfo payType:(DWPaymentType)payType currentVC:(UIViewController *)currentVC completion:(void (^)(DWPaymentType, id))completion {
++(void)payWithOrderInfo:(id)orderInfo payType:(DWPaymentType)payType currentVC:(UIViewController *)currentVC completion:(PaymentCompletion)completion {
     BOOL invalid = NO;
     if ([orderInfo isKindOfClass:[NSString class]] && [orderInfo length] == 0) {
         invalid = YES;

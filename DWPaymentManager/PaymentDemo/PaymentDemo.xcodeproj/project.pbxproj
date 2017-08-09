@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9BB4854D1F39C21F00B0CDDA /* DWPaymentConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BB4854C1F39C21F00B0CDDA /* DWPaymentConfig.m */; };
 		9BE55BB61F345DFF00224DC8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BE55BB51F345DFF00224DC8 /* main.m */; };
 		9BE55BB91F345DFF00224DC8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BE55BB81F345DFF00224DC8 /* AppDelegate.m */; };
 		9BE55BBC1F345DFF00224DC8 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BE55BBB1F345DFF00224DC8 /* ViewController.m */; };
@@ -56,6 +57,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9BB4854B1F39C21F00B0CDDA /* DWPaymentConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWPaymentConfig.h; sourceTree = "<group>"; };
+		9BB4854C1F39C21F00B0CDDA /* DWPaymentConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWPaymentConfig.m; sourceTree = "<group>"; };
 		9BE55BB11F345DFF00224DC8 /* PaymentDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PaymentDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BE55BB51F345DFF00224DC8 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9BE55BB71F345DFF00224DC8 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -233,6 +236,8 @@
 		9BE55C4B1F347E8E00224DC8 /* Framework */ = {
 			isa = PBXGroup;
 			children = (
+				9BB4854B1F39C21F00B0CDDA /* DWPaymentConfig.h */,
+				9BB4854C1F39C21F00B0CDDA /* DWPaymentConfig.m */,
 				9BE55C4C1F347E8E00224DC8 /* DWAbstractManager.h */,
 				9BE55C4D1F347E8E00224DC8 /* DWAbstractManager.m */,
 				9BE55C4E1F347E8E00224DC8 /* DWPaymentHeader.h */,
@@ -461,6 +466,7 @@
 				9BE55BBC1F345DFF00224DC8 /* ViewController.m in Sources */,
 				9BE55BB91F345DFF00224DC8 /* AppDelegate.m in Sources */,
 				9BE55C751F347E8E00224DC8 /* DWWeiXinManager.m in Sources */,
+				9BB4854D1F39C21F00B0CDDA /* DWPaymentConfig.m in Sources */,
 				9BE55C6B1F347E8E00224DC8 /* DWPaymentManager.m in Sources */,
 				9BE55C741F347E8E00224DC8 /* DWUnionPayManager.m in Sources */,
 				9BE55C721F347E8E00224DC8 /* 微信支付集成指南.md in Sources */,

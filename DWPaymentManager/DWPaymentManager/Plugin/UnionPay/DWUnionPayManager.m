@@ -39,20 +39,36 @@ static DWUnionPayManager * manager = nil;
 
 +(void)defaultCallBackWithUrl:(NSURL *)url {
     [[UPPaymentControl defaultControl] handlePaymentResult:url completeBlock:^(NSString *code, NSDictionary *data) {
-        if ([DWUnionPayManager shareManager].paymentCompletion) {
+        PaymentCompletion completion = [DWUnionPayManager shareManager].paymentCompletion;
+        if (completion) {
+            PayStatus status = PayStatusFail;
+            if ([code isEqualToString:@"success"]) {
+                status = PayStatusSuccess;
+            } else if ([code isEqualToString:@"cancel"]) {
+                status = PayStatusCancel;
+            }
             NSMutableDictionary * result = @{}.mutableCopy;
-            if (code) {
-                [result setValue:code forKey:@"code"];
-            }
             if (data) {
-                [result setValue:data forKey:@"data"];
+                NSString * dataStr = data[@"data"];
+                if (dataStr.length) {
+                    [[dataStr componentsSeparatedByString:@"&"] enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                        if (obj.length && [obj containsString:@"="]) {
+                            NSArray <NSString *>* arr = [obj componentsSeparatedByString:@"="];
+                            if (arr.firstObject.length) {
+                                [result setValue:arr.lastObject.length?arr.lastObject:@"" forKey:arr.firstObject];
+                            }
+                        }
+                    }];
+                }
+                NSString * sign = data[@"sign"];
+                [result setValue:sign?:@"" forKey:@"sign"];
             }
-            [DWUnionPayManager shareManager].paymentCompletion(DWPaymentTypeUnionPay, result);
+            completion(DWPaymentTypeUnionPay, status,nil,nil,result);
         }
     }];
 }
 
-+(void)registIfNeed {
++(void)registIfNeedWithConfig:(DWPaymentConfig *)config {
     ///Nothing To Do;
 }
 

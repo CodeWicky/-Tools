@@ -173,3 +173,14 @@
 }
 
 @end
+
+@implementation UIView (DWViewSubViewsUtils)
+
+-(void)removeAllSubviews {
+    if (self.subviews.count == 0) {
+        return;
+    }
+    [self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+}
+
+@end

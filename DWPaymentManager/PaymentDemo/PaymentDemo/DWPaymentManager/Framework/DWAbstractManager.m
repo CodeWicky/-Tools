@@ -23,7 +23,7 @@
     AbstractMethodNotImplemented();
 }
 
-+(void)registIfNeed {
++(void)registIfNeedWithConfig:(DWPaymentConfig *)config {
     AbstractMethodNotImplemented();
 }
 

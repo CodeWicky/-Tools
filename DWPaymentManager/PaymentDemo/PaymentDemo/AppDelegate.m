@@ -16,7 +16,12 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [DWPaymentManager registPaymentManager];
+    
+    DWPaymentConfig * wxConfig = [DWPaymentConfig new];
+    wxConfig.payType = DWPaymentTypeWeiXin;
+    wxConfig.AppID = @"wx7e1a39693cb1a1f1";
+    
+    [DWPaymentManager registPaymentManagerWithConfigs:@[wxConfig]];
     return YES;
 }
 

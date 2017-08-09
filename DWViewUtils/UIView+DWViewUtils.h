@@ -46,3 +46,10 @@
 -(void)dw_AddCorner:(UIRectCorner)corners radius:(CGFloat)radius;
 
 @end
+
+@interface UIView (DWViewSubViewsUtils)
+
+///移除所有子视图
+-(void)removeAllSubviews;
+
+@end

@@ -31,9 +31,12 @@ static DWWeiXinManager * manager = nil;
     [WXApi handleOpenURL:url delegate:[DWWeiXinManager shareManager]];
 }
 
-+(void)registIfNeed {
++(void)registIfNeedWithConfig:(DWPaymentConfig *)config {
+    if (config.payType != DWPaymentTypeWeiXin || config.AppID.length == 0) {
+        return;
+    }
     //AppID 及 Des 根据项目自行配置
-    [WXApi registerApp:@"wx7e1a39693cb1a1f1"];
+    [WXApi registerApp:config.AppID];
 }
 
 +(instancetype)shareManager {
@@ -56,21 +59,26 @@ static DWWeiXinManager * manager = nil;
 #pragma mark - WXApiDelegate
 - (void)onResp:(BaseResp *)resp {
     if([resp isKindOfClass:[PayResp class]]){
-        PayResp * response = (PayResp *)resp;
-        //支付返回结果，实际支付结果需要去微信服务器端查询
-        NSMutableDictionary * result = @{}.mutableCopy;
-        if (response.errStr) {
-            [result setValue:response.errStr forKey:@"data"];
-        }
-        if (response.errCode) {
-            [result setValue:@(response.errCode) forKey:@"code"];
-        }
-        if (response.returnKey) {
-            [result setValue:response.returnKey forKey:@"returnKey"];
-        }
         PaymentCompletion completion = [DWWeiXinManager shareManager].paymentCompletion;
         if (completion) {
-            completion(DWPaymentTypeWeiXin,result);
+            PayResp * response = (PayResp *)resp;
+            PayStatus status = PayStatusFail;
+            NSString * payCode = [NSString stringWithFormat:@"%d",response.errCode];
+            NSMutableDictionary * result = @{}.mutableCopy;
+            switch (response.errCode) {
+                case WXSuccess:
+                    status = PayStatusSuccess;
+                    break;
+                case WXErrCodeUserCancel:
+                    status = PayStatusCancel;
+                default:
+                    break;
+            }
+            if (response.returnKey) {
+                [result setValue:response.returnKey forKey:@"returnKey"];
+            }
+            [result setValue:@(response.type) forKey:@"type"];
+            completion(DWPaymentTypeWeiXin,status,payCode,response.errStr,result);
         }
     } else if (self.otherHandler) {
         self.otherHandler();
