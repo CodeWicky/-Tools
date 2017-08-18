@@ -201,6 +201,39 @@ static inline NSString * StringFromAction(DWArrayKeyPathActionType action) {
 
 @end
 
+@implementation NSArray (DWArraySearchUtils)
+
+-(void)dw_BinarySearchWithCondition:(DWSearchCondition)condition {
+    if (!condition || self.count == 0) {
+        return;
+    }
+    NSUInteger hR = self.count - 1;
+    NSUInteger lR = 0;
+    NSUInteger mR = 0;
+    BOOL stop = NO;
+    while (lR <= hR) {
+        mR = (hR + lR) / 2;
+        NSComparisonResult result = condition(self[mR],mR,&stop);
+        if (result == NSOrderedSame || stop == YES) {
+            break;
+        } else if (result == NSOrderedAscending) {
+            if (mR == 0) {
+                break;
+            } else {
+                hR = mR - 1;
+            }
+        } else {
+            if (mR == self.count - 1) {
+                break;
+            } else {
+                lR = mR + 1;
+            }
+        }
+    }
+}
+
+@end
+
 @implementation NSArray (DWArrayLogUtils)
 
 -(NSString *)descriptionWithLocale:(id)locale

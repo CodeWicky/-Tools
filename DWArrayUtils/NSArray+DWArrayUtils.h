@@ -63,6 +63,10 @@ typedef BOOL(^DWFilter)(id obj, NSUInteger idx,NSUInteger count,BOOL * stop);
 
 typedef NSComparisonResult(^DWComparator)(id obj1,id obj2);
 
+/**
+ 以下两个宏可作为DWComparator类型数据直接返回
+ */
+
 ///数字升序排列
 #define DWComparatorNumberAscending \
 if ([obj1 floatValue] < [obj2 floatValue]) {\
@@ -130,6 +134,51 @@ typedef NS_ENUM(NSUInteger, DWArrayKeyPathActionType) {
  注：path可为nil，则返回array自身的相应动作值
  */
 -(id)dw_GetObjectWithKeyPath:(NSString *)path action:(DWArrayKeyPathActionType)action;
+
+@end
+
+
+typedef NSComparisonResult(^DWSearchCondition)(id obj,NSUInteger currentIdx,BOOL * stop);
+
+@interface NSArray (DWArraySearchUtils)
+
+/**
+ 二分法查找数组中指定元素
+ 
+ @param condition 对比条件
+ - obj 当前找到元素
+ - currentIdx 当前找到角标
+ - *stop 是否停止查找
+ 
+ eg. 在给定数组@[@1,@2,@3,@4,@5]中查找@2的角标
+ 
+        NSArray * arr = @[@1,@2,@3,@4,@5];
+        __block NSUInteger idx = NSNotFound;
+        [arr dw_BinarySearchWithCondition:^NSComparisonResult(NSNumber * obj, NSUInteger currentIdx, BOOL *stop) {
+            if ([obj isEqualToNumber:@2]) {
+                idx = currentIdx;
+                return NSOrderedSame;
+            } else if (obj.integerValue > 2) {
+                return NSOrderedAscending;
+            } else {
+                return NSOrderedDescending;
+            }
+        }];
+        if (idx == NSNotFound) {
+            NSLog(@"未找到@2");
+        } else {
+            NSLog(@"元素@2的角标为%lu",idx);
+        }
+ 
+ 注：
+ 1.当condition为nil的时候会立刻返回
+ 2.请确保被查找容器为有序容器
+ 3.当查找到所需元素时，返回NSOrderedSame以停止查找过程
+ 当未查找到所需元素时，返回NSOrderedAscending以检测角标较小的一侧
+ 当未查找到所需元素时，返回NSOrderedDescending以检测角标较大的一侧
+ 4.任何时候，可以通过修改stop为YES以停止查找过程
+ */
+-(void)dw_BinarySearchWithCondition:(DWSearchCondition)condition;
 
 @end
 
