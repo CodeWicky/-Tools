@@ -184,9 +184,9 @@
 -(NSString *)distantStringSinceTimeStamp:(NSInteger)timeStamp
 {
     NSInteger distant = self.timeStamp - timeStamp;
-    NSString * sufStr = @"前";
+    NSString * sufStr = @"后";
     if (distant < 0) {
-        sufStr = @"后";
+        sufStr = @"前";
         distant = -distant;
     }
     NSString * preStr = @"";

@@ -735,9 +735,15 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
     if (width <= 0) {
         return -1;
     }
+    
+    CGRect cellBounds = cell.bounds;
+    cellBounds.size.width = width;
+    cell.bounds = cellBounds;
+    
     //根据辅助视图校正width
+    CGFloat accessroyWidth = 0;
     if (cell.accessoryView) {
-        width -= cell.accessoryView.bounds.size.width + 16;
+        accessroyWidth = cell.accessoryView.bounds.size.width + 16;
     }
     else
     {
@@ -748,8 +754,9 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
             [UITableViewCellAccessoryCheckmark] = 40,
             [UITableViewCellAccessoryDetailButton] = 48
         };
-        width -= accessoryWidth[cell.accessoryType];
+        accessroyWidth -= accessoryWidth[cell.accessoryType];
     }
+    width -= accessroyWidth;
     CGFloat height = 0;
     if (width > 0) {//如果不是非自适应模式则添加约束后计算约束后高度
         NSLayoutConstraint * widthConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:width];
@@ -768,7 +775,7 @@ static DWTableViewHelperModel * PlaceHolderCellModelAvoidCrashing = nil;
             
             ///添加4个约束
             NSLayoutConstraint *leftConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:cell attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
-            NSLayoutConstraint *rightConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:cell attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
+            NSLayoutConstraint *rightConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:cell attribute:NSLayoutAttributeRight multiplier:1.0 constant:accessroyWidth];
             NSLayoutConstraint *topConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:cell attribute:NSLayoutAttributeTop multiplier:1.0 constant:0];
             NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint constraintWithItem:cell.contentView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:cell attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0];
             edgeConstraints = @[leftConstraint, rightConstraint, topConstraint, bottomConstraint];
@@ -1145,6 +1152,5 @@ static UIImage * defaultUnselectIcon = nil;
 {
     _model = model;
 }
-
 @end
 
