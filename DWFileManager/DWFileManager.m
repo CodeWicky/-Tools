@@ -109,8 +109,7 @@
 }
 
 +(BOOL)dw_CreateDirectoryAtPath:(NSString *)path error:(NSError *__autoreleasing *)error {
-    BOOL isSuccess = [DefaultFileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:error];
-    return isSuccess;
+    return [DefaultFileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:error];
 }
 
 +(BOOL)dw_IsDirectoryIsEmptyAtPath:(NSString *)path {
@@ -127,9 +126,8 @@
 +(BOOL)dw_ClearDirectoryAtPath:(NSString *)path {
     NSArray *subFiles = [self dw_ListFilesInDirectoryAtPath:path deep:NO];
     BOOL isSuccess = YES;
-    
-    for (NSString *file in subFiles) {
-        NSString *absolutePath = [path stringByAppendingPathComponent:file];
+    for (DWFileManagerFile *file in subFiles) {
+        NSString *absolutePath = [path stringByAppendingPathComponent:file.fileName];
         isSuccess &= [self dw_RemoveItemAtPath:absolutePath];
     }
     return isSuccess;
@@ -145,11 +143,11 @@
 
 +(BOOL)dw_CreateFileAtPath:(NSString *)path content:(NSObject *)content overwrite:(BOOL)overwrite error:(NSError *__autoreleasing *)error {
     if ([self dw_IsFileAtPath:path] && !overwrite) {
-        *error = [NSError errorWithDomain:@"Write File Error!" code:10001 userInfo:@{@"reason":@"attemp to write a file which is already exist."}];
+        safeLinkError(error, [NSError errorWithDomain:@"Write File Error!" code:10001 userInfo:@{@"reason":@"attemp to write a file which is already exist."}]);
         return NO;
     }
-    [self dw_CreateDirectoryAtPath:[self dw_DirectoryPathAtPath:path] error:error];
-    if (*error) {
+    
+    if (![self dw_CreateDirectoryAtPath:[self dw_DirectoryPathAtPath:path] error:error]) {
         return NO;
     }
     BOOL isSuccess = [DefaultFileManager createFileAtPath:path contents:nil attributes:nil];
@@ -204,15 +202,15 @@
 
 +(BOOL)dw_CopyItemAtPath:(NSString *)path toPath:(NSString *)toPath overwrite:(BOOL)overwrite error:(NSError *__autoreleasing *)error {
     if (![self dw_IsFileAtPath:path]) {
-        *error = [NSError errorWithDomain:@"Read File Error!" code:10002 userInfo:@{@"reason":[NSString stringWithFormat:@"file not exist at %@.",path]}];
+        safeLinkError(error, [NSError errorWithDomain:@"Read File Error!" code:10002 userInfo:@{@"reason":[NSString stringWithFormat:@"file not exist at %@.",path]}]);
         return NO;
     }
     if ([self dw_IsFileAtPath:toPath] && !overwrite) {
-        *error = [NSError errorWithDomain:@"Write File Error!" code:10001 userInfo:@{@"reason":@"attemp to write a file which is already exist."}];
+        safeLinkError(error, [NSError errorWithDomain:@"Write File Error!" code:10001 userInfo:@{@"reason":@"attemp to write a file which is already exist."}]);
         return NO;
     }
     if (![self dw_CreateDirectoryAtPath:toPath]) {
-        *error = [NSError errorWithDomain:@"Write File Error!" code:10001 userInfo:@{@"reason":[NSString stringWithFormat:@"can not create folder at %@.",toPath]}];
+        safeLinkError(error, [NSError errorWithDomain:@"Write File Error!" code:10001 userInfo:@{@"reason":[NSString stringWithFormat:@"can not create folder at %@.",toPath]}]);
         return NO;
     }
     return [DefaultFileManager copyItemAtPath:path toPath:toPath error:error];
@@ -225,7 +223,7 @@
     }
     isSuccess = [self dw_RemoveItemAtPath:path];
     if (!isSuccess) {
-        *error = [NSError errorWithDomain:@"Remove File Error!" code:10003 userInfo:@{@"reason":[NSString stringWithFormat:@"can not remove file at %@.",path]}];
+        safeLinkError(error, [NSError errorWithDomain:@"Remove File Error!" code:10003 userInfo:@{@"reason":[NSString stringWithFormat:@"can not remove file at %@.",path]}]);
         return NO;
     }
     return YES;
@@ -295,6 +293,12 @@
     return [DefaultFileManager isWritableFileAtPath:path];
 }
 
+static inline void safeLinkError(NSError * __autoreleasing * error ,NSError * error2Link) {
+    if (error != NULL) {
+        *error = error2Link;
+    }
+}
+
 @end
 
 @implementation DWFileManagerFile
@@ -329,3 +333,4 @@
 }
 
 @end
+
