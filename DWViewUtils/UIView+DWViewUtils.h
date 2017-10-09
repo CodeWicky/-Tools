@@ -35,6 +35,11 @@
  */
 @property (nonatomic ,assign ,readonly,getter=isInScreen) BOOL inScreen;
 
+/**
+ 获取当前view所属控制器
+ */
+@property (nonatomic ,strong ,readonly) UIViewController * viewController;
+
 @end
 
 @interface UIView (DWViewDecorateUtils)
@@ -53,3 +58,4 @@
 -(void)removeAllSubviews;
 
 @end
+
