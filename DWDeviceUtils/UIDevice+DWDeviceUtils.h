@@ -45,6 +45,12 @@
 ///获取当前设备具体型号
 +(NSString *)dw_DeviceDetailModel;
 
+///获取当前设备平台号
++(NSString *)dw_DevicePlatform;
+
+///获取当前设备CPU架构
++(NSString *)dw_DeviceCPUType;
+
 ///获取当前手机运营商
 +(NSString *)dw_MobileOperator;
 
