@@ -197,6 +197,29 @@ static NSDictionary * infoDic = nil;
     return platform;
 }
 
++(CGFloat)dw_DeviceTotalMemory {
+    float size = 0.0;
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSDictionary *dictionary = [[NSFileManager defaultManager] attributesOfFileSystemForPath:[paths lastObject] error: nil];
+    if (dictionary) {
+        NSNumber *_total = [dictionary objectForKey:NSFileSystemSize];
+        size = [_total unsignedLongLongValue]*1.0/(1024);
+    }
+    return size;
+}
+
++(CGFloat)dw_DeviceFreeMemory {
+    float size = 0.0;
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSDictionary *dictionary = [[NSFileManager defaultManager] attributesOfFileSystemForPath:[paths lastObject] error: nil];
+    if (dictionary)
+    {
+        NSNumber *_free = [dictionary objectForKey:NSFileSystemFreeSize];
+        size = [_free unsignedLongLongValue]*1.0/(1024);
+    }
+    return size;
+}
+
 +(NSString *)dw_MobileOperator {
     CTTelephonyNetworkInfo * info = [[CTTelephonyNetworkInfo alloc] init];
     CTCarrier * carrier = [info subscriberCellularProvider];

@@ -9,6 +9,9 @@
 /**
  DWDeviceUtils
  提供Device相关信息及便捷方法
+ 
+ version 1.0.0
+ 提供一些设备、工程基本信息
  */
 
 #import <UIKit/UIKit.h>
@@ -50,6 +53,12 @@
 
 ///获取当前设备CPU架构
 +(NSString *)dw_DeviceCPUType;
+
+///获取当前设备总内存大小(Kb)
++(CGFloat)dw_DeviceTotalMemory;
+
+///获取当前设备可用内存大小(Kb)
++(CGFloat)dw_DeviceFreeMemory;
 
 ///获取当前手机运营商
 +(NSString *)dw_MobileOperator;
