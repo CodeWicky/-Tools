@@ -19,6 +19,8 @@
 #import <Foundation/Foundation.h>
 
 @interface NSData (DWDataEncodeUtils)
-+(NSData *)dw_DataFromBase64String:(NSString *)aString;
++(NSData *)dw_DecodeDataFromBase64String:(NSString *)aString;
 -(NSString *)dw_Base64EncodedString;
++(NSData *)dw_WebSafeDecodeDataFromBase64String:(NSString *)aString;
+-(NSString *)dw_WebSafeBase64EncodedStringWithPadding:(BOOL)padding;
 @end
