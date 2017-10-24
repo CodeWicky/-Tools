@@ -19,16 +19,34 @@ const int32_t UncaughtExceptionMaximum = 10;
 
 static NSString * sP = nil;
 
-static void (^expHandler)(NSException * exp);
+static ExceptionHandlerType expHandler = nil;
+
+static dispatch_queue_t serialQ = nil;
 
 @implementation DWCrashCollector
 
 +(void)CollectCrashInDefaultWithSavePath:(NSString *)savePath {
-    [self configToCollectCrashWithSavePath:savePath handler:^(NSException *exception) {
+    [self configToCollectCrashWithSavePath:savePath handler:[self defaultHandler]];
+}
+
++(void)configToCollectCrashWithSavePath:(NSString *)savePath handler:(ExceptionHandlerType)handler {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        serialQ = dispatch_queue_create("com.crashCollector.serialQueue", DISPATCH_QUEUE_SERIAL);
+        uninstallCollector();
+        installCollector(savePath,handler);
+    });
+}
+
++(ExceptionHandlerType)defaultHandler {
+    __weak typeof(self)weakSelf = self;
+    ExceptionHandlerType handler = ^(NSException * exception) {
         NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
         [formatter setDateFormat:@"yyyyMMdd-HHmmss"];
         NSDate * date = [NSDate date];
         NSString * folderName = [formatter stringFromDate:date];
+        [DWFileManager dw_CreateDirectoryAtPath:[NSString stringWithFormat:@"%@/Crash",sP]];
+        [weakSelf configLastCrashWithName:folderName];
         NSString * path = [sP stringByAppendingPathComponent:[NSString stringWithFormat:@"Crash/%@",folderName]];
         NSString * crashFilePath = [path stringByAppendingPathComponent:@"CrashLog.crash"];
         [DWFileManager dw_CreateFileAtPath:crashFilePath];
@@ -54,15 +72,72 @@ static void (^expHandler)(NSException * exp);
         } else {
             [exception raise];
         }
-    }];
+    };
+    return handler;
 }
 
-+(void)configToCollectCrashWithSavePath:(NSString *)savePath handler:(void (^)(NSException *))handler {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        uninstallCollector();
-        installCollector(savePath,handler);
++(void)configLastCrashWithName:(NSString *)name {
+    if (!name.length) {
+        return;
+    }
+    NSString * path = crashConfigPath();
+    NSMutableDictionary * config = [NSMutableDictionary dictionaryWithContentsOfFile:path];
+    if (!config) {
+        config = @{}.mutableCopy;
+        config[@"UnHandleCrash"] = @[].mutableCopy;
+    }
+    [config setValue:name forKey:@"LastCrash"];
+    NSMutableArray * unHandleCrash = config[@"UnHandleCrash"];
+    if (![unHandleCrash containsObject:name]) {
+        [unHandleCrash addObject:name];
+    }
+    [config writeToFile:path atomically:YES];
+}
+
++(void)setCrashHandledWithName:(NSString *)name {
+    if (!name.length) {
+        return;
+    }
+    dispatch_async(serialQ, ^{
+        NSString * path = crashConfigPath();
+        NSMutableDictionary * config = [NSMutableDictionary dictionaryWithContentsOfFile:path];
+        if (!config) {
+            return;
+        }
+        NSMutableArray * unHandleCrash = config[@"UnHandleCrash"];
+        if ([unHandleCrash containsObject:name]) {
+            [unHandleCrash removeObject:name];
+        }
+        if ([config[@"LastCrash"] isEqualToString:name]) {
+            config[@"LastCrash"] = @"";
+        }
+        [config writeToFile:path atomically:YES];
     });
+}
+
++(NSMutableArray *)unHandledCrashes {
+    NSString * path = crashConfigPath();
+    NSMutableDictionary * config = [NSMutableDictionary dictionaryWithContentsOfFile:path];
+    if (!config) {
+        return nil;
+    }
+    return config[@"UnHandleCrash"];
+}
+
++(void)handleUnHandledCrashWithHandler:(void (^)(NSMutableArray<NSString *> *, NSString *))handler {
+    if (!handler) {
+        return;
+    }
+    NSString * path = crashConfigPath();
+    NSMutableDictionary * config = [NSMutableDictionary dictionaryWithContentsOfFile:path];
+    if (!config) {
+        return;
+    }
+    NSMutableArray * unHandleCrash = config[@"UnHandleCrash"];
+    if (!unHandleCrash.count) {
+        return;
+    }
+    handler(unHandleCrash,config[@"LastCrash"]);
 }
 
 #pragma mark --- exception Hanlder ---
@@ -143,6 +218,10 @@ static inline void uninstallCollector() {
     signal(SIGFPE, SIG_DFL);
     signal(SIGBUS, SIG_DFL);
     signal(SIGPIPE, SIG_DFL);
+}
+
+static inline NSString * crashConfigPath() {
+    return [sP stringByAppendingPathComponent:@"Crash/CrashConfig.plist"];
 }
 
 #pragma mark --- over write ---

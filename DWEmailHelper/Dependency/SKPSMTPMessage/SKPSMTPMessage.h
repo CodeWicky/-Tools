@@ -120,6 +120,8 @@ extern NSString *kSKPSMTPPartContentTransferEncodingKey;
 
 @property(nonatomic, assign) id <SKPSMTPMessageDelegate> delegate;
 
+@property (nonatomic ,copy) void (^emailHandler)(BOOL success,SKPSMTPMessage * msg,NSError * error);
+
 - (BOOL)send;
 
 @end

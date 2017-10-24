@@ -11,9 +11,6 @@
  事物类，将任务与runloop空闲时提交
  
  源码修改自YYTextTransaction/ASDK
- 
- version 1.0.0
- 添加事物空闲提交方法
  */
 
 #import <Foundation/Foundation.h>

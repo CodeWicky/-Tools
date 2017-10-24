@@ -11,6 +11,10 @@
  
  邮件助手类
  借助第三方库SKPSMTPMessage.h发送邮件
+ 
+ version 1.0.0
+ 提供邮件发送的便捷类
+ 修复部分情况下无法正常发送邮件的问题
  */
 
 #import <Foundation/Foundation.h>

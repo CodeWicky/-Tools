@@ -8,6 +8,7 @@
 
 #import "DWEmailHelper.h"
 #import "NSData+Base64Additions.h"
+#import "DWTransaction.h"
 
 @interface DWEmailAttachment()
 
@@ -252,7 +253,7 @@ static inline NSString * fileTypeWithExtension(NSString * ext) {
 
 @interface DWEmailHelper()<SKPSMTPMessageDelegate>
 
-@property (nonatomic ,copy) void (^emailHandler)(BOOL success,SKPSMTPMessage * msg,NSError * error);
+@property (nonatomic ,strong) NSMutableSet * mmSet;
 
 @end
 
@@ -262,17 +263,33 @@ static DWEmailHelper * h = nil;
 
 +(void)sendEmailEntity:(DWEmailEntity *)entity completion:(void (^)(BOOL, SKPSMTPMessage *, NSError *))completion {
     DWEmailHelper * helper = [DWEmailHelper shareHelper];
-    SKPSMTPMessage * mm=[[SKPSMTPMessage alloc] init];
-    mm.subject = [NSString stringWithUTF8String:"我们"];
+    NSMutableDictionary * dic = @{}.mutableCopy;
+    if (entity) {
+        dic[@"entity"] = entity;
+    }
+    if (completion) {
+        dic[@"completion"] = completion;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[DWTransaction dw_TransactionWithTarget:helper selector:@selector(sendEntity:) withObject:dic] commit];
+    });
+}
+
+-(void)sendEntity:(NSDictionary *)userInfo {
+    DWEmailEntity * entity = userInfo[@"entity"];
+    void (^completion)(BOOL, SKPSMTPMessage *, NSError *) = userInfo[@"completion"];
+    SKPSMTPMessage * mm = [[SKPSMTPMessage alloc] init];
+    mm.subject = entity.subject;
     mm.toEmail = entity.reciverEmailAddress;
     mm.fromEmail = entity.hostEmailAddress;
     NSString * tail = [entity.hostEmailAddress componentsSeparatedByString:@"@"].lastObject;
     mm.relayHost = [@"smtp." stringByAppendingString:tail];
     mm.requiresAuth = YES;
-    NSDictionary *plainPart = [NSDictionary dictionaryWithObjectsAndKeys:@"text/plain",kSKPSMTPPartContentTypeKey,[NSString stringWithFormat:@"%@\r\n",entity.content],kSKPSMTPPartMessageKey,@"8bit",kSKPSMTPPartContentTransferEncodingKey,nil];
-   
+    mm.emailHandler = completion;
+    NSDictionary * plainPart = [NSDictionary dictionaryWithObjectsAndKeys:@"text/plain",kSKPSMTPPartContentTypeKey,[NSString stringWithFormat:@"%@\r\n",entity.content],kSKPSMTPPartMessageKey,@"8bit",kSKPSMTPPartContentTransferEncodingKey,nil];
+    
     // testMsg.validateSSLChain = NO;
-    mm.delegate = helper;
+    mm.delegate = self;
     NSMutableArray * arr = @[].mutableCopy;
     [arr addObject:plainPart];
     [entity.attachments enumerateObjectsUsingBlock:^(DWEmailAttachment * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -284,21 +301,24 @@ static DWEmailHelper * h = nil;
     mm.login = entity.loginName.length?entity.loginName:entity.hostEmailAddress;
     mm.pass = entity.password;
     mm.wantsSecure = YES;
+    [self.mmSet addObject:mm];
     [mm send];
-    
-    helper.emailHandler = completion;
 }
 
 -(void)messageSent:(SKPSMTPMessage *)message {
-    if (self.emailHandler) {
-        self.emailHandler(YES, message, nil);
+    void (^completion)(BOOL, SKPSMTPMessage *, NSError *) = message.emailHandler;
+    if (completion) {
+        completion(YES, message, nil);
     }
+    [self.mmSet removeObject:message];
 }
 
 -(void)messageFailed:(SKPSMTPMessage *)message error:(NSError *)error {
-    if (self.emailHandler) {
-        self.emailHandler(NO, message, error);
+    void (^completion)(BOOL, SKPSMTPMessage *, NSError *) = message.emailHandler;
+    if (completion) {
+        completion(NO, message, error);
     }
+    [self.mmSet removeObject:message];
 }
 
 #pragma mark --- singleton ---
@@ -314,6 +334,7 @@ static DWEmailHelper * h = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         h = [super allocWithZone:zone];
+        h.mmSet = [NSMutableSet set];
     });
     return h;
 }

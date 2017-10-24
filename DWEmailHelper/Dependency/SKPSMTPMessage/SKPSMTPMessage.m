@@ -175,6 +175,8 @@ delegate, connectTimer, connectTimeout, watchdogTimer, validateSSLChain;
                                                        userInfo:nil
                                                         repeats:NO];
     
+    
+    
     [NSStream getStreamsToHostNamed:relayHost port:relayPort inputStream:&inputStream outputStream:&outputStream];
     if ((inputStream != nil) && (outputStream != nil))
     {
