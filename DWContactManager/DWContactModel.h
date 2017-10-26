@@ -91,8 +91,21 @@
 ///住址
 @property (nonatomic ,strong) NSArray<DWContactLabelStringModel *> * socialProfiles;
 
-///生日（格林尼日）
-@property (nonatomic ,strong) NSDate * nonGregorianBirthday;
+/*
+ 农历生日
+ 
+ 此属性为农历生日，由于本人不懂农历历法，所以相关数值规律尚不清楚，只能测试出各字段对应信息。
+
+@"calendarIdentifier":@"chinese"   ----> 农历，固定（当然如果不在中国还有希伯来历<@"hebrew">及伊斯兰历<@"islamic-civil">）
+@"era": @78,       ----> 农历年，78是戊戌年，应该也是按顺序排的，开发者自己找一下规律吧，我不懂农历历法
+@"isLeapMonth": @0,   ----> 农历是否闰月，反正左侧示例数据中改为@1后赋值无效，还是那句话，我不懂农历历法
+@"day" :@7         ----> 农历初几
+@"month": @9,       ----> 农历几月
+@"year": @34,      ----> 公元年，计算规则不知道，34的时候是2017年，35是2018年
+ 
+ 上面左侧示例数据对应2017年10月26日
+ */
+@property (nonatomic ,strong) NSDictionary * nonGregorianBirthday;
 
 #pragma mark --- 间接属性 ---
 ///全名
@@ -120,12 +133,18 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wdeprecated-declarations"
 
-///以ABRecord实例化方法
+///实例化方法
 -(instancetype)initWithABRecord:(ABRecordRef)ABRecord;
+-(instancetype)initWithDictionary:(NSDictionary *)dic;
 
 ///将模型转化为ABRecord对象
 -(void)transferToABRecordWithCompletion:(void(^)(ABRecordRef aRecord))completion;
+-(ABRecordRef)transferToABRecord;
 #pragma clang diagnostic pop
+
+///将模型转化为字典,仅保留长度大于0字段，图片以NSData形式保存
+-(NSDictionary *)transferToDictionary;
+-(void)transferToDictionaryWithCompletion:(void(^)(NSDictionary * dic))completion;
 
 ///重置联系人更新状态
 /**

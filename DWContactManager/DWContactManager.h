@@ -30,6 +30,11 @@
  
  version 1.0.4
  提供同步接口
+ 
+ version 1.0.5
+ 添加字典模型互转方法
+ 修复农历生日崩溃问题
+ 晚上同异步接口
  */
 
 
@@ -46,7 +51,9 @@
 
 ///获取全部联系人
 -(void)fetchAllContactsWithCompletion:(void(^)(NSMutableArray * allContacts))completion;
--(NSMutableArray *)fetctAllContacts;
+-(NSMutableArray *)fetchAllContacts;
+-(NSArray *)fetchAllContactsInAB;
+-(NSArray <NSDictionary *>*)fetchAllContactsInDictionary;
 
 ///获取全部联系人后分组并排序
 -(void)fetchSortedContactsInGroupWitnCompletion:(void(^)(NSMutableDictionary * sortedContacts,NSArray * sortedKeys))completion;
@@ -94,9 +101,13 @@
  */
 ///添加联系人
 -(BOOL)addNewContact:(DWContactModel *)personModel;
+-(BOOL)addNewContactFromArray:(NSArray <DWContactModel *>*)arr;
+-(void)addNewContactFromArray:(NSArray <DWContactModel *>*)arr completion:(void(^)(BOOL success))completion;
 
 ///删除联系人
 -(BOOL)removeContact:(DWContactModel *)personModel;
+-(BOOL)removeAllContacts;
+-(void)removeAllContactsWithCompletion:(void(^)(BOOL success))completion;
 
 ///修改联系人
 -(BOOL)editContactWithModel:(DWContactModel *)personModel handler:(void(^)(DWContactModel * aPersonModel))handler;

@@ -71,7 +71,7 @@ static DWContactManager * manager = nil;
     }
 }
 
--(NSMutableArray *)fetctAllContacts {
+-(NSMutableArray *)fetchAllContacts {
     if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) {
         return nil;
     }
@@ -80,6 +80,25 @@ static DWContactManager * manager = nil;
     }
     self.allContacts = [self getAllContacts];
     return self.allContacts;
+}
+
+-(NSArray *)fetchAllContactsInAB {
+    return (__bridge_transfer NSArray *)ABAddressBookCopyArrayOfAllPeople(self.addressBook);
+}
+
+-(NSArray<NSDictionary *> *)fetchAllContactsInDictionary {
+    NSArray * all = [self fetchAllContacts];
+    NSMutableArray * container = @[].mutableCopy;
+    [all enumerateObjectsUsingBlock:^(DWContactModel * obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSDictionary * tmp = [obj transferToDictionary];
+        if (tmp) {
+            [container addObject:tmp];
+        }
+    }];
+    if (container.count) {
+        return [container copy];
+    }
+    return nil;
 }
 
 -(void)fetchSortedContactsInGroupWitnCompletion:(void(^)(NSMutableDictionary * sortedContacts,NSArray * sortedKeys))completion {
@@ -105,7 +124,7 @@ static DWContactManager * manager = nil;
 
 -(NSDictionary *)fetchSortedContactsInGroup {
     if (!self.sortedContacts || !self.sortedKeys) {
-        NSMutableArray * contacts = [self fetctAllContacts];
+        NSMutableArray * contacts = [self fetchAllContacts];
         NSMutableDictionary * contactsInGroup = [self seperateContactsToGroup:contacts];
         [self sortContactsInGroup:contactsInGroup];
     }
@@ -134,7 +153,7 @@ static DWContactManager * manager = nil;
 
 -(NSArray *)filterAllContactsWithCondition:(BOOL (^)(DWContactModel *))condition {
     if (!self.allContacts) {
-        [self fetctAllContacts];
+        [self fetchAllContacts];
     }
     return [self filterContacts:self.allContacts condition:condition];
 }
@@ -206,24 +225,35 @@ static DWContactManager * manager = nil;
     return dicG;
 }
 
-
-
 -(BOOL)addNewContact:(DWContactModel *)personModel {
     if (self.isChangingAB) {
         return NO;
     }
-    __block BOOL success = NO;
     self.isChangingAB = YES;
-    [personModel transferToABRecordWithCompletion:^(ABRecordRef aRecord) {
-        CFErrorRef error = NULL;
-        success = ABAddressBookAddRecord(self.addressBook, aRecord, &error);
-        if (error) {
-            NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
-            CFRelease(error);
-        }
-        self.isChangingAB = NO;
+    ABRecordRef aRecord = [personModel transferToABRecord];
+    CFErrorRef error = NULL;
+    BOOL success = ABAddressBookAddRecord(self.addressBook, aRecord, &error);
+    self.isChangingAB = NO;
+    if (error) {
+        NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
+        CFRelease(error);
+    }
+    return success;
+}
+
+-(BOOL)addNewContactFromArray:(NSArray<DWContactModel *> *)arr {
+    __block BOOL success = YES;
+    [arr enumerateObjectsUsingBlock:^(DWContactModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        success &= [self addNewContact:obj];
     }];
     return success;
+}
+
+-(void)addNewContactFromArray:(NSArray<DWContactModel *> *)arr completion:(void (^)(BOOL))completion {
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        BOOL success = [self addNewContactFromArray:arr];
+        completion?completion(success):nil;
+    });
 }
 
 -(BOOL)removeContact:(DWContactModel *)personModel {
@@ -242,6 +272,27 @@ static DWContactManager * manager = nil;
         self.isChangingAB = NO;
     }
     return success;
+}
+
+-(BOOL)removeAllContacts {
+    NSArray * all = [self fetchAllContacts];
+    __block BOOL success = YES;
+    [all enumerateObjectsUsingBlock:^(DWContactModel * obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        success &= [self removeContact:obj];
+    }];
+    return success;
+}
+
+-(void)removeAllContactsWithCompletion:(void (^)(BOOL))completion {
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [self fetchAllContactsWithCompletion:^(NSMutableArray *allContacts) {
+            __block BOOL success = YES;
+            [allContacts enumerateObjectsUsingBlock:^(DWContactModel * obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                success &= [self removeContact:obj];
+            }];
+            completion?completion(success):nil;
+        }];
+    });
 }
 
 -(BOOL)editContactWithModel:(DWContactModel *)personModel handler:(void (^)(DWContactModel *))handler {

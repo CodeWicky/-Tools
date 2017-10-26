@@ -27,12 +27,32 @@ UpdateArrayValue(self.originRecord, property, value, &toBeUpdated);\
 @interface DWContactModel ()
 {
     BOOL toBeUpdated;
+    dispatch_queue_t serialQ;
+    BOOL setValueWithD;
+    NSArray * stringKeys;
+    NSArray * dateKeys;
+    NSArray * arrStringKeys;
+    NSArray * arrDicKeys;
+    NSArray * arrDateKeys;
 }
 @end
 
 @implementation DWContactModel
--(instancetype)initWithABRecord:(ABRecordRef)ABRecord {
+-(instancetype)init {
     if (self = [super init]) {
+        serialQ = dispatch_queue_create("com.DWContactModel.transfer.queue", DISPATCH_QUEUE_SERIAL);
+        setValueWithD = NO;
+        stringKeys = @[@"givenName",@"familyName",@"middleName",@"namePrefix",@"nameSuffix",@"nickname",@"phoneticGivenName",@"phoneticFamilyName",@"phoneticMiddleName",@"organizationName",@"departmentName",@"jobTitle",@"note"];
+        dateKeys = @[@"birthday"];
+        arrStringKeys = @[@"emailAddresses",@"phoneNumbers",@"urlAddresses",@"contactRelations",@"socialProfiles"];
+        arrDicKeys = @[@"postalAddresses",@"instantMessageAddresses"];
+        arrDateKeys = @[@"dates"];
+    }
+    return self;
+}
+
+-(instancetype)initWithABRecord:(ABRecordRef)ABRecord {
+    if (self = [self init]) {
         _originRecord = ABRecord;
         _fullName = CFStringToNSString(ABRecordCopyCompositeName(ABRecord));
         _headerImage = [UIImage imageWithData:(__bridge_transfer NSData *)ABPersonCopyImageDataWithFormat(ABRecord, kABPersonImageFormatThumbnail)];
@@ -59,13 +79,30 @@ UpdateArrayValue(self.originRecord, property, value, &toBeUpdated);\
         _urlAddresses = [self getLabelValueWithABRecord:ABRecord property:kABPersonURLProperty];
         _contactRelations = [self getLabelValueWithABRecord:ABRecord property:kABPersonRelatedNamesProperty];
         _socialProfiles = [self getLabelValueWithABRecord:ABRecord property:kABPersonSocialProfileProperty];
-        _nonGregorianBirthday = (__bridge_transfer NSDate *)ABRecordCopyValue(ABRecord, kABPersonAlternateBirthdayProperty);
+        _nonGregorianBirthday = (__bridge_transfer NSDictionary *)ABRecordCopyValue(ABRecord, kABPersonAlternateBirthdayProperty);
         _recordID = ABRecordGetRecordID(ABRecord);
     }
     return self;
 }
 
+-(instancetype)initWithDictionary:(NSDictionary *)dic {
+    if (!dic.allKeys.count) {
+        return nil;
+    }
+    if (self = [self init]) {
+        [self setValuesForKeysWithDictionary:dic];
+    }
+    return self;
+}
+
 -(void)transferToABRecordWithCompletion:(void(^)(ABRecordRef aRecord))completion {
+    dispatch_async(serialQ, ^{
+        ABRecordRef record = [self transferToABRecord];
+        completion?completion(record):nil;
+    });
+}
+
+-(ABRecordRef)transferToABRecord {
     ABRecordRef record = self.originRecord?:ABPersonCreate();
     if (self.headerImage) {
         CFDataRef data = CFBridgingRetain(UIImagePNGRepresentation(self.headerImage));;
@@ -102,16 +139,235 @@ UpdateArrayValue(self.originRecord, property, value, &toBeUpdated);\
     SetArrayWithProperty(record, kABPersonRelatedNamesProperty, self.contactRelations);
     SetArrayWithProperty(record, kABPersonSocialProfileProperty, self.socialProfiles);
     if (self.nonGregorianBirthday) {
-        CFDateRef nonGregorianBirthday = (__bridge_retained CFDateRef)self.nonGregorianBirthday;
+        CFDictionaryRef nonGregorianBirthday = (__bridge_retained CFDictionaryRef)self.nonGregorianBirthday;
         ABRecordSetValue(record, kABPersonAlternateBirthdayProperty, nonGregorianBirthday, nil);
         CFRelease(nonGregorianBirthday);
     }
-    completion?completion(record):nil;
-    CFRelease(record);
+    return CFAutorelease(record);
+}
+
+-(void)transferToDictionaryWithCompletion:(void (^)(NSDictionary *))completion {
+    dispatch_async(serialQ, ^{
+        NSDictionary * dic = [self transferToDictionary];
+        completion?completion(dic):nil;
+    });
+}
+
+-(NSDictionary *)transferToDictionary {
+    NSMutableDictionary * dic = @{}.mutableCopy;
+    
+    for (NSString * key in stringKeys) {
+        NSString * value = [self valueForKey:key];
+        if (value.length) {
+            [dic setValue:value forKey:key];
+        }
+    }
+    
+    for (NSString * key in dateKeys) {
+        NSDate * date = [self valueForKey:key];
+        if (date) {
+            [dic setValue:date forKey:key];
+        }
+    }
+    
+    for (NSString * key in arrStringKeys) {
+        NSArray <DWContactLabelStringModel *>* arr = [self valueForKey:key];
+        if (arr) {
+            NSMutableArray * temp = @[].mutableCopy;
+            for (DWContactLabelStringModel * model in arr) {
+                if (model.label.length && model.labelValue.length) {
+                    NSDictionary * dicT = @{@"label":model.label,@"labelValue":model.labelValue};
+                    [temp addObject:dicT];
+                }
+            }
+            if (temp.count) {
+                [dic setValue:temp forKey:key];
+            }
+        }
+    }
+    
+    for (NSString * key in arrDicKeys) {
+        NSArray <DWContactLabelDictionaryModel *>* arr = [self valueForKey:key];
+        if (arr) {
+            NSMutableArray * temp = @[].mutableCopy;
+            for (DWContactLabelDictionaryModel * model in arr) {
+                if (model.label.length && model.labelValue.allKeys.count) {
+                    NSDictionary * dicT = @{@"label":model.label,@"labelValue":model.labelValue};
+                    [temp addObject:dicT];
+                }
+            }
+            if (temp.count) {
+                [dic setValue:temp forKey:key];
+            }
+        }
+    }
+    
+    for (NSString * key in arrDateKeys) {
+        NSArray <DWContactLabelDateModel *>* arr = [self valueForKey:key];
+        if (arr) {
+            NSMutableArray * temp = @[].mutableCopy;
+            for (DWContactLabelDateModel * model in arr) {
+                if (model.label.length && model.labelValue) {
+                    NSDictionary * dicT = @{@"label":model.label,@"labelValue":model.labelValue};
+                    [temp addObject:dicT];
+                }
+            }
+            if (temp.count) {
+                [dic setValue:temp forKey:key];
+            }
+        }
+    }
+    
+    if (self.headerImage) {
+        NSData * jpgData = UIImageJPEGRepresentation(self.headerImage, 1);
+        if (jpgData) {
+            [dic setValue:jpgData forKey:@"headerImage"];
+        }
+    }
+    
+    [dic setValue:@(self.contactType) forKey:@"contactType"];
+    
+    if (self.nonGregorianBirthday.allKeys.count) {
+        [dic setValue:self.nonGregorianBirthday forKey:@"nonGregorianBirthday"];
+    }
+    
+    return [dic copy];
 }
 
 -(void)setUpdated {
     toBeUpdated = NO;
+}
+
+#pragma mark --- override ---
+-(void)setValuesForKeysWithDictionary:(NSDictionary<NSString *,id> *)keyedValues {
+    setValueWithD = YES;
+    [super setValuesForKeysWithDictionary:keyedValues];
+    setValueWithD = NO;
+}
+
+-(void)setValue:(id)value forKey:(NSString *)key {
+    if (setValueWithD) {
+        if (!value) {
+            return;
+        }
+        if ([stringKeys containsObject:key]) {
+            if ([value isKindOfClass:[NSString class]]) {
+                [super setValue:value forKey:key];
+            } else {
+                NSLog(@"Wrong type of value with property in DWContactModel Class:\tkey:%@\tvalue:%@",key,value);
+            }
+        } else if ([dateKeys containsObject:key]) {
+            if ([value isKindOfClass:[NSDate class]]) {
+                [super setValue:value forKey:key];
+            } else {
+                NSLog(@"Wrong type of value with property in DWContactModel Class:\tkey:%@\tvalue:%@",key,value);
+            }
+        } else if ([arrStringKeys containsObject:key]) {
+            if ([value isKindOfClass:[NSArray class]]) {
+                NSArray * temp = (NSArray *)value;
+                if (temp.count) {
+                    NSMutableArray * container = @[].mutableCopy;
+                    for (id obj in temp) {
+                        if ([obj isKindOfClass:[NSDictionary class]] && [[obj valueForKey:@"label"] length] && [[obj valueForKey:@"labelValue"] isKindOfClass:[NSString class]] && [[obj valueForKey:@"labelValue"] length]) {
+                            DWContactLabelStringModel * model = [DWContactLabelStringModel new];
+                            [model setValuesForKeysWithDictionary:obj];
+                            [container addObject:model];
+                        } else if ([obj isKindOfClass:[DWContactLabelStringModel class]] && [[obj label] length] && [[obj labelValue] isKindOfClass:[NSString class]] && [[obj labelValue] length]) {
+                            [container addObject:obj];
+                        } else {
+                            NSLog(@"Wrong type of value with property in DWContactModel Class:\tkey:%@\tvalue:%@",key,value);
+                        }
+                    }
+                    if (container.count) {
+                        [super setValue:container forKey:key];
+                    }
+                }
+            } else {
+                NSLog(@"Wrong type of value with property in DWContactModel Class:\tkey:%@\tvalue:%@",key,value);
+            }
+        } else if ([arrDicKeys containsObject:key]) {
+            if ([value isKindOfClass:[NSArray class]]) {
+                NSArray * temp = (NSArray *)value;
+                if (temp.count) {
+                    NSMutableArray * container = @[].mutableCopy;
+                    for (id obj in temp) {
+                        if ([obj isKindOfClass:[NSDictionary class]] && [[obj valueForKey:@"label"] length] && [[obj valueForKey:@"labelValue"] isKindOfClass:[NSDictionary class]] && [[[obj valueForKey:@"labelValue"] allKeys] count]) {
+                            DWContactLabelDictionaryModel * model = [DWContactLabelDictionaryModel new];
+                            [model setValuesForKeysWithDictionary:obj];
+                            [container addObject:model];
+                        } else if ([obj isKindOfClass:[DWContactLabelDictionaryModel class]] && [[obj label] length] && [[obj labelValue] isKindOfClass:[NSDictionary class]] && [[[obj labelValue] allKeys] count]) {
+                            [container addObject:obj];
+                        } else {
+                            NSLog(@"Wrong type of value with property in DWContactModel Class:\tkey:%@\tvalue:%@",key,value);
+                        }
+                    }
+                    if (container.count) {
+                        [super setValue:container forKey:key];
+                    }
+                }
+            } else {
+                NSLog(@"Wrong type of value with property in DWContactModel Class:\tkey:%@\tvalue:%@",key,value);
+            }
+        } else if ([arrDateKeys containsObject:key]) {
+            if ([value isKindOfClass:[NSArray class]]) {
+                NSArray * temp = (NSArray *)value;
+                if (temp.count) {
+                    NSMutableArray * container = @[].mutableCopy;
+                    for (id obj in temp) {
+                        if ([obj isKindOfClass:[NSDictionary class]] && [[obj valueForKey:@"label"] length] && [[obj valueForKey:@"labelValue"] isKindOfClass:[NSDate class]]) {
+                            DWContactLabelDateModel * model = [DWContactLabelDateModel new];
+                            [model setValuesForKeysWithDictionary:obj];
+                            [container addObject:model];
+                        } else if ([obj isKindOfClass:[DWContactLabelDateModel class]] && [[obj label] length] && [[obj labelValue] isKindOfClass:[NSDate class]]) {
+                            [container addObject:obj];
+                        } else {
+                            NSLog(@"Wrong type of value with property in DWContactModel Class:\tkey:%@\tvalue:%@",key,value);
+                        }
+                    }
+                    if (container.count) {
+                        [super setValue:container forKey:key];
+                    }
+                }
+            } else {
+                NSLog(@"Wrong type of value with property in DWContactModel Class:\tkey:%@\tvalue:%@",key,value);
+            }
+        } else if ([key isEqualToString:@"headerImage"]) {
+            if ([value isKindOfClass:[UIImage class]]) {
+                [super setValue:value forKey:key];
+            } else if ([value isKindOfClass:[NSData class]]) {
+                UIImage * img = [UIImage imageWithData:value];
+                if (img) {
+                    [super setValue:img forKey:key];
+                } else {
+                    NSLog(@"Wrong type of value with property in DWContactModel Class:\tkey:%@\tvalue:%@",key,value);
+                }
+            } else {
+                NSLog(@"Wrong type of value with property in DWContactModel Class:\tkey:%@\tvalue:%@",key,value);
+            }
+        } else if ([key isEqualToString:@"contactType"]) {
+            if ([value isKindOfClass:[NSNumber class]]) {
+                [super setValue:value forKey:key];
+            } else {
+                NSLog(@"Wrong type of value with property in DWContactModel Class:\tkey:%@\tvalue:%@",key,value);
+            }
+        } else if ([key isEqualToString:@"nonGregorianBirthday"]) {
+            NSSet * valueKeySet = [NSSet setWithArray:[value allKeys]];
+            NSSet * targetKeySet = [NSSet setWithObjects:@"calendarIdentifier",@"era",@"isLeapMonth",@"day",@"month",@"year", nil];
+            if ([value isKindOfClass:[NSDictionary class]] && [valueKeySet isEqualToSet:targetKeySet]) {
+                [super setValue:value forKey:key];
+            } else {
+                NSLog(@"Wrong type of value with property in DWContactModel Class:\tkey:%@\tvalue:%@",key,value);
+            }
+        } else {
+            [super setValue:value forKey:key];
+        }
+    } else {
+        [super setValue:value forKey:key];
+    }
+}
+
+-(void)setValue:(id)value forUndefinedKey:(NSString *)key {
+    NSLog(@"Unknown key named %@ in DWContactModel Class.",key);
 }
 
 #pragma mark --- setter/getter ---
@@ -244,13 +500,13 @@ UpdateArrayValue(self.originRecord, property, value, &toBeUpdated);\
     NeedsToUpdateArrayValue(socialProfiles, kABPersonSocialProfileProperty);
 }
 
--(void)setNonGregorianBirthday:(NSDate *)nonGregorianBirthday {
-    if (![_nonGregorianBirthday isEqualToDate:nonGregorianBirthday]) {
+-(void)setNonGregorianBirthday:(NSDictionary *)nonGregorianBirthday {
+    if (![_nonGregorianBirthday isEqualToDictionary:nonGregorianBirthday]) {
         _nonGregorianBirthday = nonGregorianBirthday;
         if (self.originRecord) {
             toBeUpdated = YES;
             if (nonGregorianBirthday) {
-                CFDateRef nonGregorianBirthDay = (__bridge_retained CFDateRef)nonGregorianBirthday;
+                CFDictionaryRef nonGregorianBirthDay = (__bridge_retained CFDictionaryRef)nonGregorianBirthday;
                 ABRecordSetValue(self.originRecord, kABPersonAlternateBirthdayProperty, nonGregorianBirthDay, nil);
                 CFRelease(nonGregorianBirthDay);
             } else {
@@ -303,8 +559,8 @@ static inline void SetArrayWithProperty(ABRecordRef record,ABPropertyID property
     }
     ABMultiValueRef multi = ABMultiValueCreateMutable(kABStringPropertyType);
     for (DWContactLabelModel * model in values) {
-        void * value = (__bridge_retained void *)model.labelValue;
-        CFStringRef label = (__bridge_retained CFStringRef)model.label;
+        void * value = (__bridge_retained void *)[model valueForKey:@"labelValue"];
+        CFStringRef label = (__bridge_retained CFStringRef)[model valueForKey:@"label"];
         ABMultiValueAddValueAndLabel(multi, value, label, NULL);
         CFRelease(value);
         CFRelease(label);
@@ -330,6 +586,10 @@ static inline void SetArrayWithProperty(ABRecordRef record,ABPropertyID property
 @end
 
 @implementation DWContactLabelModel
+
+-(void)setValue:(id)value forUndefinedKey:(NSString *)key {
+    NSLog(@"Unknown key named %@ in DWContactModel Class.",key);
+}
 
 @end
 
