@@ -25,12 +25,11 @@
 
 @property (nonatomic ,assign) ABAddressBookRef addressBook;
 
-@property (nonatomic ,assign) BOOL isChangingAB;
-
 @end
 
 
 static DWContactManager * manager = nil;
+static dispatch_queue_t serialQ = nil;
 @implementation DWContactManager
 
 #pragma mark --- interface method ---
@@ -226,18 +225,16 @@ static DWContactManager * manager = nil;
 }
 
 -(BOOL)addNewContact:(DWContactModel *)personModel {
-    if (self.isChangingAB) {
-        return NO;
-    }
-    self.isChangingAB = YES;
-    ABRecordRef aRecord = [personModel transferToABRecord];
-    CFErrorRef error = NULL;
-    BOOL success = ABAddressBookAddRecord(self.addressBook, aRecord, &error);
-    self.isChangingAB = NO;
-    if (error) {
-        NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
-        CFRelease(error);
-    }
+    __block BOOL success = NO;
+    dispatch_sync(serialQ, ^{
+        ABRecordRef aRecord = [personModel transferToABRecord];
+        CFErrorRef error = NULL;
+        success = ABAddressBookAddRecord(self.addressBook, aRecord, &error);
+        if (error) {
+            NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
+            CFRelease(error);
+        }
+    });
     return success;
 }
 
@@ -257,20 +254,17 @@ static DWContactManager * manager = nil;
 }
 
 -(BOOL)removeContact:(DWContactModel *)personModel {
-    if (self.isChangingAB) {
-        return NO;
-    }
-    BOOL success = NO;
-    self.isChangingAB = YES;
-    if (personModel.originRecord) {
-        CFErrorRef error = NULL;
-        success = ABAddressBookRemoveRecord(self.addressBook, personModel.originRecord, &error);
-        if (error) {
-            NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
-            CFRelease(error);
+    __block BOOL success = NO;
+    dispatch_sync(serialQ, ^{
+        if (personModel.originRecord) {
+            CFErrorRef error = NULL;
+            success = ABAddressBookRemoveRecord(self.addressBook, personModel.originRecord, &error);
+            if (error) {
+                NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
+                CFRelease(error);
+            }
         }
-        self.isChangingAB = NO;
-    }
+    });
     return success;
 }
 
@@ -296,33 +290,32 @@ static DWContactManager * manager = nil;
 }
 
 -(BOOL)editContactWithModel:(DWContactModel *)personModel handler:(void (^)(DWContactModel *))handler {
-    if (!personModel.originRecord || !handler || self.isChangingAB) {
+    if (!personModel.originRecord || !handler) {
         return NO;
     }
-    self.isChangingAB = YES;
-    handler(personModel);
-    self.isChangingAB = NO;
+    dispatch_sync(serialQ, ^{
+        handler(personModel);
+    });
     return YES;
 }
 
 -(BOOL)saveAddressBookChange {
-    if (self.isChangingAB) {
-        return NO;
-    }
-    CFErrorRef error = NULL;
-    BOOL success = ABAddressBookSave(self.addressBook, &error);
-    if (error) {
-        NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
-        CFRelease(error);
-    }
+    __block BOOL success = NO;
+    dispatch_sync(serialQ, ^{
+        CFErrorRef error = NULL;
+        success = ABAddressBookSave(self.addressBook, &error);
+        if (error) {
+            NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
+            CFRelease(error);
+        }
+    });
     return success;
 }
 
 -(void)dropAddressBookChange {
-    if (self.isChangingAB) {
-        return;
-    }
-    ABAddressBookRevert(self.addressBook);
+    dispatch_sync(serialQ, ^{
+        ABAddressBookRevert(self.addressBook);
+    });
 }
 
 #pragma mark --- tool method ---
@@ -497,6 +490,7 @@ void ContactChangeCallBack(ABAddressBookRef addressBook,CFDictionaryRef info,voi
 #pragma mark --- overwrite ---
 -(instancetype)init {
     if (self = [super init]) {
+        serialQ = dispatch_queue_create("com.changeAB.serial.queue", DISPATCH_QUEUE_SERIAL);
         [self createAddressBook];
     }
     return self;
