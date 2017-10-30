@@ -26,6 +26,9 @@ static dispatch_queue_t serialQ = nil;
 @implementation DWCrashCollector
 
 +(void)CollectCrashInDefaultWithSavePath:(NSString *)savePath {
+    if (!savePath.length) {
+        savePath = [DWFileManager dw_DocumentsDir];
+    }
     [self configToCollectCrashWithSavePath:savePath handler:[self defaultHandler]];
 }
 
@@ -61,7 +64,7 @@ static dispatch_queue_t serialQ = nil;
         crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device Model: %@\n",[UIDevice dw_DeviceDetailModel]]];
         crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device System: %@\n",[UIDevice dw_DeviceSystemVersion]]];
         crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device CPU Arch: %@\n",[UIDevice dw_DeviceCPUType]]];
-        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Crash Detail:\n%@",exception.debugDescription]];
+        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Crash Detail:\n%@\n%@.\n%@",exception.name,exception.reason,[NSThread callStackSymbols]]];
         writeDataString2File(crashStr, crashFilePath);
         saveCrashImage2Path(path);
         printf("\nCrash Log Path Is %s\n\n",crashFilePath.UTF8String);
@@ -174,7 +177,7 @@ static void signalCollector(int signal)
         signalStr = @"SIGPIPE";
     }
     
-    NSString * reason = [NSString stringWithFormat:@"%@ error was raised.",signalStr];
+    NSString * reason = [NSString stringWithFormat:@"%@ error was raised",signalStr];
     NSException * exc =[NSException exceptionWithName:@"DWCrashCollectorSignalErrorName" reason:reason userInfo:userInfo];
     @throw exc;
 }

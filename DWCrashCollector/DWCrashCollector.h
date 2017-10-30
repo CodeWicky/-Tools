@@ -16,6 +16,10 @@
  version 1.0.0
  提供崩溃捕捉
  提供捕捉后崩溃处理等接口
+ 
+ version 1.0.1
+ 添加默认保存目录
+ 添加崩溃堆栈信息
  */
 
 #import <Foundation/Foundation.h>
@@ -27,7 +31,7 @@ typedef void(^ExceptionHandlerType)(NSException * exc);
 ///自定义崩溃如何处理
 +(void)configToCollectCrashWithSavePath:(NSString *)savePath handler:(ExceptionHandlerType)handler;
 
-///已默认行为（保存崩溃日志至指定路径）处理崩溃
+///已默认行为（保存崩溃日志至指定路径）处理崩溃，当savePath为空时默认为Documents文件夹
 +(void)CollectCrashInDefaultWithSavePath:(NSString *)savePath;
 
 ///收集crash的默认行为

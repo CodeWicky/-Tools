@@ -134,7 +134,6 @@ static dispatch_queue_t serialQ = nil;
 }
 
 -(void)setNeedsRefetch {
-    [self createAddressBook];
     self.allContacts = nil;
     self.sortedContacts = nil;
     self.sortedKeys = nil;
@@ -256,7 +255,7 @@ static dispatch_queue_t serialQ = nil;
 -(BOOL)removeContact:(DWContactModel *)personModel {
     __block BOOL success = NO;
     dispatch_sync(serialQ, ^{
-        if (personModel.originRecord) {
+        if (personModel.originRecord != NULL) {
             CFErrorRef error = NULL;
             success = ABAddressBookRemoveRecord(self.addressBook, personModel.originRecord, &error);
             if (error) {
@@ -307,6 +306,8 @@ static dispatch_queue_t serialQ = nil;
         if (error) {
             NSLog(@"Something wrong, you may check this error :%@",(__bridge_transfer NSError *)error);
             CFRelease(error);
+        } else {
+            [self setNeedsRefetch];
         }
     });
     return success;
