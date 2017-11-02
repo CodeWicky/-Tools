@@ -44,6 +44,6 @@ typedef void(^ExceptionHandlerType)(NSException * exc);
 +(NSMutableArray *)unHandledCrashes;
 
 ///处理未处理的crash
-+(void)handleUnHandledCrashWithHandler:(void(^)(NSMutableArray <NSString *>* unHandledCrashes,NSString * lastCrash))handler;
++(void)handleUnHandledCrashWithHandler:(void(^)(NSMutableArray <NSString *>* unHandledCrashes,NSString * lastCrash,NSString * lastCrashReason))handler;
 
 @end

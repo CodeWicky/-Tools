@@ -49,7 +49,7 @@ static dispatch_queue_t serialQ = nil;
         NSDate * date = [NSDate date];
         NSString * folderName = [formatter stringFromDate:date];
         [DWFileManager dw_CreateDirectoryAtPath:[NSString stringWithFormat:@"%@/Crash",sP]];
-        [weakSelf configLastCrashWithName:folderName];
+        [weakSelf configLastCrashWithName:folderName reason:exception.reason];
         NSString * path = [sP stringByAppendingPathComponent:[NSString stringWithFormat:@"Crash/%@",folderName]];
         NSString * crashFilePath = [path stringByAppendingPathComponent:@"CrashLog.crash"];
         [DWFileManager dw_CreateFileAtPath:crashFilePath];
@@ -79,7 +79,7 @@ static dispatch_queue_t serialQ = nil;
     return handler;
 }
 
-+(void)configLastCrashWithName:(NSString *)name {
++(void)configLastCrashWithName:(NSString *)name reason:(NSString *)reason {
     if (!name.length) {
         return;
     }
@@ -90,6 +90,7 @@ static dispatch_queue_t serialQ = nil;
         config[@"UnHandleCrash"] = @[].mutableCopy;
     }
     [config setValue:name forKey:@"LastCrash"];
+    [config setValue:reason forKey:@"LastCrashReason"];
     NSMutableArray * unHandleCrash = config[@"UnHandleCrash"];
     if (![unHandleCrash containsObject:name]) {
         [unHandleCrash addObject:name];
@@ -113,6 +114,7 @@ static dispatch_queue_t serialQ = nil;
         }
         if ([config[@"LastCrash"] isEqualToString:name]) {
             config[@"LastCrash"] = @"";
+            config[@"LastCrashReason"] = @"";
         }
         [config writeToFile:path atomically:YES];
     });
@@ -127,7 +129,8 @@ static dispatch_queue_t serialQ = nil;
     return config[@"UnHandleCrash"];
 }
 
-+(void)handleUnHandledCrashWithHandler:(void (^)(NSMutableArray<NSString *> *, NSString *))handler {
+
++(void)handleUnHandledCrashWithHandler:(void(^)(NSMutableArray <NSString *>*,NSString *,NSString *))handler {
     if (!handler) {
         return;
     }
@@ -140,7 +143,7 @@ static dispatch_queue_t serialQ = nil;
     if (!unHandleCrash.count) {
         return;
     }
-    handler(unHandleCrash,config[@"LastCrash"]);
+    handler(unHandleCrash,config[@"LastCrash"],config[@"LastCrashReason"]);
 }
 
 #pragma mark --- exception Hanlder ---
