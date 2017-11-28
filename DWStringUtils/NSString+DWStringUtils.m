@@ -130,6 +130,14 @@ string = [NSString stringWithFormat:@"%@%d",string,tone];\
     return [regex stringByReplacingMatchesInString:self options:(NSMatchingReportProgress) range:NSMakeRange(0, self.length) withTemplate:temp];
 }
 
+-(NSString *)dw_StringByTrimmingWhitespace {
+    NSString * temp = [self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    
+    NSArray *components = [temp componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    components = [components filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self <> ''"]];
+    return [components componentsJoinedByString:@" "];
+}
+
 #pragma mark --- setter/getter ---
 -(void)setPinyinString:(NSString *)pinyinString {
     objc_setAssociatedObject(self, @selector(pinyinString), pinyinString, OBJC_ASSOCIATION_COPY_NONATOMIC);

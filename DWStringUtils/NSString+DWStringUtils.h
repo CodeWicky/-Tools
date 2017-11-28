@@ -85,6 +85,14 @@
  */
 -(NSString *)dw_StringByReplacingCharactersInArray:(NSArray *)characters withString:(NSString *)temp;
 
+
+/**
+ 去除首尾空格并压缩串中空格至1个
+
+ @return 压缩后的字符串
+ */
+-(NSString *)dw_StringByTrimmingWhitespace;
+
 @end
 
 @interface NSString (DWStringSortUtils)
