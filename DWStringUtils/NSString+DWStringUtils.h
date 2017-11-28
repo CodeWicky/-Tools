@@ -75,6 +75,16 @@
 ///判断字符串是否是中文
 -(BOOL)dw_StringIsChinese;
 
+
+/**
+ 将字符串中的包含在数组中的子串替换为另一字符串
+
+ @param characters 要被替换的子串数组
+ @param temp 替换的目标串
+ @return 替换后的字符串
+ */
+-(NSString *)dw_StringByReplacingCharactersInArray:(NSArray *)characters withString:(NSString *)temp;
+
 @end
 
 @interface NSString (DWStringSortUtils)

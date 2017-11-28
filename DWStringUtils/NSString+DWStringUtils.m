@@ -9,7 +9,7 @@
 #import "NSString+DWStringUtils.h"
 #import <objc/runtime.h>
 
-#define replaceIfContain(string,target,replacement,tone) \
+#define replaceIfContains(string,target,replacement,tone) \
 do {\
 if ([string containsString:target]) {\
 string = [string stringByReplacingOccurrencesOfString:target withString:replacement];\
@@ -117,6 +117,17 @@ string = [NSString stringWithFormat:@"%@%d",string,tone];\
     }
     NSPredicate * predicate = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",@"[\\u4E00-\\u9FA5]+"];
     return [predicate evaluateWithObject:self];
+}
+
+-(NSString *)dw_StringByReplacingCharactersInArray:(NSArray *)characters withString:(NSString *)temp {
+    if (characters.count == 0) {
+        return nil;
+    }
+    NSString * pattern = [characters componentsJoinedByString:@","];
+    pattern = [@"[" stringByAppendingString:pattern];
+    pattern = [pattern stringByAppendingString:@"]"];
+    NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:pattern options:(NSRegularExpressionCaseInsensitive) error:nil];
+    return [regex stringByReplacingMatchesInString:self options:(NSMatchingReportProgress) range:NSMakeRange(0, self.length) withTemplate:temp];
 }
 
 #pragma mark --- setter/getter ---
@@ -235,27 +246,27 @@ string = [NSString stringWithFormat:@"%@%d",string,tone];\
 }
 
 #pragma mark --- inline method ---
-static inline NSString * transformPinyinTone(NSString * pinyin) {
-    replaceIfContain(pinyin, @"ā", @"a",1);
-    replaceIfContain(pinyin, @"á", @"a",2);
-    replaceIfContain(pinyin, @"ǎ", @"a",3);
-    replaceIfContain(pinyin, @"à", @"a",4);
-    replaceIfContain(pinyin, @"ō", @"o",1);
-    replaceIfContain(pinyin, @"ó", @"o",2);
-    replaceIfContain(pinyin, @"ǒ", @"o",3);
-    replaceIfContain(pinyin, @"ò", @"o",4);
-    replaceIfContain(pinyin, @"ē", @"e",1);
-    replaceIfContain(pinyin, @"é", @"e",2);
-    replaceIfContain(pinyin, @"ě", @"e",3);
-    replaceIfContain(pinyin, @"è", @"e",4);
-    replaceIfContain(pinyin, @"ī", @"i",1);
-    replaceIfContain(pinyin, @"í", @"i",2);
-    replaceIfContain(pinyin, @"ǐ", @"i",3);
-    replaceIfContain(pinyin, @"ì", @"i",4);
-    replaceIfContain(pinyin, @"ū", @"u",1);
-    replaceIfContain(pinyin, @"ú", @"u",2);
-    replaceIfContain(pinyin, @"ǔ", @"u",3);
-    replaceIfContain(pinyin, @"ù", @"u",4);
+static NSString * transformPinyinTone(NSString * pinyin) {
+    replaceIfContains(pinyin, @"ā", @"a",1);
+    replaceIfContains(pinyin, @"á", @"a",2);
+    replaceIfContains(pinyin, @"ǎ", @"a",3);
+    replaceIfContains(pinyin, @"à", @"a",4);
+    replaceIfContains(pinyin, @"ō", @"o",1);
+    replaceIfContains(pinyin, @"ó", @"o",2);
+    replaceIfContains(pinyin, @"ǒ", @"o",3);
+    replaceIfContains(pinyin, @"ò", @"o",4);
+    replaceIfContains(pinyin, @"ē", @"e",1);
+    replaceIfContains(pinyin, @"é", @"e",2);
+    replaceIfContains(pinyin, @"ě", @"e",3);
+    replaceIfContains(pinyin, @"è", @"e",4);
+    replaceIfContains(pinyin, @"ī", @"i",1);
+    replaceIfContains(pinyin, @"í", @"i",2);
+    replaceIfContains(pinyin, @"ǐ", @"i",3);
+    replaceIfContains(pinyin, @"ì", @"i",4);
+    replaceIfContains(pinyin, @"ū", @"u",1);
+    replaceIfContains(pinyin, @"ú", @"u",2);
+    replaceIfContains(pinyin, @"ǔ", @"u",3);
+    replaceIfContains(pinyin, @"ù", @"u",4);
     return pinyin;
 }
 
