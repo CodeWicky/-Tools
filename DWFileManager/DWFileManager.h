@@ -151,6 +151,9 @@
 ///判断目录是否可写
 +(BOOL)dw_IsWritableItemAtPath:(NSString *)path;
 
+///返回文件mimeType
++(NSString *)dw_MineTypeForFile:(NSString *)fileName;
+
 @end
 
 /**
