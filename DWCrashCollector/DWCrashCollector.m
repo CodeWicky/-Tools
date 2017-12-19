@@ -25,7 +25,7 @@ static dispatch_queue_t serialQ = nil;
 
 @implementation DWCrashCollector
 
-+(void)CollectCrashInDefaultWithSavePath:(NSString *)savePath {
++(void)collectCrashInDefaultWithSavePath:(NSString *)savePath {
     if (!savePath.length) {
         savePath = [DWFileManager dw_DocumentsDir];
     }
