@@ -152,7 +152,7 @@
 +(BOOL)dw_IsWritableItemAtPath:(NSString *)path;
 
 ///返回文件mimeType
-+(NSString *)dw_MineTypeForFile:(NSString *)fileName;
++(NSString *)dw_MimeTypeForFile:(NSString *)fileName;
 
 @end
 

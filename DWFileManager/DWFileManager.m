@@ -293,7 +293,7 @@
     return [DefaultFileManager isWritableFileAtPath:path];
 }
 
-+(NSString *)dw_MineTypeForFile:(NSString *)fileName {
++(NSString *)dw_MimeTypeForFile:(NSString *)fileName {
     if (![fileName pathExtension]) {
         return nil;
     }
