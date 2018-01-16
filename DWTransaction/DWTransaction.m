@@ -19,7 +19,15 @@
 
 @property (nonatomic ,strong) DWTransaction * cycleSelf;
 
+#pragma mark --- Wait ---
 @property (nonatomic ,strong) NSBlockOperation * op;
+
+#pragma mark --- MissionComlpetion ---
+@property (atomic ,assign) int missionCount;
+
+@property (nonatomic ,strong) NSMutableArray <dispatch_block_t>* completionHandlerContainer;
+
+@property (nonatomic ,strong) dispatch_semaphore_t sema;
 
 @end
 
@@ -94,6 +102,35 @@ static inline void DWTransactionCallBack(CFRunLoopObserverRef observer, CFRunLoo
     DWTransactionCreateObserver();
     [transactionSet addObject:self];
 }
+
+#pragma mark --- setter/getter ---
+-(NSMutableArray<dispatch_block_t> *)completionHandlerContainer {
+    if (!_completionHandlerContainer) {
+        _completionHandlerContainer = @[].mutableCopy;
+    }
+    return _completionHandlerContainer;
+}
+
+-(dispatch_semaphore_t)sema {
+    if (!_sema) {
+        _sema = dispatch_semaphore_create(1);
+    }
+    return _sema;
+}
+
+#pragma mark --- tool func ---
+static inline void freeTransaction(DWTransaction * trans) {
+    trans.cycleSelf = nil;
+    trans.target = nil;
+    trans.selector = nil;
+    trans.object = nil;
+    trans.completionHandlerContainer = nil;
+    trans.missionCount = 0;
+    trans.sema = nil;
+}
+@end
+
+@implementation DWTransaction (Wait)
 
 +(instancetype)dw_WaitUtil:(NSTimeInterval)timeout completion:(dispatch_block_t)completion {
     if (!completion) {
@@ -178,10 +215,49 @@ static inline void DWTransactionCallBack(CFRunLoopObserverRef observer, CFRunLoo
     freeTransaction(self);
 }
 
-static inline void freeTransaction(DWTransaction * trans) {
-    trans.cycleSelf = nil;
-    trans.target = nil;
-    trans.selector = nil;
-    trans.object = nil;
+@end
+
+@implementation DWTransaction (MissionComlpetion)
+
++(instancetype)dw_ConfigWithMissionCompletionHandler:(dispatch_block_t)completion {
+    DWTransaction * t = [DWTransaction new];
+    if (completion) {
+        [t.completionHandlerContainer addObject:completion];
+    }
+    return t;
 }
+
+-(void)addMissionCompletionHandler:(dispatch_block_t)completion {
+    if (!completion) {
+        return;
+    }
+    dispatch_semaphore_wait(self.sema, DISPATCH_TIME_FOREVER);
+    [self.completionHandlerContainer addObject:completion];
+    dispatch_semaphore_signal(self.sema);
+}
+
+-(void)startAnMission {
+    if (!self.cycleSelf) {
+        self.cycleSelf = self;
+    }
+    self.missionCount ++;
+}
+
+-(void)finishAnMission {
+    self.missionCount --;
+    if (self.missionCount == 0) {
+        [self callCompletionHandler];
+    }
+}
+
+-(void)callCompletionHandler {
+    dispatch_semaphore_wait(self.sema, DISPATCH_TIME_FOREVER);
+    [self.completionHandlerContainer enumerateObjectsUsingBlock:^(dispatch_block_t  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        obj();
+    }];
+    [self.completionHandlerContainer removeAllObjects];
+    dispatch_semaphore_signal(self.sema);
+    freeTransaction(self);
+}
+
 @end

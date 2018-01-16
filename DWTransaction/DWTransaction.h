@@ -17,6 +17,9 @@
  
  version 1.0.1
  添加事务延时方法
+ 
+ version 1.0.2
+ 添加任务等待方法
  */
 
 #import <Foundation/Foundation.h>
@@ -39,9 +42,13 @@
 +(instancetype)dw_TransactionWithTarget:(id)target selector:(SEL)selector withObject:(id)object;
 -(void)commit;
 
+@end
+
+@interface DWTransaction (Wait)
+
 /**
  添加延时执行事务，可立即执行也可取消执行
-
+ 
  注：
  1.timeout 传入小于或等于0的数值时将等待run调用在执行
  2.任务执行完成或取消之前会实例持有自己本身以防止实例提前释放
@@ -66,5 +73,24 @@
  若任务未执行则不会释放，为避免循环引用的产生，此时应调用-invalidate释放对target的持有
  */
 -(void)invalidate;
+
+@end
+
+@interface DWTransaction (MissionComlpetion)
+
+/**
+ 配置任务等待实例，所有任务完成时调用完成回调。
+ 适用于想在几个并行任务完成后再触发回调时使用。
+ 内部维护一个计数器，初始值为0，调用 -startAnMission 时计数器加一，调用 -finishAnMission 时计数器减一，当计数器为零时触发回调。
+ 
+ 注：
+ 1.计数器不为0时实例持有自己本身以防止实例提前释放
+ 2.计数器为0时自身的持有，此时若实例引用计数为零，在下一次runloop时实例将被释放。
+ 3. -addMissionCompletionHandler 可添加完成时的回调动作。
+ */
++(instancetype)dw_ConfigWithMissionCompletionHandler:(dispatch_block_t)completion;
+-(void)addMissionCompletionHandler:(dispatch_block_t)completion;
+-(void)startAnMission;
+-(void)finishAnMission;
 
 @end
