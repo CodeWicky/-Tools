@@ -2,7 +2,7 @@
 //  DWAuthorizationTool.h
 //  a
 //
-//  Created by 张丁文 on 2018/1/15.
+//  Created by Wicky on 2018/1/15.
 //  Copyright © 2018年 Wicky. All rights reserved.
 //
 
