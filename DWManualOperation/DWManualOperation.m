@@ -19,6 +19,8 @@
 
 @property (atomic ,assign) NSUInteger handlerCount;
 
+@property (nonatomic ,strong) DWManualOperation * cycleSelf;
+
 @end
 
 @implementation DWManualOperation
@@ -59,6 +61,7 @@
     _executing = NO;
     [self didChangeValueForKey:@"isExecuting"];
     [self didChangeValueForKey:@"isFinished"];
+    freeOperation(self);
 }
 
 #pragma mark --- override ---
@@ -66,8 +69,14 @@
     if (self.isExecuting || self.isFinished) {///正在执行或已经完成的任务不可以调用开始方法。
         return;
     }
+    self.cycleSelf = self;
     _handlerCount = self.handlerContainer.count;
     [super start];
+}
+
+-(void)cancel {
+    [super cancel];
+    freeOperation(self);
 }
 
 -(void)main {///系统实现中 -start 方法中会调用 -main 方法
@@ -79,6 +88,11 @@
     [self.handlerContainer enumerateObjectsWithOptions:(NSEnumerationConcurrent) usingBlock:^(OperationHandler  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         obj(weakSelf);
     }];
+}
+
+#pragma mark --- tool func ---
+static inline void freeOperation(DWManualOperation * op) {
+    op.cycleSelf = nil;
 }
 
 #pragma mark --- setter/getter ---
