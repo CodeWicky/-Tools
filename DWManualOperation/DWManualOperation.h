@@ -16,6 +16,12 @@
     适用于为将异步任务封装在DWManualOperation中后自行控制任务被标记为完成状态的时机。
     可用于多个异步任务实际完成后触发另一个任务的情况。例如两个请求任务均结束后再进行数据刷新。
     同时可与 NSOperation 的其他子类配合再 NSOperationQueue 中使用。
+ 
+    version 1.0.0
+    提供基本功能，提供控制任务完成时机接口，提供直接完成任务接口。
+ 
+    version 1.0.1
+    提供任务回调串并行接口，以便控制回调的调用方式。
  */
 
 #import <Foundation/Foundation.h>
@@ -23,6 +29,9 @@
 @class DWManualOperation;
 typedef void(^OperationHandler)(DWManualOperation * op);
 @interface DWManualOperation : NSOperation
+
+///是否已并行模式调用回调，默认为真
+@property (nonatomic ,assign) BOOL concurrentHandler;
 
 /**
  以需要实现的任务生成operation对象

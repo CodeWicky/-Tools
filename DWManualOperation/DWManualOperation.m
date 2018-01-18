@@ -65,6 +65,13 @@
 }
 
 #pragma mark --- override ---
+-(instancetype)init {
+    if (self = [super init]) {
+        _concurrentHandler = YES;
+    }
+    return self;
+}
+
 -(void)start {
     if (self.isExecuting || self.isFinished) {///正在执行或已经完成的任务不可以调用开始方法。
         return;
@@ -85,7 +92,11 @@
     [self didChangeValueForKey:@"isExecuting"];
     [super main];
     __weak typeof(self)weakSelf = self;
-    [self.handlerContainer enumerateObjectsWithOptions:(NSEnumerationConcurrent) usingBlock:^(OperationHandler  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    NSEnumerationOptions opt = NSEnumerationConcurrent;
+    if (!self.concurrentHandler) {
+        opt = 0;
+    }
+    [self.handlerContainer enumerateObjectsWithOptions:(opt) usingBlock:^(OperationHandler  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         obj(weakSelf);
     }];
 }
@@ -96,6 +107,13 @@ static inline void freeOperation(DWManualOperation * op) {
 }
 
 #pragma mark --- setter/getter ---
+-(void)setConcurrentHandler:(BOOL)concurrentHandler {
+    if (self.isExecuting || self.isFinished) {
+        return;
+    }
+    _concurrentHandler = concurrentHandler;
+}
+
 -(NSMutableArray<OperationHandler> *)handlerContainer {
     if (!_handlerContainer) {
         _handlerContainer = @[].mutableCopy;
