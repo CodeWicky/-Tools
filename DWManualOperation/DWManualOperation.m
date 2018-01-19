@@ -61,13 +61,13 @@
     _executing = NO;
     [self didChangeValueForKey:@"isExecuting"];
     [self didChangeValueForKey:@"isFinished"];
-    freeOperation(self);
 }
 
 #pragma mark --- override ---
 -(instancetype)init {
     if (self = [super init]) {
         _concurrentHandler = YES;
+        self.completionBlock = nil;
     }
     return self;
 }
@@ -112,6 +112,17 @@ static inline void freeOperation(DWManualOperation * op) {
         return;
     }
     _concurrentHandler = concurrentHandler;
+}
+
+-(void)setCompletionBlock:(void (^)(void))completionBlock {
+    __weak typeof(self)weakSelf = self;
+    dispatch_block_t ab = ^(void) {
+        if (completionBlock) {
+            completionBlock();
+        }
+        freeOperation(weakSelf);
+    };
+    [super setCompletionBlock:ab];
 }
 
 -(NSMutableArray<OperationHandler> *)handlerContainer {

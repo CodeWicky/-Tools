@@ -22,6 +22,9 @@
  
     version 1.0.1
     提供任务回调串并行接口，以便控制回调的调用方式。
+ 
+    version 1.0.2
+    改变任务完成时释放自身时机至任务完成回调后释放自身。
  */
 
 #import <Foundation/Foundation.h>
