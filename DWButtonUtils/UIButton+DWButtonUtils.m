@@ -56,8 +56,8 @@
     }
     if (self.dw_IgnoreClickInterval > 0) {
         self.ignoreClick = YES;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self performSelector:@selector(setIgnoreClick:) withObject:@(NO) afterDelay:self.dw_IgnoreClickInterval];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.dw_IgnoreClickInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{///不宜用performSelector系方法，object进行强转时无法保证值正确
+            self.ignoreClick = NO;
         });
     }
     [self dw_sendAction:action to:target forEvent:event];

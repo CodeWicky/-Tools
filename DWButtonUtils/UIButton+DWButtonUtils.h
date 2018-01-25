@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+/**
+ *  提供防重点、响应区域放大、Block方法等属性
+ */
 @interface UIButton (DWButtonUtils)
 
 /**
