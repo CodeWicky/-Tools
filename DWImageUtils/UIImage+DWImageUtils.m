@@ -574,10 +574,11 @@ static inline CGRect swapWidthAndHeight(CGRect rect)
 - (UIImage *)dw_SubImageWithRect:(CGRect)rect {
     ///防止处理过image的scale不为1情况rect错误
     CGFloat scale = self.scale;
-    CGRect scaleRect = CGRectMake(rect.origin.x * scale, rect.origin.y * scale, rect.size.width * scale, rect.size.height * scale);
-    CGImageRef newImageRef = CGImageCreateWithImageInRect(self.CGImage, scaleRect);
-    UIImage *newImage = [[UIImage imageWithCGImage:newImageRef] dw_RescaleImageToSize:rect.size];
-    CGImageRelease(newImageRef);
+    if (scale != 1.0) {
+        rect = CGRectMake(rect.origin.x * scale, rect.origin.y * scale, rect.size.width * scale, rect.size.height * scale);
+    }
+    CGImageRef newImageRef = CGImageCreateWithImageInRect(self.CGImage, rect);
+    UIImage *newImage = [UIImage imageWithCGImage:newImageRef scale:self.scale orientation:self.imageOrientation];
     return newImage;
 }
 

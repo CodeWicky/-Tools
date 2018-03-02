@@ -96,6 +96,7 @@
 
 -(void)cancel {
     [super cancel];
+    [self finishOperation];
     freeOperation(self);
 }
 
@@ -112,6 +113,10 @@
     [self.handlerContainer enumerateObjectsWithOptions:(opt) usingBlock:^(OperationHandler  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         obj(weakSelf);
     }];
+}
+
+-(void)dealloc {
+    NSLog(@"dealloc");
 }
 
 #pragma mark --- tool func ---
