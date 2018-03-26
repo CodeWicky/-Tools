@@ -12,9 +12,10 @@
 
 ///继承自NSOperation时为了自行控制执行状态，需实重写以下两个属性，重写后，系统无法改变状态，需要自行触发状态改变。改变状态时应调用 -willChangeValueForKey: 和 -didChangeValueForKey: 来保证KVO正常触发。executing默认状态系统为 -main 方法开始时改变为YES。任务处理完成时改变executing为NO，finished为YES。
 
+///为保证单独使用时，Operation可以在调用-finishOperation之前不被释放，故自身持有自身，完成时在释放自身持有。
 ///为保证子类在NSOperationQueue中可以有正常响应，应保证两个状态时刻正确。其正确状态为：
 ///-start中如果isCanceled状态为真则将finished置为YES并不调用-main方法。
-///-main中将executing置为YES
+///-main中将executing置为YES。
 ///任务处于完成状态时将executing置为NO,finished置为YES。
 @property (nonatomic ,assign ,getter=isFinished) BOOL finished;
 
