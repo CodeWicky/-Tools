@@ -97,8 +97,6 @@
 
 -(void)cancel {
     [super cancel];
-    [self finishOperation];
-    freeOperation(self);
 }
 
 -(void)main {///系统实现中 -start 方法中会调用 -main 方法
