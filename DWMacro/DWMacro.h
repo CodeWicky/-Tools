@@ -103,12 +103,38 @@ label.bounds.size.width;\
 //MARK: - Additional Function
 
 ///安全回到主线程
-#define dispatch_async_main_safe(block)\
-if ([NSThread currentThread].isMainThread) {\
-block();\
+///主线程取值
+#define DWSafeMainThreadGetValue(a) \
+({\
+__block typeof(a)value;\
+DWSafeMainThreadCode(value = a);\
+value;\
+});
+
+///主线程赋值（把b值赋给a）
+#define DWSafeMainThreadSetValue(a,b) DWSafeMainThreadCode(a = b)
+
+///主线程执行一句代码（无需分号）
+#define DWSafeMainThreadCode(a) \
+do {\
+if ([NSThread isMainThread]) {\
+a;\
 } else {\
-dispatch_async(dispatch_get_main_queue(),block);\
-}
+dispatch_sync(dispatch_get_main_queue(), ^{\
+a;\
+});\
+}\
+} while (0)
+
+///主线程执行Block（a应该是一个dispatch_block_t）
+#define DWSafeMainThreadBlock(a) \
+do {\
+if ([NSThread isMainThread]) {\
+a();\
+} else {\
+dispatch_sync(dispatch_get_main_queue(), a);\
+}\
+} while (0)
 
 ///改变Layer属性是否需要动画
 #define DWLayerTransactionWithAnimation(animated,animationBlock) \
