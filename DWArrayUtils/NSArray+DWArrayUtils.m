@@ -236,16 +236,25 @@ static inline NSString * StringFromAction(DWArrayKeyPathActionType action) {
 
 @implementation NSArray (DWArrayLogUtils)
 
--(NSString *)descriptionWithLocale:(id)locale
-{
-    NSMutableString *string=[[NSMutableString alloc]init];
-    [string appendString:@"("];
-    
-    for (id obj in self) {//self就是当前可变数组,遍历数组中的对象拼接成新的字符串返回
-        [string appendFormat:@"\n\t%@",obj];
+-(NSString *)descriptionWithLocale:(id)locale indent:(NSUInteger)level {
+    NSString * footerBlank = @"";
+    for (int i = 0; i < level; i++) {
+        footerBlank = [footerBlank stringByAppendingString:@"\t"];
     }
-    [string appendString:@"\n)"];
-    return string;
+    NSMutableString *str = [[NSMutableString alloc] initWithFormat:@"("];
+    NSString * contentBlank = [footerBlank stringByAppendingString:@"\t"];
+    for (id obj in self) {
+        id value = obj;
+        if ([value respondsToSelector:@selector(descriptionWithLocale:indent:)]) {
+            value = [value descriptionWithLocale:locale indent:level + 1];
+        }
+        [str appendFormat:@"\n%@%@,",contentBlank,value];
+    }
+    if (self.count) {
+        [str deleteCharactersInRange:NSMakeRange(str.length - 1, 1)];
+    }
+    [str appendString:[NSString stringWithFormat:@"\n%@)",footerBlank]];
+    return str;
 }
 
 @end
