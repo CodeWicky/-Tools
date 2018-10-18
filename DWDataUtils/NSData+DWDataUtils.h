@@ -17,6 +17,7 @@
  
  version 1.0.1
  提供AES256加解密方法
+ 提供MD5摘要计算
  */
 
 #import <Foundation/Foundation.h>
@@ -54,4 +55,11 @@
  @return 解密后的数据
  */
 -(NSData *)dw_AES256DecryptWithKey:(NSString *)key;
+
+/**
+ 获取data的MD5计算后的字符串
+
+ @return MD5计算后的字符串
+ */
+-(NSString *)dw_MD5String;
 @end
