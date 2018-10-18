@@ -7,6 +7,7 @@
 //
 
 #import "NSData+DWDataUtils.h"
+#import <CommonCrypto/CommonCryptor.h>
 
 #define xx 65
 
@@ -83,6 +84,38 @@ static const char webSafeBase64DecodeLookup[256] =
 
 -(NSString *)dw_WebSafeBase64EncodedStringWithPadding:(BOOL)padding {
     return encodeStringFromData(self, webSafeBase64EncodeLookup, padding);
+}
+
+-(NSData *)dw_AES256EncryptWithKey:(NSString *)key {
+    char keyPtr[kCCKeySizeAES256+1];
+    bzero(keyPtr, sizeof(keyPtr));
+    [key getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];
+    NSUInteger dataLength = [self length];
+    size_t bufferSize = dataLength + kCCBlockSizeAES128;
+    void *buffer = malloc(bufferSize);
+    size_t numBytesEncrypted = 0;
+    CCCryptorStatus cryptStatus = CCCrypt(kCCEncrypt, kCCAlgorithmAES128, kCCOptionPKCS7Padding,keyPtr, kCCKeySizeAES256,NULL,[self bytes], dataLength,buffer, bufferSize,&numBytesEncrypted);
+    if (cryptStatus == kCCSuccess) {
+        return [NSData dataWithBytesNoCopy:buffer length:numBytesEncrypted];
+    }
+    free(buffer);
+    return nil;
+}
+
+- (NSData *)AES256DecryptWithKey:(NSString *)key {
+    char keyPtr[kCCKeySizeAES256+1];
+    bzero(keyPtr, sizeof(keyPtr));
+    [key getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];
+    NSUInteger dataLength = [self length];
+    size_t bufferSize = dataLength + kCCBlockSizeAES128;
+    void *buffer = malloc(bufferSize);
+    size_t numBytesDecrypted = 0;
+    CCCryptorStatus cryptStatus = CCCrypt(kCCDecrypt, kCCAlgorithmAES128, kCCOptionPKCS7Padding,keyPtr, kCCKeySizeAES256,NULL,[self bytes], dataLength,buffer, bufferSize,&numBytesDecrypted);
+    if (cryptStatus == kCCSuccess) {
+        return [NSData dataWithBytesNoCopy:buffer length:numBytesDecrypted];
+    }
+    free(buffer);
+    return nil;
 }
 
 #pragma mark --- inline method ---
