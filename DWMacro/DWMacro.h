@@ -41,7 +41,7 @@
 
 /****** 字符串相关 ******/
 ///返回对象属性的字符串化
-#define keyPathString(objc, keyPath) @(((void)objc.keyPath, #keyPath))
+#define DWKeyPathString(objc, keyPath) @(((void)objc.keyPath, #keyPath))
 
 ///快速返回字符串高度
 #define DWStringHeight(string,widthLimit,font) ([string boundingRectWithSize:CGSizeMake(widthLimit, MAXFLOAT) options: NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size.height)

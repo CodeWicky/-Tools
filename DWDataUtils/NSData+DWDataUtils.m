@@ -7,6 +7,8 @@
 //
 
 #import "NSData+DWDataUtils.h"
+#import <CommonCrypto/CommonCryptor.h>
+#import <CommonCrypto/CommonCrypto.h>
 
 #define xx 65
 
@@ -83,6 +85,57 @@ static const char webSafeBase64DecodeLookup[256] =
 
 -(NSString *)dw_WebSafeBase64EncodedStringWithPadding:(BOOL)padding {
     return encodeStringFromData(self, webSafeBase64EncodeLookup, padding);
+}
+
+-(NSData *)dw_AES256EncryptWithKey:(NSString *)key {
+    char keyPtr[kCCKeySizeAES256+1];
+    bzero(keyPtr, sizeof(keyPtr));
+    [key getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];
+    NSUInteger dataLength = [self length];
+    size_t bufferSize = dataLength + kCCBlockSizeAES128;
+    void *buffer = malloc(bufferSize);
+    size_t numBytesEncrypted = 0;
+    CCCryptorStatus cryptStatus = CCCrypt(kCCEncrypt, kCCAlgorithmAES128, kCCOptionPKCS7Padding,keyPtr, kCCKeySizeAES256,NULL,[self bytes], dataLength,buffer, bufferSize,&numBytesEncrypted);
+    if (cryptStatus == kCCSuccess) {
+        return [NSData dataWithBytesNoCopy:buffer length:numBytesEncrypted];
+    }
+    free(buffer);
+    return nil;
+}
+
+-(NSData *)dw_AES256DecryptWithKey:(NSString *)key {
+    char keyPtr[kCCKeySizeAES256+1];
+    bzero(keyPtr, sizeof(keyPtr));
+    [key getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];
+    NSUInteger dataLength = [self length];
+    size_t bufferSize = dataLength + kCCBlockSizeAES128;
+    void *buffer = malloc(bufferSize);
+    size_t numBytesDecrypted = 0;
+    CCCryptorStatus cryptStatus = CCCrypt(kCCDecrypt, kCCAlgorithmAES128, kCCOptionPKCS7Padding,keyPtr, kCCKeySizeAES256,NULL,[self bytes], dataLength,buffer, bufferSize,&numBytesDecrypted);
+    if (cryptStatus == kCCSuccess) {
+        return [NSData dataWithBytesNoCopy:buffer length:numBytesDecrypted];
+    }
+    free(buffer);
+    return nil;
+}
+
+-(NSString *)dw_MD5String {
+    const char * str = [self bytes];
+    CC_MD5_CTX md5;
+    CC_MD5_Init (&md5);
+    CC_MD5_Update (&md5, str, (uint)strlen(str));
+    
+    unsigned char digest[CC_MD5_DIGEST_LENGTH];
+    CC_MD5_Final (digest, &md5);
+    return  [NSString stringWithFormat: @"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+             digest[0],  digest[1],
+             digest[2],  digest[3],
+             digest[4],  digest[5],
+             digest[6],  digest[7],
+             digest[8],  digest[9],
+             digest[10], digest[11],
+             digest[12], digest[13],
+             digest[14], digest[15]];
 }
 
 #pragma mark --- inline method ---
