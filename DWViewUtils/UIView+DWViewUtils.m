@@ -7,6 +7,7 @@
 //
 
 #import "UIView+DWViewUtils.h"
+#import <objc/runtime.h>
 
 @implementation UIView (DWViewFrameUtils)
 
@@ -186,11 +187,42 @@
 
 @implementation UIView (DWViewSubViewsUtils)
 
+static const char * zIndexKey = "dw_zIndex_key";
+
 -(void)removeAllSubviews {
     if (self.subviews.count == 0) {
         return;
     }
     [self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+}
+
+-(void)dw_InsertSubview:(UIView *)view atZIndex:(NSUInteger)index {
+    UIView * targetView = nil;
+    for (UIView * v in self.subviews) {
+        if (zIndexOfView(v) > index) {
+            targetView = v;
+            break;
+        }
+    }
+    setZIndexOfView(view, index);
+    if (targetView) {
+        [self insertSubview:view belowSubview:targetView];
+    } else {
+        [self addSubview:view];
+    }
+}
+
+#pragma mark --- tool func ---
+static NSInteger zIndexOfView(UIView * view) {
+    NSNumber * num = objc_getAssociatedObject(view, zIndexKey);
+    if (!num) {
+        return -1;
+    }
+    return [num unsignedIntegerValue];
+}
+
+static void setZIndexOfView(UIView * view,NSUInteger index) {
+    objc_setAssociatedObject(view, zIndexKey, @(index), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end
