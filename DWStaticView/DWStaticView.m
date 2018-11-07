@@ -254,7 +254,6 @@
         self.staticBackImage = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
     }
-    self.layer.contents = (__bridge id)(self.staticBackImage.CGImage);
 }
 
 #pragma mark --- override ---
@@ -264,6 +263,7 @@
     if (self.staticBackLayer) {
         ///背景模式绘制背景
         [self drawStaticBackView];
+        self.layer.contents = (__bridge id)(self.staticBackImage.CGImage);
     } else {
         ///否则移除寄宿图
         self.layer.contents = nil;
