@@ -19,6 +19,9 @@
  
  version 1.0.0
  静态视图初步完成，完成基本绘制功能
+ 
+ version 1.0.2
+ 完善静态状态切换功能，添加插入视图接口，添加重绘接口
  */
 @interface DWStaticView : UIView
 
@@ -26,12 +29,22 @@
 
 @property (nonatomic ,strong ,readonly) NSArray<UIView *> * staticBackSubviews;
 
+///添加背景静态视图
 -(void)addStaticBackSubview:(UIView *)view;
 
+///以角标插入视图
+-(void)insertStaticBackSubview:(UIView *)view atIndex:(NSInteger)index;
+
+///插入背景静态视图在指定视图之上
 -(void)insertStaticBackSubview:(UIView *)view aboveSubview:(UIView *)siblingSubview;
 
+///插入背景静态视图在指定视图之下
 -(void)insertStaticBackSubview:(UIView *)view belowSubview:(UIView *)siblingSubview;
 
+///移除背景静态视图
 -(void)removeStaticBackSubview:(UIView *)view;
+
+///设置视图需要重绘（子视图frame发生改变时需要调用）
+-(void)setNeedsRedrawStaticView;
 
 @end
