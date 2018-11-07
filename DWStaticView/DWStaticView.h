@@ -24,9 +24,11 @@
 
 @property (nonatomic ,assign) BOOL staticBackLayer;
 
-@property (nonatomic ,strong) NSMutableArray<UIView *> * staticBackSubviews;
+@property (nonatomic ,strong ,readonly) NSArray<UIView *> * staticBackSubviews;
 
 -(void)addStaticBackSubview:(UIView *)view;
+
+-(void)insertStaticBackSubview:(UIView *)view aboveSubview:(UIView *)siblingSubview;
 
 -(void)insertStaticBackSubview:(UIView *)view belowSubview:(UIView *)siblingSubview;
 

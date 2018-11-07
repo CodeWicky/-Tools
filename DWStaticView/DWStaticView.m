@@ -12,6 +12,8 @@
 
 @property (nonatomic ,strong) UIImage * staticBackImage;
 
+@property (nonatomic ,strong) NSMutableArray <UIView *>* inner_staticBackSubviews;
+
 @end
 
 @implementation DWStaticView
@@ -22,10 +24,42 @@
         return;
     }
     if (self.staticBackLayer) {
-        [self.staticBackSubviews addObject:view];
+        if (view.superview) {
+            [view removeFromSuperview];
+        }
+        NSInteger index = [self.inner_staticBackSubviews indexOfObject:view];
+        if (index == NSNotFound) {
+            [self.inner_staticBackSubviews addObject:view];
+        } else {
+            [self.inner_staticBackSubviews removeObjectAtIndex:index];
+            [self.inner_staticBackSubviews addObject:view];
+        }
         [self setNeedsRedrawStaticView];
     } else {
         [self addSubview:view];
+    }
+}
+
+-(void)insertStaticBackSubview:(UIView *)view aboveSubview:(UIView *)siblingSubview {
+    if (!view) {
+        return;
+    }
+    if (self.staticBackLayer) {
+        if (view.superview) {
+            [view removeFromSuperview];
+        }
+        if (![self.inner_staticBackSubviews containsObject:siblingSubview]) {
+            [self.inner_staticBackSubviews addObject:view];
+        } else {
+            if ([view isEqual:siblingSubview]) {
+                return;
+            }
+            NSUInteger idx = [self.inner_staticBackSubviews indexOfObject:siblingSubview] + 1;
+            [self.inner_staticBackSubviews insertObject:view atIndex:idx];
+        }
+        [self setNeedsRedrawStaticView];
+    } else {
+        [self insertSubview:view aboveSubview:siblingSubview];
     }
 }
 
@@ -35,12 +69,17 @@
         return;
     }
     if (self.staticBackLayer) {
-        if (![self.staticBackSubviews containsObject:siblingSubview]) {
-            [self.staticBackSubviews addObject:view];
+        if (view.superview) {
+            [view removeFromSuperview];
+        }
+        if (![self.inner_staticBackSubviews containsObject:siblingSubview]) {
+            [self.inner_staticBackSubviews addObject:view];
         } else {
-            NSUInteger idx = [self.staticBackSubviews indexOfObject:siblingSubview];
-            
-            [self.staticBackSubviews insertObject:view atIndex:idx];
+            if ([view isEqual:siblingSubview]) {
+                return;
+            }
+            NSUInteger idx = [self.inner_staticBackSubviews indexOfObject:siblingSubview];
+            [self.inner_staticBackSubviews insertObject:view atIndex:idx];
         }
         [self setNeedsRedrawStaticView];
     } else {
@@ -54,8 +93,8 @@
         return;
     }
     if (self.staticBackLayer) {
-        if ([self.staticBackSubviews containsObject:view]) {
-            [self.staticBackSubviews removeObject:view];
+        if ([self.inner_staticBackSubviews containsObject:view]) {
+            [self.inner_staticBackSubviews removeObject:view];
             [self setNeedsRedrawStaticView];
         }
     } else {
@@ -83,7 +122,7 @@
     if (!self.staticBackImage) {
         UIView * tempView = [[UIView alloc] initWithFrame:self.bounds];
         
-        [self.staticBackSubviews enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [self.inner_staticBackSubviews enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             [tempView addSubview:obj];
         }];
         
@@ -96,12 +135,16 @@
     self.layer.contents = (__bridge id)(self.staticBackImage.CGImage);
 }
 
--(NSMutableArray<UIView *> *)staticBackSubviews
+-(NSMutableArray<UIView *> *)inner_staticBackSubviews
 {
-    if (!_staticBackSubviews) {
-        _staticBackSubviews = [NSMutableArray array];
+    if (!_inner_staticBackSubviews) {
+        _inner_staticBackSubviews = [NSMutableArray array];
     }
-    return _staticBackSubviews;
+    return _inner_staticBackSubviews;
+}
+
+-(NSArray<UIView *> *)staticBackSubviews {
+    return [self.inner_staticBackSubviews copy];
 }
 
 @end
