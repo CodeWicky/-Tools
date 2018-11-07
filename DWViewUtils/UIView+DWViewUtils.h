@@ -57,5 +57,8 @@
 ///移除所有子视图
 -(void)removeAllSubviews;
 
+///按照ZIndex插入视图，ZIndex越大层级越高
+-(void)dw_InsertSubview:(UIView *)view atZIndex:(NSUInteger)index;
+
 @end
 
