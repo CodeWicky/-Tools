@@ -35,6 +35,8 @@ __attribute__((constructor)) static void dw_enhance_protocol() {
             if (![protocol_ctn containsObject:ptlStr]) {
                 continue;
             }
+           
+            ///添加实例方法
             Class tempClass = objc_getClass([NSString stringWithFormat:@"%@TemporaryClass",ptlStr].UTF8String);
             unsigned methodCount;
             Method *methods = class_copyMethodList(tempClass, &methodCount);
@@ -43,7 +45,8 @@ __attribute__((constructor)) static void dw_enhance_protocol() {
                 class_addMethod(class, method_getName(method), method_getImplementation(method), method_getTypeEncoding(method));
             }
             free(methods);
-
+            
+            ///添加类方法
             Class metaTempClass = object_getClass(tempClass);
             unsigned metaMethodCount;
             Method *metaMethods = class_copyMethodList(metaTempClass, &metaMethodCount);
