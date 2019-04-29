@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic ,assign) size_t levelsOfDetail;
 
+-(void)invalidateCache;
+
 @end
 
 NS_ASSUME_NONNULL_END

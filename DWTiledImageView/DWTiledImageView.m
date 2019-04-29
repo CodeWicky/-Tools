@@ -28,6 +28,12 @@
 
 @implementation DWTiledImageInternalView
 
+#pragma mark --- interface method ---
+-(void)invalidateCache {
+    self.layer.contents = nil;
+    [self setNeedsDisplay];
+}
+
 #pragma mark --- override ---
 +(Class)layerClass {
     return [CATiledLayer class];
@@ -82,6 +88,10 @@
 @end
 
 @implementation DWTiledImageView
+
+-(void)invalidateCache {
+    [self.tiledView invalidateCache];
+}
 
 #pragma mark --- tool method ---
 -(void)calculateImageScale {
@@ -196,6 +206,14 @@
     }
 }
 
+-(void)calculateActualTileSize:(CGSize)tileSize {
+    if (self.bounds.size.width * self.bounds.size.height) {
+        int widthFactor = ceil(self.bounds.size.width / tileSize.width);
+        int heightFactor = ceil(self.bounds.size.height / tileSize.height);
+        self.tiledView.tileSize = CGSizeMake(_viewWidth / widthFactor, _viewHeight / heightFactor);
+    }
+}
+
 #pragma mark --- override ---
 -(void)drawRect:(CGRect)rect {
     if (self.mediaScale * self.viewScale == 0) {
@@ -234,6 +252,7 @@
         } else {
             _viewScale = 0;
         }
+        [self calculateActualTileSize:_tileSize];
         [self resizeTiledLayer];
         [self calculateImageScale];
     }
@@ -244,9 +263,7 @@
 -(void)setTileSize:(CGSize)tileSize {
     if (!CGSizeEqualToSize(_tileSize, tileSize)) {
         _tileSize = tileSize;
-        int widthFactor = ceil(self.bounds.size.width / tileSize.width);
-        int heightFactor = ceil(self.bounds.size.height / tileSize.height);
-        self.tiledView.tileSize = CGSizeMake(_viewWidth / widthFactor, _viewHeight / heightFactor);
+        [self calculateActualTileSize:tileSize];
     }
 }
 
@@ -260,6 +277,7 @@
 -(void)setImage:(UIImage *)image {
     if (![_image isEqual:image]) {
         _image = image;
+        [_tiledView invalidateCache];
         _tiledView.image = image;
         if (image.size.height * image.size.width > 0) {
             _mediaScale = fabs(image.size.width / image.size.height);
