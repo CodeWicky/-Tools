@@ -8,11 +8,20 @@
 
 #import <UIKit/UIKit.h>
 
+/**
+ 控制器转场类
+ 
+ 用于快速自定制 UITabBarController / UINavigationController / UIViewController 的转场动画。
+ 
+ version 1.0.0
+ 提供基础转场动画及定制接口。
+ */
+
 typedef NS_OPTIONS(NSUInteger, DWTransitionType) {
     ///Describe default transition type which means that push and from right.
     DWTransitionDefaultType = 0,
     
-    ///Describe current transition is either push or pop.
+    ///Describe current transition is either push、pop、present or dismiss.
     DWTransitionPushType = 1 << 0,
     DWTransitionPopType = 1 << 1,
     DWTransitionPresentType = 1 << 2,
@@ -24,7 +33,7 @@ typedef NS_OPTIONS(NSUInteger, DWTransitionType) {
     DWTransitionAnimationMoveInFromTopType = 1 << 6,
     DWTransitionAnimationMoveInFromBottomType = 1 << 7,
     DWTransitionAnimationZoomInType = 1 << 8,
-    DWTransitionAniamtionFadeInType = 1 << 9,
+    DWTransitionAnimationFadeInType = 1 << 9,
     DWTransitionAnimationCustomType = 1 << 10,
     DWTransitionAnimationNoneType = 1 << 11,
     
