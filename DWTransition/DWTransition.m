@@ -41,13 +41,13 @@
     CGFloat cW = containerView.bounds.size.width;
     CGFloat cH = containerView.bounds.size.height;
     switch (self.transitionType & DWTransitionAnimationTypeMask) {
-        case DWTransitionPushAnimationNoneType:
+        case DWTransitionAnimationNoneType:
         {
             ///no animation,nothing to do.
             [transitionContext completeTransition:YES];
         }
             break;
-        case DWTransitionPushAnimationMoveInFromLeftType:
+        case DWTransitionAnimationMoveInFromLeftType:
         {
             toVC.view.frame = CGRectMake(-cW, 0, cW, cH);
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
@@ -57,7 +57,7 @@
             }];
         }
             break;
-        case DWTransitionPushAnimationMoveInFromTopType:
+        case DWTransitionAnimationMoveInFromTopType:
         {
             toVC.view.frame = CGRectMake(0, -cH, cW, cH);
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
@@ -67,7 +67,7 @@
             }];
         }
             break;
-        case DWTransitionPushAnimationMoveInFromBottomType:
+        case DWTransitionAnimationMoveInFromBottomType:
         {
             toVC.view.frame = CGRectMake(0, cH, cW, cH);
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
@@ -77,7 +77,7 @@
             }];
         }
             break;
-        case DWTransitionPushAnimationZoomInType:
+        case DWTransitionAnimationZoomInType:
         {
             toVC.view.transform = CGAffineTransformMakeScale(1.0 / cW, 1.0 / cH);
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
@@ -87,7 +87,7 @@
             }];
         }
             break;
-        case DWTransitionPushAniamtionFadeInType:
+        case DWTransitionAniamtionFadeInType:
         {
             toVC.view.alpha = 0;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
@@ -97,7 +97,7 @@
             }];
         }
             break;
-        case DWTransitionPushAnimationCustomType:
+        case DWTransitionAnimationCustomType:
         {
             if (self.customTransition) {
                 self.customTransition(self,transitionContext);
@@ -123,17 +123,19 @@
     UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     UIViewController *fromVC = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIView *containerView = [transitionContext containerView];
-    [containerView insertSubview:toVC.view atIndex:0];
+    if ((self.transitionType & DWTransitionTypeMask) == DWTransitionPopType) {
+        [containerView insertSubview:toVC.view atIndex:0];
+    }
     CGFloat cW = containerView.bounds.size.width;
     CGFloat cH = containerView.bounds.size.height;
     switch (self.transitionType & DWTransitionAnimationTypeMask) {
-        case DWTransitionPushAnimationNoneType:
+        case DWTransitionAnimationNoneType:
         {
             ///no animation,nothing to do.
             [transitionContext completeTransition:YES];
         }
             break;
-        case DWTransitionPushAnimationMoveInFromLeftType:
+        case DWTransitionAnimationMoveInFromLeftType:
         {
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 fromVC.view.transform = CGAffineTransformMakeTranslation(-cW, 0);
@@ -142,7 +144,7 @@
             }];
         }
             break;
-        case DWTransitionPushAnimationMoveInFromTopType:
+        case DWTransitionAnimationMoveInFromTopType:
         {
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 fromVC.view.transform = CGAffineTransformMakeTranslation(0, -cH);
@@ -151,7 +153,7 @@
             }];
         }
             break;
-        case DWTransitionPushAnimationMoveInFromBottomType:
+        case DWTransitionAnimationMoveInFromBottomType:
         {
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 fromVC.view.transform = CGAffineTransformMakeTranslation(0, cH);
@@ -160,7 +162,7 @@
             }];
         }
             break;
-        case DWTransitionPushAnimationZoomInType:
+        case DWTransitionAnimationZoomInType:
         {
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 fromVC.view.transform = CGAffineTransformMakeScale(1.0 / cW, 1.0 / cH);
@@ -169,7 +171,7 @@
             }];
         }
             break;
-        case DWTransitionPushAniamtionFadeInType:
+        case DWTransitionAniamtionFadeInType:
         {
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 fromVC.view.alpha = 0;
@@ -178,7 +180,7 @@
             }];
         }
             break;
-        case DWTransitionPushAnimationCustomType:
+        case DWTransitionAnimationCustomType:
         {
             if (self.customTransition) {
                 self.customTransition(self,transitionContext);
@@ -205,8 +207,9 @@
 }
 
 -(void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
-    switch (self.transitionType & DWTransitionPushTypeMask) {
+    switch (self.transitionType & DWTransitionTypeMask) {
         case DWTransitionPopType:
+        case DWTransitionDismissType:
             [self popAnimationWithTransition:transitionContext];
             break;
         default:

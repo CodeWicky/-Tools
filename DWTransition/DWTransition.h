@@ -9,26 +9,28 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_OPTIONS(NSUInteger, DWTransitionType) {
-    ///Describe default transition type.
+    ///Describe default transition type which means that push and from right.
     DWTransitionDefaultType = 0,
     
     ///Describe current transition is either push or pop.
     DWTransitionPushType = 1 << 0,
     DWTransitionPopType = 1 << 1,
+    DWTransitionPresentType = 1 << 2,
+    DWTransitionDismissType = 1 << 3,
     
     ///Describe current transition's animation type
-    DWTransitionPushAnimationMoveInFromLeftType = 1 << 2,
-    DWTransitionPushAnimationMoveInFromRightType = 1 << 3,
-    DWTransitionPushAnimationMoveInFromTopType = 1 << 4,
-    DWTransitionPushAnimationMoveInFromBottomType = 1 << 5,
-    DWTransitionPushAnimationZoomInType = 1 << 6,
-    DWTransitionPushAniamtionFadeInType = 1 << 7,
-    DWTransitionPushAnimationCustomType = 1 << 8,
-    DWTransitionPushAnimationNoneType = 1 << 9,
+    DWTransitionAnimationMoveInFromLeftType = 1 << 4,
+    DWTransitionAnimationMoveInFromRightType = 1 << 5,
+    DWTransitionAnimationMoveInFromTopType = 1 << 6,
+    DWTransitionAnimationMoveInFromBottomType = 1 << 7,
+    DWTransitionAnimationZoomInType = 1 << 8,
+    DWTransitionAniamtionFadeInType = 1 << 9,
+    DWTransitionAnimationCustomType = 1 << 10,
+    DWTransitionAnimationNoneType = 1 << 11,
     
     ///Describe push or animaiton type mask.
-    DWTransitionPushTypeMask = 0x03,
-    DWTransitionAnimationTypeMask = 0x3fc,
+    DWTransitionTypeMask = 0x00f,
+    DWTransitionAnimationTypeMask = 0xff0,
 };
 
 ///Follow DWTransitionProtocol so that viewcontroller can manager animationType itself.
@@ -44,7 +46,7 @@ typedef void(^DWCustomTransitionHandler)(DWTransition * transition,id <UIViewCon
 ///DWTransition can provide an easy to customsize push/present transition.
 @interface DWTransition : NSObject<UIViewControllerAnimatedTransitioning>
 
-///Initialize with DWTransitionPushAnimationCustomType and provide customTransition in order to customsize the transition as you want.
+///Initialize with DWTransitionAnimationCustomType and provide customTransition in order to customsize the transition as you want.
 @property (nonatomic ,copy) DWCustomTransitionHandler customTransition;
 
 ///Transition duration controls how long the transition will take.Default by 0.4.
