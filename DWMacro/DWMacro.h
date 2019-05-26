@@ -141,18 +141,25 @@ dispatch_sync(dispatch_get_main_queue(), a);\
 
 ///改变Layer属性是否需要动画
 #define DWLayerTransactionWithAnimation(animated,animationBlock) \
+do {\
 [CATransaction begin];\
 if (!animated) {\
 [CATransaction setAnimationDuration:0];\
 }\
 animationBlock();\
 [CATransaction commit];\
+} while (0)
 
 ///角度转弧度
 #define DWDegreesToRadian(x) (M_PI * (x) / 180.0)
 
 ///弧度转角度
 #define DWRadianToDegrees(radian) (radian*180.0)/(M_PI)
+
+///数字判断
+#define DWFloatEqualTo(a,b) (fabs(a - b) <= __FLT_EPSILON__)
+#define DWFloatNotGreaterThan(a,b) (a < b || DWFloatEqualTo(a,b))
+#define DWFloatNotLessThan(a,b) (a > b || DWFloatEqualTo(a,b))
 
 ///版本判断
 #define DW_SYSTEM_VERSION [[[UIDevice currentDevice] systemVersion] floatValue]
