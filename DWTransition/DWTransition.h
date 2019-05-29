@@ -26,20 +26,22 @@ typedef NS_OPTIONS(NSUInteger, DWTransitionType) {
     DWTransitionPopType = 1 << 1,
     DWTransitionPresentType = 1 << 2,
     DWTransitionDismissType = 1 << 3,
+    DWTransitionTransparentPushType = 1 << 4,
+    DWTransitionTransparentPopType = 1 << 5,
     
     ///Describe current transition's animation type
-    DWTransitionAnimationMoveInFromLeftType = 1 << 4,
-    DWTransitionAnimationMoveInFromRightType = 1 << 5,
-    DWTransitionAnimationMoveInFromTopType = 1 << 6,
-    DWTransitionAnimationMoveInFromBottomType = 1 << 7,
-    DWTransitionAnimationZoomInType = 1 << 8,
-    DWTransitionAnimationFadeInType = 1 << 9,
-    DWTransitionAnimationCustomType = 1 << 10,
-    DWTransitionAnimationNoneType = 1 << 11,
+    DWTransitionAnimationMoveInFromLeftType = 1 << 6,
+    DWTransitionAnimationMoveInFromRightType = 1 << 7,
+    DWTransitionAnimationMoveInFromTopType = 1 << 8,
+    DWTransitionAnimationMoveInFromBottomType = 1 << 9,
+    DWTransitionAnimationZoomInType = 1 << 10,
+    DWTransitionAnimationFadeInType = 1 << 11,
+    DWTransitionAnimationCustomType = 1 << 12,
+    DWTransitionAnimationNoneType = 1 << 13,
     
     ///Describe push or animaiton type mask.
-    DWTransitionTypeMask = 0x00f,
-    DWTransitionAnimationTypeMask = 0xff0,
+    DWTransitionTypeMask = 0x003f,
+    DWTransitionAnimationTypeMask = 0x3fc0,
 };
 
 ///Follow DWTransitionProtocol so that viewcontroller can manager animationType itself.
