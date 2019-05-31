@@ -433,28 +433,64 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     UIViewController *fromVC = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIView * fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];
+    UIView * toView = [transitionContext viewForKey:UITransitionContextToViewKey];
+    UIView * container = [transitionContext containerView];
     CGRect fromStart = [transitionContext initialFrameForViewController:fromVC];
     CGRect fromEnd = fromStart;
+    
+    ///这里如果是transparentPop，有可能因为transparentPush的时候手动insert的Push的fromView而导致containerView中初始状态就多了很多其他的view。且Pop具有以此Pop多个控制器的方法，如PopToRoot。故先查找toView在container中的层级，然后把toView之后fromView之前的view全部从container中移除，并将他们绘制成一个图片，加载在一个在toView与fromView之间临时的imageView上。然后imageView跟随fromView一起做动画。并且在pop完成时，手动移除临时imageView即可。
+    NSInteger index = [container.subviews indexOfObject:toView];
+    if (index == NSNotFound) {
+        ///如果视图层级中没有，则添加在底部，并且之上所有视图均为需要移除视图
+        [container insertSubview:toView atIndex:0];
+        index = 1;
+    } else {
+        ///如果有，则其角标之后一个即为需要移除视图
+        ++ index;
+    }
+    
+    ///添加临时图层，用来盛放即将移除的视图，然后对此时图做截图
+    UIView * middleCtn = [[UIView alloc] initWithFrame:container.bounds];
+    middleCtn.backgroundColor = [UIColor clearColor];
+    UIView * tmp = container.subviews[index];
+    while (![tmp isEqual:fromView]) {
+        [middleCtn addSubview:tmp];
+        tmp = container.subviews[index];
+    }
+    
+    ///将截图添加到临时imageView中，并插入在fromView和toView之间
+    UIImageView * middleImageView = [[UIImageView alloc] initWithFrame:container.bounds];
+    middleImageView.image = [self snapWithView:middleCtn];
+    [container insertSubview:middleImageView belowSubview:fromView];
     
     switch (self.transitionType & DWTransitionAnimationTypeMask) {
         case DWTransitionAnimationNoneType:
         {
             ///no animation,nothing to do.
             [transitionContext completeTransition:YES];
+            [middleImageView removeFromSuperview];
         }
             break;
         case DWTransitionAnimationMoveInFromLeftType:
         {
+            ///临时图层与fromView同步做动画
             fromEnd.origin.x = - fromEnd.size.width;
             fromView.frame = fromStart;
+            middleImageView.frame = fromStart;
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width, 0);
             }
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 fromView.frame = fromEnd;
+                middleImageView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    ///并在动画完成时，移除临时图层
+                    [middleImageView removeFromSuperview];
+                }
             }];
         }
             break;
@@ -462,14 +498,20 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             fromEnd.origin.y = - fromEnd.size.height;
             fromView.frame = fromStart;
+            middleImageView.frame = fromStart;
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width, 0);
             }
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 fromView.frame = fromEnd;
+                middleImageView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [middleImageView removeFromSuperview];
+                }
             }];
         }
             break;
@@ -477,42 +519,60 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             fromEnd.origin.y = fromEnd.size.height;
             fromView.frame = fromStart;
+            middleImageView.frame = fromStart;
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width, 0);
             }
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 fromView.frame = fromEnd;
+                middleImageView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [middleImageView removeFromSuperview];
+                }
             }];
         }
             break;
         case DWTransitionAnimationZoomInType:
         {
             fromView.frame = fromStart;
+            middleImageView.frame = fromEnd;
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width, 0);
             }
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 fromView.transform = CGAffineTransformMakeScale(1.0 / fromView.bounds.size.width, 1.0 / fromView.bounds.size.height);
+                middleImageView.transform = CGAffineTransformMakeScale(1.0 / middleImageView.bounds.size.width, 1.0 / middleImageView.bounds.size.height);
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [middleImageView removeFromSuperview];
+                }
             }];
         }
             break;
         case DWTransitionAnimationFadeInType:
         {
             fromView.frame = fromStart;
+            middleImageView.frame = fromStart;
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width,0);
             }
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 fromView.alpha = 0;
+                middleImageView.alpha = 0;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [middleImageView removeFromSuperview];
+                }
             }];
         }
             break;
@@ -522,6 +582,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
                 self.customTransition(self,transitionContext);
             } else {
                 [transitionContext completeTransition:YES];
+                [middleImageView removeFromSuperview];
             }
         }
             break;
@@ -529,14 +590,20 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             fromEnd.origin.x = fromEnd.size.width;
             fromView.frame = fromStart;
+            middleImageView.frame = fromStart;
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width, 0);
             }
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 fromView.frame = fromEnd;
+                middleImageView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [middleImageView removeFromSuperview];
+                }
             }];
         }
             break;
@@ -706,12 +773,18 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
 }
 
 -(UIImage *)snapWithViewController:(UIViewController *)vc {
-    CGSize size = vc.view.frame.size;
-    UIGraphicsBeginImageContextWithOptions(size, YES, 0.0);
-    [vc.view drawViewHierarchyInRect:vc.view.bounds afterScreenUpdates:NO];
-    UIImage *snapshot = UIGraphicsGetImageFromCurrentImageContext();
+    return [self snapWithView:vc.view];
+}
+
+-(UIImage *)snapWithView:(UIView *)view {
+    CGFloat scale = [UIScreen mainScreen].scale;
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, NO, scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSaveGState(context);
+    [view.layer renderInContext:context];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-    return snapshot;
+    return image;
 }
 
 #pragma mark --- transition delegate ---

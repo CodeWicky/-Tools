@@ -47,7 +47,9 @@ typedef NS_OPTIONS(NSUInteger, DWTransitionType) {
 ///Follow DWTransitionProtocol so that viewcontroller can manager animationType itself.
 @protocol DWTransitionProtocol <NSObject>
 
-@property (nonatomic ,assign) DWTransitionType animationType;
+@property (nonatomic ,assign) DWTransitionType pushAnimationType;
+
+@property (nonatomic ,assign) DWTransitionType popAnimationType;
 
 @end
 
