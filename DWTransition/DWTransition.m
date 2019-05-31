@@ -201,6 +201,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             fromEnd.origin.x = - fromEnd.size.width;
             toView.frame = toStart;
             fromView.frame = fromStart;
+            ///这里内部使用toVC获取tabBar是因为，若A->B->C,B和C均为hidesBottomBarWhenPushed为YES，当C执行PopToRoot时，C作为FromVC是没有tabBarVC的。
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width * 2, 0);
             }
@@ -310,15 +311,10 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     UIView * toView = [transitionContext viewForKey:UITransitionContextToViewKey];
     UIView * fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];
-    UIImageView * fromImageView = [[UIImageView alloc] initWithFrame:fromView.frame];
-    fromImageView.image = [self snapWithView:fromView];
     UIView *containerView = [transitionContext containerView];
-    [containerView addSubview:fromImageView];
     [containerView addSubview:toView];
     
-    objc_setAssociatedObject(containerView, kDWTransitionTransparentTempView.UTF8String, fromImageView, OBJC_ASSOCIATION_RETAIN);
-    
-    ///transparent为透明覆盖模式，所以from位置不变，只需要获取toEnd即可
+    ///transparent为透明覆盖模式，所以from位置不变，只需要获取toEnd即可。由于Push结束后会自动移除fromView，所以再我们标记完成后要重新添加在toView底部，这样才能覆盖
     CGRect toEnd = [transitionContext finalFrameForViewController:toVC];
     ///由于不确定原始控制器回到哪里，所以这里一定取不到值，我们只知道原始控制器的起始位置，结束位置会在其基础上做改变，所以临时赋值为起始位置，根据动画类型再行更改。
     CGRect toStart = toEnd;
@@ -327,6 +323,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             ///no animation,nothing to do.
             [transitionContext completeTransition:YES];
+            [containerView insertSubview:fromView belowSubview:toView];
         }
             break;
         case DWTransitionAnimationMoveInFromLeftType:
@@ -336,7 +333,11 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 toView.frame = toEnd;
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [containerView insertSubview:fromView belowSubview:toView];
+                }
             }];
         }
             break;
@@ -347,7 +348,11 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 toView.frame = toEnd;
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [containerView insertSubview:fromView belowSubview:toView];
+                }
             }];
         }
             break;
@@ -358,7 +363,11 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 toView.frame = toEnd;
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [containerView insertSubview:fromView belowSubview:toView];
+                }
             }];
         }
             break;
@@ -369,7 +378,11 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 toView.transform = CGAffineTransformIdentity;
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [containerView insertSubview:fromView belowSubview:toView];
+                }
             }];
         }
             break;
@@ -380,7 +393,11 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 toView.alpha = 1;
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [containerView insertSubview:fromView belowSubview:toView];
+                }
             }];
         }
             break;
@@ -390,6 +407,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
                 self.customTransition(self,transitionContext);
             } else {
                 [transitionContext completeTransition:YES];
+                [containerView insertSubview:fromView belowSubview:toView];
             }
         }
             break;
@@ -400,7 +418,11 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 toView.frame = toEnd;
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [containerView insertSubview:fromView belowSubview:toView];
+                }
             }];
         }
             break;
@@ -411,20 +433,13 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     UIViewController *fromVC = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIView * fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];
-    
-    UIView *containerView = [transitionContext containerView];
-    [containerView insertSubview:toVC.view atIndex:0];
-    
     CGRect fromStart = [transitionContext initialFrameForViewController:fromVC];
     CGRect fromEnd = fromStart;
-    
-    UIView * transparentTempView = objc_getAssociatedObject(containerView, kDWTransitionTransparentTempView.UTF8String);
     
     switch (self.transitionType & DWTransitionAnimationTypeMask) {
         case DWTransitionAnimationNoneType:
         {
             ///no animation,nothing to do.
-            [transparentTempView removeFromSuperview];
             [transitionContext completeTransition:YES];
         }
             break;
@@ -439,7 +454,6 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
                 fromView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transparentTempView removeFromSuperview];
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
         }
@@ -455,7 +469,6 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
                 fromView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transparentTempView removeFromSuperview];
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
         }
@@ -471,7 +484,6 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
                 fromView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transparentTempView removeFromSuperview];
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
         }
@@ -486,7 +498,6 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
                 fromView.transform = CGAffineTransformMakeScale(1.0 / fromView.bounds.size.width, 1.0 / fromView.bounds.size.height);
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transparentTempView removeFromSuperview];
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
         }
@@ -501,7 +512,6 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
                 fromView.alpha = 0;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transparentTempView removeFromSuperview];
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
         }
@@ -511,7 +521,6 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             if (self.customTransition) {
                 self.customTransition(self,transitionContext);
             } else {
-                [transparentTempView removeFromSuperview];
                 [transitionContext completeTransition:YES];
             }
         }
@@ -527,7 +536,6 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
                 fromView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transparentTempView removeFromSuperview];
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
         }
@@ -698,13 +706,9 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
 }
 
 -(UIImage *)snapWithViewController:(UIViewController *)vc {
-    return [self snapWithView:vc.view];
-}
-
--(UIImage *)snapWithView:(UIView *)view {
-    CGSize size = view.frame.size;
+    CGSize size = vc.view.frame.size;
     UIGraphicsBeginImageContextWithOptions(size, YES, 0.0);
-    [view drawViewHierarchyInRect:view.bounds afterScreenUpdates:NO];
+    [vc.view drawViewHierarchyInRect:vc.view.bounds afterScreenUpdates:NO];
     UIImage *snapshot = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return snapshot;
