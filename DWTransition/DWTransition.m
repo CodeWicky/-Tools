@@ -188,32 +188,35 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     CGRect toEnd = [transitionContext finalFrameForViewController:toVC];
     CGRect toStart = toEnd;
     
-    ///这里由于Pop回去是要展示之前的控制器的，若之前的是transParentPush进来的，转场图层中存在transparentPush进来时手动添加的fromView，他们位于toView之下。这里应该一起做动画，由于可能会有很多个图层，所以我们添加临时中间图层显示截图做动画即可。动画完成后要移除临时视图
-    NSInteger index = [containerView.subviews indexOfObject:toView];
+    ///这里由于Pop回去是要展示之前的控制器的，若之前的是transParentPush进来的，转场图层中存在transparentPush进来时手动添加的fromView，他们位于toView之下。这里应该一起做动画，由于可能会有很多个图层，所以我们添加临时中间图层显示截图做动画即可。动画完成后要移除临时视图。（用这种看堆栈而不用直接找container.subviews的方式是应为如果是transparentPush->Push->transparentPush这样的形式，在pop回到第一层的时候，container中并没有先前的视图。）
+    NSInteger index = [toVC.navigationController.viewControllers indexOfObject:toVC];
     UIImageView * middleImageView = nil;
     
     if (index > 0 && index != NSNotFound) {
         ///添加临时图层，用来盛放即将移除的视图，然后对此时图做截图
         UIView * middleCtn = [[UIView alloc] initWithFrame:containerView.bounds];
         middleCtn.backgroundColor = [UIColor clearColor];
-        
-        [containerView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if (idx < index) {
-                obj.frame = toEnd;
-                UIImageView * tmp = [[UIImageView alloc] initWithFrame:containerView.bounds];
-                tmp.backgroundColor = [UIColor clearColor];
-                tmp.image = [self snapWithView:obj];
-                [middleCtn addSubview:tmp];
+        while (index > 0) {
+            UIViewController * tmp = toVC.navigationController.viewControllers[index];
+            if ([tmp conformsToProtocol:@protocol(DWTransitionProtocol)] && [tmp respondsToSelector:@selector(pushAnimationType)] && (((id<DWTransitionProtocol>)tmp).pushAnimationType & DWTransitionTypeMask) == DWTransitionTransparentPushType) {
+                ///如果当前是transparentPush进来的，要将上一个视图补进来
+                -- index;
+                [middleCtn insertSubview:toVC.navigationController.viewControllers[index].view atIndex:0];
             } else {
-                *stop = YES;
+                break;
             }
-        }];
+        }
         
         if (middleCtn.subviews.count > 0) {
             ///将截图添加到临时imageView中，并插入在fromView和toView之间
             middleImageView = [[UIImageView alloc] initWithFrame:containerView.bounds];
             middleImageView.image = [self snapWithView:middleCtn];
             [containerView insertSubview:middleImageView belowSubview:toView];
+            
+            [middleCtn.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                obj.frame = toEnd;
+                [containerView insertSubview:obj belowSubview:middleImageView];
+            }];
         }
     }
     
