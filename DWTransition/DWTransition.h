@@ -47,9 +47,14 @@ typedef NS_OPTIONS(NSUInteger, DWTransitionType) {
 ///Follow DWTransitionProtocol so that viewcontroller can manager animationType itself.
 @protocol DWTransitionProtocol <NSObject>
 
+///Describe the animationType for push or present a new viewController.
 @property (nonatomic ,assign) DWTransitionType pushAnimationType;
 
+///Describe the animationType for pop or dismiss an old viewController.
 @property (nonatomic ,assign) DWTransitionType popAnimationType;
+
+///Indicate that should use this animationType preferentially if you operate several viewControllers at the same time.
+@property (nonatomic ,assign) BOOL animationFlag;
 
 @end
 

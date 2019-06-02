@@ -187,7 +187,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     CGRect fromEnd = fromStart;
     CGRect toEnd = [transitionContext finalFrameForViewController:toVC];
     CGRect toStart = toEnd;
-
+    
     switch (self.transitionType & DWTransitionAnimationTypeMask) {
         case DWTransitionAnimationNoneType:
         {
