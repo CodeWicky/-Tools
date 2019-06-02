@@ -7,7 +7,6 @@
 //
 
 #import "DWTransition.h"
-#import <objc/runtime.h>
 
 @interface DWTransition ()
 
@@ -181,18 +180,49 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     UIView * fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];
     
     UIView *containerView = [transitionContext containerView];
-    [containerView insertSubview:toVC.view atIndex:0];
+    [containerView insertSubview:toView belowSubview:fromView];
+    
     
     CGRect fromStart = [transitionContext initialFrameForViewController:fromVC];
     CGRect fromEnd = fromStart;
     CGRect toEnd = [transitionContext finalFrameForViewController:toVC];
     CGRect toStart = toEnd;
     
+    ///这里由于Pop回去是要展示之前的控制器的，若之前的是transParentPush进来的，转场图层中存在transparentPush进来时手动添加的fromView，他们位于toView之下。这里应该一起做动画，由于可能会有很多个图层，所以我们添加临时中间图层显示截图做动画即可。动画完成后要移除临时视图
+    NSInteger index = [containerView.subviews indexOfObject:toView];
+    UIImageView * middleImageView = nil;
+    
+    if (index > 0 && index != NSNotFound) {
+        ///添加临时图层，用来盛放即将移除的视图，然后对此时图做截图
+        UIView * middleCtn = [[UIView alloc] initWithFrame:containerView.bounds];
+        middleCtn.backgroundColor = [UIColor clearColor];
+        
+        [containerView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if (idx < index) {
+                obj.frame = toEnd;
+                UIImageView * tmp = [[UIImageView alloc] initWithFrame:containerView.bounds];
+                tmp.backgroundColor = [UIColor clearColor];
+                tmp.image = [self snapWithView:obj];
+                [middleCtn addSubview:tmp];
+            } else {
+                *stop = YES;
+            }
+        }];
+        
+        if (middleCtn.subviews.count > 0) {
+            ///将截图添加到临时imageView中，并插入在fromView和toView之间
+            middleImageView = [[UIImageView alloc] initWithFrame:containerView.bounds];
+            middleImageView.image = [self snapWithView:middleCtn];
+            [containerView insertSubview:middleImageView belowSubview:toView];
+        }
+    }
+    
     switch (self.transitionType & DWTransitionAnimationTypeMask) {
         case DWTransitionAnimationNoneType:
         {
             ///no animation,nothing to do.
             [transitionContext completeTransition:YES];
+            [middleImageView removeFromSuperview];
         }
             break;
         case DWTransitionAnimationMoveInFromLeftType:
@@ -200,6 +230,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             toStart.origin.x = toStart.size.width * 0.5;
             fromEnd.origin.x = - fromEnd.size.width;
             toView.frame = toStart;
+            middleImageView.frame = toStart;
             fromView.frame = fromStart;
             ///这里内部使用toVC获取tabBar是因为，若A->B->C,B和C均为hidesBottomBarWhenPushed为YES，当C执行PopToRoot时，C作为FromVC是没有tabBarVC的。
             if (fromVC.hidesBottomBarWhenPushed) {
@@ -207,10 +238,15 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             }
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 toView.frame = toEnd;
+                middleImageView.frame = toEnd;
                 fromView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [middleImageView removeFromSuperview];
+                }
             }];
         }
             break;
@@ -219,16 +255,22 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             toStart.origin.y = toStart.size.height * 0.5;
             fromEnd.origin.y = - fromEnd.size.height;
             toView.frame = toStart;
+            middleImageView.frame = toStart;
             fromView.frame = fromStart;
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(fromEnd.size.width,fromEnd.size.height);
             }
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 toView.frame = toEnd;
+                middleImageView.frame = toEnd;
                 fromView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [middleImageView removeFromSuperview];
+                }
             }];
         }
             break;
@@ -237,22 +279,29 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             toStart.origin.y = - toStart.size.height * 0.5;
             fromEnd.origin.y = fromEnd.size.height;
             toView.frame = toStart;
+            middleImageView.frame = toStart;
             fromView.frame = fromStart;
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(fromEnd.size.width,-fromEnd.size.height);
             }
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 toView.frame = toEnd;
+                middleImageView.frame = toEnd;
                 fromView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [middleImageView removeFromSuperview];
+                }
             }];
         }
             break;
         case DWTransitionAnimationZoomInType:
         {
             toView.frame = toStart;
+            middleImageView.frame = toStart;
             fromView.frame = fromStart;
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(fromEnd.size.width,fromEnd.size.height);
@@ -261,13 +310,18 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
                 fromView.transform = CGAffineTransformMakeScale(1.0 / fromView.bounds.size.width, 1.0 / fromView.bounds.size.height);
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [middleImageView removeFromSuperview];
+                }
             }];
         }
             break;
         case DWTransitionAnimationFadeInType:
         {
             toView.frame = toStart;
+            middleImageView.frame = toStart;
             fromView.frame = fromStart;
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(fromEnd.size.width,fromEnd.size.height);
@@ -276,7 +330,11 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
                 fromView.alpha = 0;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [middleImageView removeFromSuperview];
+                }
             }];
         }
             break;
@@ -294,12 +352,18 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             toStart.origin.x = - toStart.size.width * 0.5;
             fromEnd.origin.x = fromEnd.size.width;
             toView.frame = toStart;
+            middleImageView.frame = toStart;
             fromView.frame = fromStart;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
                 toView.frame = toEnd;
+                middleImageView.frame = toEnd;
                 fromView.frame = fromEnd;
             } completion:^(BOOL finished) {
-                [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                BOOL cancelled = [transitionContext transitionWasCancelled];
+                [transitionContext completeTransition:!cancelled];
+                if (!cancelled) {
+                    [middleImageView removeFromSuperview];
+                }
             }];
         }
             break;
@@ -434,15 +498,15 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     UIViewController *fromVC = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIView * fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];
     UIView * toView = [transitionContext viewForKey:UITransitionContextToViewKey];
-    UIView * container = [transitionContext containerView];
+    UIView * containerView = [transitionContext containerView];
     CGRect fromStart = [transitionContext initialFrameForViewController:fromVC];
     CGRect fromEnd = fromStart;
     
     ///这里如果是transparentPop，有可能因为transparentPush的时候手动insert的Push的fromView而导致containerView中初始状态就多了很多其他的view。且Pop具有以此Pop多个控制器的方法，如PopToRoot。故先查找toView在container中的层级，然后把toView之后fromView之前的view全部从container中移除，并将他们绘制成一个图片，加载在一个在toView与fromView之间临时的imageView上。然后imageView跟随fromView一起做动画。并且在pop完成时，手动移除临时imageView即可。
-    NSInteger index = [container.subviews indexOfObject:toView];
+    NSInteger index = [containerView.subviews indexOfObject:toView];
     if (index == NSNotFound) {
         ///如果视图层级中没有，则添加在底部，并且之上所有视图均为需要移除视图
-        [container insertSubview:toView atIndex:0];
+        [containerView insertSubview:toView atIndex:0];
         index = 1;
     } else {
         ///如果有，则其角标之后一个即为需要移除视图
@@ -450,18 +514,18 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     }
     
     ///添加临时图层，用来盛放即将移除的视图，然后对此时图做截图
-    UIView * middleCtn = [[UIView alloc] initWithFrame:container.bounds];
+    UIView * middleCtn = [[UIView alloc] initWithFrame:containerView.bounds];
     middleCtn.backgroundColor = [UIColor clearColor];
-    UIView * tmp = container.subviews[index];
+    UIView * tmp = containerView.subviews[index];
     while (![tmp isEqual:fromView]) {
         [middleCtn addSubview:tmp];
-        tmp = container.subviews[index];
+        tmp = containerView.subviews[index];
     }
     
     ///将截图添加到临时imageView中，并插入在fromView和toView之间
-    UIImageView * middleImageView = [[UIImageView alloc] initWithFrame:container.bounds];
+    UIImageView * middleImageView = [[UIImageView alloc] initWithFrame:containerView.bounds];
     middleImageView.image = [self snapWithView:middleCtn];
-    [container insertSubview:middleImageView belowSubview:fromView];
+    [containerView insertSubview:middleImageView belowSubview:fromView];
     
     switch (self.transitionType & DWTransitionAnimationTypeMask) {
         case DWTransitionAnimationNoneType:
@@ -611,11 +675,12 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
 }
 
 -(void)presentAnimationWithTransition:(id <UIViewControllerContextTransitioning>)transitionContext {
-    UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+    UIViewController * toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+    UIView * toView = [transitionContext viewForKey:UITransitionContextToViewKey];
+    CGRect toEnd = [transitionContext finalFrameForViewController:toVC];
+    CGRect toStart = toEnd;
     UIView *containerView = [transitionContext containerView];
-    [containerView addSubview:toVC.view];
-    CGFloat cW = containerView.bounds.size.width;
-    CGFloat cH = containerView.bounds.size.height;
+    [containerView addSubview:toView];
     switch (self.transitionType & DWTransitionAnimationTypeMask) {
         case DWTransitionAnimationNoneType:
         {
@@ -625,9 +690,10 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationMoveInFromLeftType:
         {
-            toVC.view.frame = CGRectMake(-cW, 0, cW, cH);
+            toStart.origin.x = - toEnd.size.width;
+            toView.frame = toStart;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-                toVC.view.transform = CGAffineTransformMakeTranslation(cW, 0);
+                toView.frame = toEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
@@ -635,9 +701,10 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationMoveInFromRightType:
         {
-            toVC.view.frame = CGRectMake(cW, 0, cW, cH);
+            toStart.origin.x = toEnd.size.width;
+            toView.frame = toStart;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-                toVC.view.transform = CGAffineTransformMakeTranslation(-cW, 0);
+                toView.frame = toEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
@@ -645,9 +712,10 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationMoveInFromTopType:
         {
-            toVC.view.frame = CGRectMake(0, -cH, cW, cH);
+            toStart.origin.y = -toEnd.size.height;
+            toView.frame = toStart;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-                toVC.view.transform = CGAffineTransformMakeTranslation(0, cH);
+                toView.frame = toEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
@@ -655,9 +723,10 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationZoomInType:
         {
-            toVC.view.transform = CGAffineTransformMakeScale(1.0 / cW, 1.0 / cH);
+            toView.frame = toStart;
+            toView.transform = CGAffineTransformMakeScale(1.0 / toEnd.size.width, 1.0 / toEnd.size.height);
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-                toVC.view.transform = CGAffineTransformIdentity;
+                toView.transform = CGAffineTransformIdentity;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
@@ -665,9 +734,10 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationFadeInType:
         {
-            toVC.view.alpha = 0;
+            toView.frame = toStart;
+            toView.alpha = 0;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-                toVC.view.alpha = 1;
+                toView.alpha = 1;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
@@ -684,9 +754,10 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         default:
         {
-            toVC.view.frame = CGRectMake(0, cH, cW, cH);
+            toStart.origin.y = toEnd.size.height;
+            toView.frame = toStart;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-                toVC.view.transform = CGAffineTransformMakeTranslation(0, -cH);
+                toView.frame = toEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
@@ -696,9 +767,10 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
 }
 
 -(void)dismissAnimationWithTransition:(id <UIViewControllerContextTransitioning>)transitionContext {
-    UIViewController *fromVC = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
-    CGFloat cW = fromVC.view.bounds.size.width;
-    CGFloat cH = fromVC.view.bounds.size.height;
+    UIViewController * fromVC = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+    UIView * fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];
+    CGRect fromStart = [transitionContext initialFrameForViewController:fromVC];
+    CGRect fromEnd = fromStart;
     switch (self.transitionType & DWTransitionAnimationTypeMask) {
         case DWTransitionAnimationNoneType:
         {
@@ -708,8 +780,10 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationMoveInFromLeftType:
         {
+            fromEnd.origin.x = - fromStart.size.width;
+            fromView.frame = fromStart;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-                fromVC.view.transform = CGAffineTransformMakeTranslation(-cW, 0);
+                fromView.frame = fromEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
@@ -717,8 +791,10 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationMoveInFromRightType:
         {
+            fromEnd.origin.x = fromStart.size.width;
+            fromView.frame = fromStart;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-                fromVC.view.transform = CGAffineTransformMakeTranslation(cW, 0);
+                fromView.frame = fromEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
@@ -726,8 +802,10 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationMoveInFromTopType:
         {
+            fromEnd.origin.y = - fromStart.size.height;
+            fromView.frame = fromStart;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-                fromVC.view.transform = CGAffineTransformMakeTranslation(0, -cH);
+                fromView.frame = fromEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
@@ -735,8 +813,9 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationZoomInType:
         {
+            fromView.frame = fromStart;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-                fromVC.view.transform = CGAffineTransformMakeScale(1.0 / cW, 1.0 / cH);
+                fromView.transform = CGAffineTransformMakeScale(1.0 / fromStart.size.width, 1.0 / fromStart.size.height);
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
@@ -744,8 +823,9 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationFadeInType:
         {
+            fromView.frame = fromStart;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-                fromVC.view.alpha = 0;
+                fromView.alpha = 0;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
@@ -762,8 +842,10 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         default:
         {
+            fromEnd.origin.y = fromStart.size.height;
+            fromView.frame = fromStart;
             [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-                fromVC.view.transform = CGAffineTransformMakeTranslation(0, cH);
+                fromView.frame = fromEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
             }];
