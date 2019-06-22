@@ -44,6 +44,8 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     fromView.image = [self snapWithViewController:fromVC.navigationController.view.window.rootViewController];
     
     UIView *containerView = [transitionContext containerView];
+    ///此处移除所有原有子视图，因为Push本身的行为就是Push完成之后context层只有一个toView
+    [containerView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [containerView addSubview:fromView];
     [containerView addSubview:toView];
     
