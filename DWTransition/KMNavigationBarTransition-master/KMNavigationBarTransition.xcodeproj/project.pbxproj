@@ -270,6 +270,7 @@
 				TargetAttributes = {
 					CDA3726E1C3907CE00E39A6D = {
 						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = Z26Y87B8NH;
 						LastSwiftMigration = 0820;
 					};
 					CDC01B8F1E5CA42000F6F3E2 = {
@@ -283,6 +284,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -467,12 +469,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = Z26Y87B8NH;
 				INFOPLIST_FILE = "$(SRCROOT)/Example/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mo.KMNavigationBarTransition-Example";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mo.KMNavigationBarTransitionExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -480,12 +483,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = Z26Y87B8NH;
 				INFOPLIST_FILE = "$(SRCROOT)/Example/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mo.KMNavigationBarTransition-Example";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mo.KMNavigationBarTransitionExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
