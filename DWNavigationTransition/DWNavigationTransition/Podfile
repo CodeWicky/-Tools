@@ -1,0 +1,3 @@
+target 'DWNavigationTransition' do
+pod 'DWFlashFlow', '~> 1.0.2.5'
+end
