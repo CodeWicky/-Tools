@@ -1,0 +1,16 @@
+PODS:
+  - DWNavigationTransition (0.0.0.1)
+
+DEPENDENCIES:
+  - DWNavigationTransition (from `../`)
+
+EXTERNAL SOURCES:
+  DWNavigationTransition:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  DWNavigationTransition: 47187b9eebed0aed2e5c9692f9b825b2a4c70cbd
+
+PODFILE CHECKSUM: c5a31c183e862631df7e363a0e8e20031b0124e9
+
+COCOAPODS: 1.6.2

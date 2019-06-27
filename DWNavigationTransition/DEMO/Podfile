@@ -1,0 +1,3 @@
+target 'DWNavigationTransition' do
+pod 'DWNavigationTransition', :path => '../'
+end
