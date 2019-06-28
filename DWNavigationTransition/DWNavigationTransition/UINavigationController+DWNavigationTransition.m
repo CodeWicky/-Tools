@@ -26,13 +26,18 @@
         return;
     }
     UIViewController * lastVC = self.viewControllers.lastObject;
+    [lastVC.dw_statusStoreBar copyFromBar:self.navigationBar];
     BOOL needTransition = lastVC.dw_userNavigationTransition || viewController.dw_userNavigationTransition;
     if (!needTransition) {
         [self dw_pushViewController:viewController animated:animated];
         return;
     }
     
-    [lastVC.statusStoreBar copyFromBar:self.navigationBar];
+    if (animated) {
+        [lastVC dw_addTransitionBarIfNeeded];
+        [self setNavigationBarHidden:YES];
+        return;
+    }
     
     [self dw_pushViewController:viewController animated:animated];
 }

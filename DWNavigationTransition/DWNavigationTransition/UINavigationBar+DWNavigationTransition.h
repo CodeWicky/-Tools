@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UINavigationBar (DWNavigationTransition)
 
+@property (nonatomic ,strong ,readonly) UIView * dw_backgroundView;
+
 -(void)copyFromBar:(UINavigationBar *)bar;
 
 @end

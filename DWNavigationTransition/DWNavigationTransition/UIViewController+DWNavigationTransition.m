@@ -18,12 +18,73 @@
         [self.dw_transitionBar removeFromSuperview];
         return;
     }
+    [self dw_adjustScrollViewContentOffsetIfNeeded];
     [self.dw_transitionBar copyFromBar:self.navigationController.navigationBar];
+    if (!self.navigationController.navigationBar.isHidden) {
+        [self dw_resizeTransitionBarFrame];
+        [self.view addSubview:self.dw_transitionBar];
+    } else {
+        [self.dw_transitionBar removeFromSuperview];
+    }
+}
+
+#pragma mark --- tool method ---
+-(UIScrollView *)scrollContainer {
+    UIScrollView * scroll = DWQuickGetAssociatedValue();
+    if (!scroll && ![DWGetAssociatedValue(self, "scrollViewHandled") boolValue]) {
+        DWSetAssignAssociatedValue(self, "scrollViewHandled", @(YES));
+        if ([self.view isKindOfClass:[UIScrollView class]]) {
+            scroll = (UIScrollView *)self.view;
+            DWQuickSetStrongAssociatedValue(_cmd, scroll);
+        }
+    }
+    return scroll;
+}
+
+-(void)dw_adjustScrollViewContentOffsetIfNeeded {
+    UIScrollView * scrollContainer = [self scrollContainer];
+    if (scrollContainer) {
+        UIEdgeInsets contentInset;
+#ifdef __IPHONE_11_0
+        if (@available(iOS 11.0, *)) {
+            contentInset = scrollContainer.adjustedContentInset;
+        } else {
+            contentInset = scrollContainer.contentInset;
+        }
+#else
+        contentInset = scrollView.contentInset;
+#endif
+        const CGFloat topContentOffsetY = -contentInset.top;
+        const CGFloat bottomContentOffsetY = scrollContainer.contentSize.height - (CGRectGetHeight(scrollContainer.bounds) - contentInset.bottom);
+        
+        CGPoint adjustedContentOffset = scrollContainer.contentOffset;
+        if (adjustedContentOffset.y > bottomContentOffsetY) {
+            adjustedContentOffset.y = bottomContentOffsetY;
+        }
+        if (adjustedContentOffset.y < topContentOffsetY) {
+            adjustedContentOffset.y = topContentOffsetY;
+        }
+        [scrollContainer setContentOffset:adjustedContentOffset animated:NO];
+    }
+}
+
+- (void)dw_resizeTransitionBarFrame {
+    if (!self.view.window) {
+        return;
+    }
+    UIView *backgroundView = self.navigationController.navigationBar.dw_backgroundView;
+    CGRect rect = [backgroundView.superview convertRect:backgroundView.frame toView:self.view];
+    self.dw_transitionBar.frame = rect;
 }
 
 #pragma mark --- setter/getter ---
 -(BOOL)dw_userNavigationTransition {
-    return [DWQuickGetAssociatedValue() boolValue];
+    NSNumber * use = DWQuickGetAssociatedValue();
+    if (!use) {
+        use = [NSNumber numberWithBool:YES];
+        DWQuickSetStrongAssociatedValue(_cmd, use);
+    }
+    return [use boolValue];
 }
 
 -(void)setDw_userNavigationTransition:(BOOL)dw_userNavigationTransition {
