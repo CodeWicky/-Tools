@@ -75,6 +75,7 @@
     UIView *backgroundView = self.navigationController.navigationBar.dw_backgroundView;
     CGRect rect = [backgroundView.superview convertRect:backgroundView.frame toView:self.view];
     self.dw_transitionBar.frame = rect;
+    
 }
 
 #pragma mark --- setter/getter ---
