@@ -1,0 +1,23 @@
+{
+  "name": "DWNavigationTransition",
+  "version": "0.0.0.1",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "summary": "导航栏平滑处理。Help you handle navigationBar.",
+  "homepage": "https://github.com/CodeWicky/-Tools/tree/master/DWNavigationTransition",
+  "authors": {
+    "codeWicky": "codewicky@163.com"
+  },
+  "source": {
+    "git": "https://github.com/CodeWicky/-Tools.git",
+    "tag": "0.0.0.1"
+  },
+  "requires_arc": true,
+  "platforms": {
+    "ios": "9.1"
+  },
+  "source_files": "DWNavigationTransition/**/*.{h,m}",
+  "frameworks": "UIKit"
+}
