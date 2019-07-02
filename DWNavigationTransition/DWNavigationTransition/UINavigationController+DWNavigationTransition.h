@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UINavigationController (DWNavigationTransition)
 
+@property (nonatomic ,assign) BOOL dw_backgroundViewHidden;
+
 @end
 
 NS_ASSUME_NONNULL_END

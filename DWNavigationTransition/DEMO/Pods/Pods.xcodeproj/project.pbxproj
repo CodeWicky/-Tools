@@ -7,16 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2CF4A6B930D2AB5CD83FEED056C54824 /* UINavigationController+DWNavigationTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FDDC492EE56055BBE289C1B517D144B /* UINavigationController+DWNavigationTransition.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		66DA8FDB5376561142BF6E0EBE968324 /* DWTransitionFunction.m in Sources */ = {isa = PBXBuildFile; fileRef = FE244D8284F4EEDE1D097B3CD6EE94A2 /* DWTransitionFunction.m */; };
-		6A5CC082A715799643D39363A02FA31E /* UINavigationController+DWNavigationTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = BA3A931A371DA73EA6CDFEED5EFEC6C9 /* UINavigationController+DWNavigationTransition.m */; };
-		72CB6A27CADFE31BE7E5117105D2266B /* UIViewController+DWNavigationTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 3316138F971E1AD96D8470FBFBF56FB8 /* UIViewController+DWNavigationTransition.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		7C063361D8AFB20C30E531D5133F5B52 /* DWNavigationTransition-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BDBF87A6460DF67B1271245D6DA8A96 /* DWNavigationTransition-dummy.m */; };
-		9B1A7A3822C4EE18006DAC4F /* UINavigationBar+DWNavigationTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 9B1A7A3622C4EE18006DAC4F /* UINavigationBar+DWNavigationTransition.h */; };
-		9B1A7A3922C4EE18006DAC4F /* UINavigationBar+DWNavigationTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1A7A3722C4EE18006DAC4F /* UINavigationBar+DWNavigationTransition.m */; };
-		9E856642452B9C4F3D76B17DCD12F943 /* UIViewController+DWNavigationTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 324955571DF54978BA4149C7C185D7A1 /* UIViewController+DWNavigationTransition.m */; };
-		AE7CA1EC57458BD07AA90FC6807FAF72 /* DWTransitionFunction.h in Headers */ = {isa = PBXBuildFile; fileRef = 925A50CDA1A6B0CD552CE748E985530B /* DWTransitionFunction.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		1ADB7C64845DF9FC5E58BE80EFB2BDD7 /* DWTransitionFunction.m in Sources */ = {isa = PBXBuildFile; fileRef = EA35A742E772665150222C82996352D9 /* DWTransitionFunction.m */; };
+		4469AD60B8C54F5FA2C072A2AFA8F645 /* UINavigationController+DWNavigationTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = DCDA9E6D7E638539701841A06888DD97 /* UINavigationController+DWNavigationTransition.m */; };
+		7147E447FFFF8B36EDFB37A27A0326E4 /* UIViewController+DWNavigationTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 98FF5A37373CE2865D5E98E798C92A11 /* UIViewController+DWNavigationTransition.m */; };
+		8D15354C9F143F5CC1E3BC4482DE8ED6 /* UIView+DWNavigationTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D117032284E1F424BB63BD33FB6416D /* UIView+DWNavigationTransition.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		936EC784E72449C91D4C9CAA3C5A75DB /* UIViewController+DWNavigationTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = DA7BF3C76813D40EEDA28A0FF1B233AD /* UIViewController+DWNavigationTransition.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		966D674736C65525070724D797C21194 /* DWNavigationTransition-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A8DD2C49D60ECA49AB203C091EC7E89B /* DWNavigationTransition-dummy.m */; };
+		9957F54A87BAD402ABA598FD296BD7C6 /* UINavigationController+DWNavigationTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = 4F2E3307F16B97F2D3FAD1357B23DED7 /* UINavigationController+DWNavigationTransition.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		B39FE0081DD978CBAB6A9AE356DE661C /* UINavigationBar+DWNavigationTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = E0CDDC3EF0AAAB32FD1D256C1778CA68 /* UINavigationBar+DWNavigationTransition.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		B44D9E801C8927B913AD69B7C4681460 /* DWTransitionFunction.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F373F785F96555D97A2E6FA93DFB736 /* DWTransitionFunction.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		CBD66466B4372075E04E7BF4DBF492AC /* UIView+DWNavigationTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 948C794377C6B7C9D6B82D1B09A0184D /* UIView+DWNavigationTransition.m */; };
 		DD8C777517056D21F6CE3A5C52DA0987 /* Pods-DWNavigationTransition-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DA37A3D0B3C45355E6AC730172110AC0 /* Pods-DWNavigationTransition-dummy.m */; };
+		F9094E31A59829783ED89F8B60F88D81 /* UINavigationBar+DWNavigationTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = A6122542308837148B4A58068A8F0684 /* UINavigationBar+DWNavigationTransition.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,45 +26,47 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 1845BDC0BE101A1635C431E15CC0008F;
+			remoteGlobalIDString = 93231D3F32F41355F84AF7C602DE4720;
 			remoteInfo = DWNavigationTransition;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0473E5E5EBE511F1869D7C6CBC6E5B44 /* DWNavigationTransition-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DWNavigationTransition-prefix.pch"; sourceTree = "<group>"; };
-		0A41B2228D9683C0B34CCCEF5F8D176B /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		2F9871F8FF01E2C30CA8B78CF3F49439 /* DWNavigationTransition.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = DWNavigationTransition.xcconfig; sourceTree = "<group>"; };
-		324955571DF54978BA4149C7C185D7A1 /* UIViewController+DWNavigationTransition.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIViewController+DWNavigationTransition.m"; path = "DWNavigationTransition/UIViewController+DWNavigationTransition.m"; sourceTree = "<group>"; };
-		3316138F971E1AD96D8470FBFBF56FB8 /* UIViewController+DWNavigationTransition.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIViewController+DWNavigationTransition.h"; path = "DWNavigationTransition/UIViewController+DWNavigationTransition.h"; sourceTree = "<group>"; };
-		4E43EE9F338424EB5671511ABA135381 /* libPods-DWNavigationTransition.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DWNavigationTransition.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6BDBF87A6460DF67B1271245D6DA8A96 /* DWNavigationTransition-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "DWNavigationTransition-dummy.m"; sourceTree = "<group>"; };
+		0C8D5509D690688B42D59C0E052B7099 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+		290B8A5C9F72558C0463CA1D8A763997 /* DWNavigationTransition-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DWNavigationTransition-prefix.pch"; sourceTree = "<group>"; };
+		3F373F785F96555D97A2E6FA93DFB736 /* DWTransitionFunction.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DWTransitionFunction.h; path = DWNavigationTransition/DWTransitionFunction.h; sourceTree = "<group>"; };
+		4E43EE9F338424EB5671511ABA135381 /* libPods-DWNavigationTransition.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-DWNavigationTransition.a"; path = "libPods-DWNavigationTransition.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F2E3307F16B97F2D3FAD1357B23DED7 /* UINavigationController+DWNavigationTransition.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UINavigationController+DWNavigationTransition.h"; path = "DWNavigationTransition/UINavigationController+DWNavigationTransition.h"; sourceTree = "<group>"; };
+		59A723FDB843959995DA3DC0CAE86A82 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE; sourceTree = "<group>"; };
 		742030B4F9E040031C243AD23CAC2DED /* Pods-DWNavigationTransition-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-DWNavigationTransition-acknowledgements.plist"; sourceTree = "<group>"; };
-		7FDDC492EE56055BBE289C1B517D144B /* UINavigationController+DWNavigationTransition.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UINavigationController+DWNavigationTransition.h"; path = "DWNavigationTransition/UINavigationController+DWNavigationTransition.h"; sourceTree = "<group>"; };
-		86728420B724AF19A3C529F2307B9FC5 /* libDWNavigationTransition.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDWNavigationTransition.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		925A50CDA1A6B0CD552CE748E985530B /* DWTransitionFunction.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DWTransitionFunction.h; path = DWNavigationTransition/DWTransitionFunction.h; sourceTree = "<group>"; };
-		9B1A7A3622C4EE18006DAC4F /* UINavigationBar+DWNavigationTransition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "UINavigationBar+DWNavigationTransition.h"; path = "DWNavigationTransition/UINavigationBar+DWNavigationTransition.h"; sourceTree = "<group>"; };
-		9B1A7A3722C4EE18006DAC4F /* UINavigationBar+DWNavigationTransition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "UINavigationBar+DWNavigationTransition.m"; path = "DWNavigationTransition/UINavigationBar+DWNavigationTransition.m"; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		86728420B724AF19A3C529F2307B9FC5 /* libDWNavigationTransition.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libDWNavigationTransition.a; path = libDWNavigationTransition.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		948C794377C6B7C9D6B82D1B09A0184D /* UIView+DWNavigationTransition.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIView+DWNavigationTransition.m"; path = "DWNavigationTransition/UIView+DWNavigationTransition.m"; sourceTree = "<group>"; };
+		98FF5A37373CE2865D5E98E798C92A11 /* UIViewController+DWNavigationTransition.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIViewController+DWNavigationTransition.m"; path = "DWNavigationTransition/UIViewController+DWNavigationTransition.m"; sourceTree = "<group>"; };
+		9D117032284E1F424BB63BD33FB6416D /* UIView+DWNavigationTransition.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIView+DWNavigationTransition.h"; path = "DWNavigationTransition/UIView+DWNavigationTransition.h"; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		A5E9AD506098C4CB793F8B7878B31675 /* Pods-DWNavigationTransition.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DWNavigationTransition.release.xcconfig"; sourceTree = "<group>"; };
-		BA3A931A371DA73EA6CDFEED5EFEC6C9 /* UINavigationController+DWNavigationTransition.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UINavigationController+DWNavigationTransition.m"; path = "DWNavigationTransition/UINavigationController+DWNavigationTransition.m"; sourceTree = "<group>"; };
-		D4A1BC9A32CBF494729562A5C5BF8B5E /* DWNavigationTransition.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; path = DWNavigationTransition.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		A6122542308837148B4A58068A8F0684 /* UINavigationBar+DWNavigationTransition.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UINavigationBar+DWNavigationTransition.m"; path = "DWNavigationTransition/UINavigationBar+DWNavigationTransition.m"; sourceTree = "<group>"; };
+		A8DD2C49D60ECA49AB203C091EC7E89B /* DWNavigationTransition-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "DWNavigationTransition-dummy.m"; sourceTree = "<group>"; };
+		D5871F0A858B74FA2F0D14E1DA4D5182 /* DWNavigationTransition.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = DWNavigationTransition.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		DA37A3D0B3C45355E6AC730172110AC0 /* Pods-DWNavigationTransition-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-DWNavigationTransition-dummy.m"; sourceTree = "<group>"; };
+		DA7BF3C76813D40EEDA28A0FF1B233AD /* UIViewController+DWNavigationTransition.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIViewController+DWNavigationTransition.h"; path = "DWNavigationTransition/UIViewController+DWNavigationTransition.h"; sourceTree = "<group>"; };
+		DCDA9E6D7E638539701841A06888DD97 /* UINavigationController+DWNavigationTransition.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UINavigationController+DWNavigationTransition.m"; path = "DWNavigationTransition/UINavigationController+DWNavigationTransition.m"; sourceTree = "<group>"; };
+		E0CDDC3EF0AAAB32FD1D256C1778CA68 /* UINavigationBar+DWNavigationTransition.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UINavigationBar+DWNavigationTransition.h"; path = "DWNavigationTransition/UINavigationBar+DWNavigationTransition.h"; sourceTree = "<group>"; };
+		EA35A742E772665150222C82996352D9 /* DWTransitionFunction.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = DWTransitionFunction.m; path = DWNavigationTransition/DWTransitionFunction.m; sourceTree = "<group>"; };
+		F224D04940429C09FC00F7969DCED5CB /* DWNavigationTransition.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = DWNavigationTransition.xcconfig; sourceTree = "<group>"; };
 		F299471C24790403493D0878D58D6F18 /* Pods-DWNavigationTransition-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-DWNavigationTransition-acknowledgements.markdown"; sourceTree = "<group>"; };
-		F4F5FA3EBFC4137B4BEF378DB07B10D6 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		F76C82076F799A968D5BB14A55CA3382 /* Pods-DWNavigationTransition.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DWNavigationTransition.debug.xcconfig"; sourceTree = "<group>"; };
-		FE244D8284F4EEDE1D097B3CD6EE94A2 /* DWTransitionFunction.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = DWTransitionFunction.m; path = DWNavigationTransition/DWTransitionFunction.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		4A770C8D65DF17AD72ADEF56D33AA384 /* Frameworks */ = {
+		51DE648E2B528FCFCB9FCD9911A90BAC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		51DE648E2B528FCFCB9FCD9911A90BAC /* Frameworks */ = {
+		55E7FE10308931EFBDCA7BEA5332AAE0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -72,14 +76,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		15684BFB85D0BA70065009700418ED0C /* Pod */ = {
+		31A3E002386B648CB87B41327AC1BD6F /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				D4A1BC9A32CBF494729562A5C5BF8B5E /* DWNavigationTransition.podspec */,
-				F4F5FA3EBFC4137B4BEF378DB07B10D6 /* LICENSE */,
-				0A41B2228D9683C0B34CCCEF5F8D176B /* README.md */,
+				F224D04940429C09FC00F7969DCED5CB /* DWNavigationTransition.xcconfig */,
+				A8DD2C49D60ECA49AB203C091EC7E89B /* DWNavigationTransition-dummy.m */,
+				290B8A5C9F72558C0463CA1D8A763997 /* DWNavigationTransition-prefix.pch */,
 			);
-			name = Pod;
+			name = "Support Files";
+			path = "DEMO/Pods/Target Support Files/DWNavigationTransition";
 			sourceTree = "<group>";
 		};
 		5D25340A8DC491088ECCF1A5E0846F76 /* Targets Support Files */ = {
@@ -90,6 +95,36 @@
 			name = "Targets Support Files";
 			sourceTree = "<group>";
 		};
+		5DED502A961C30FEDA2F9B83EDEE883D /* Pod */ = {
+			isa = PBXGroup;
+			children = (
+				D5871F0A858B74FA2F0D14E1DA4D5182 /* DWNavigationTransition.podspec */,
+				59A723FDB843959995DA3DC0CAE86A82 /* LICENSE */,
+				0C8D5509D690688B42D59C0E052B7099 /* README.md */,
+			);
+			name = Pod;
+			sourceTree = "<group>";
+		};
+		7980833ADB10547D2804162683AED687 /* DWNavigationTransition */ = {
+			isa = PBXGroup;
+			children = (
+				3F373F785F96555D97A2E6FA93DFB736 /* DWTransitionFunction.h */,
+				EA35A742E772665150222C82996352D9 /* DWTransitionFunction.m */,
+				E0CDDC3EF0AAAB32FD1D256C1778CA68 /* UINavigationBar+DWNavigationTransition.h */,
+				A6122542308837148B4A58068A8F0684 /* UINavigationBar+DWNavigationTransition.m */,
+				4F2E3307F16B97F2D3FAD1357B23DED7 /* UINavigationController+DWNavigationTransition.h */,
+				DCDA9E6D7E638539701841A06888DD97 /* UINavigationController+DWNavigationTransition.m */,
+				9D117032284E1F424BB63BD33FB6416D /* UIView+DWNavigationTransition.h */,
+				948C794377C6B7C9D6B82D1B09A0184D /* UIView+DWNavigationTransition.m */,
+				DA7BF3C76813D40EEDA28A0FF1B233AD /* UIViewController+DWNavigationTransition.h */,
+				98FF5A37373CE2865D5E98E798C92A11 /* UIViewController+DWNavigationTransition.m */,
+				5DED502A961C30FEDA2F9B83EDEE883D /* Pod */,
+				31A3E002386B648CB87B41327AC1BD6F /* Support Files */,
+			);
+			name = DWNavigationTransition;
+			path = ../..;
+			sourceTree = "<group>";
+		};
 		8454B5957BB0A1377A1A0E2FD52588B4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -97,43 +132,6 @@
 				4E43EE9F338424EB5671511ABA135381 /* libPods-DWNavigationTransition.a */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		85CEEB7BEC518CCFB6F4F5927FD2AE75 /* Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				2F9871F8FF01E2C30CA8B78CF3F49439 /* DWNavigationTransition.xcconfig */,
-				6BDBF87A6460DF67B1271245D6DA8A96 /* DWNavigationTransition-dummy.m */,
-				0473E5E5EBE511F1869D7C6CBC6E5B44 /* DWNavigationTransition-prefix.pch */,
-			);
-			name = "Support Files";
-			path = "DEMO/Pods/Target Support Files/DWNavigationTransition";
-			sourceTree = "<group>";
-		};
-		9C06DCD1F52F49AFCE35BBA18069E14D /* DWNavigationTransition */ = {
-			isa = PBXGroup;
-			children = (
-				925A50CDA1A6B0CD552CE748E985530B /* DWTransitionFunction.h */,
-				FE244D8284F4EEDE1D097B3CD6EE94A2 /* DWTransitionFunction.m */,
-				7FDDC492EE56055BBE289C1B517D144B /* UINavigationController+DWNavigationTransition.h */,
-				BA3A931A371DA73EA6CDFEED5EFEC6C9 /* UINavigationController+DWNavigationTransition.m */,
-				3316138F971E1AD96D8470FBFBF56FB8 /* UIViewController+DWNavigationTransition.h */,
-				324955571DF54978BA4149C7C185D7A1 /* UIViewController+DWNavigationTransition.m */,
-				9B1A7A3622C4EE18006DAC4F /* UINavigationBar+DWNavigationTransition.h */,
-				9B1A7A3722C4EE18006DAC4F /* UINavigationBar+DWNavigationTransition.m */,
-				15684BFB85D0BA70065009700418ED0C /* Pod */,
-				85CEEB7BEC518CCFB6F4F5927FD2AE75 /* Support Files */,
-			);
-			name = DWNavigationTransition;
-			path = ../..;
-			sourceTree = "<group>";
-		};
-		BB95C826880E721EADF9D06715F8708E /* Development Pods */ = {
-			isa = PBXGroup;
-			children = (
-				9C06DCD1F52F49AFCE35BBA18069E14D /* DWNavigationTransition */,
-			);
-			name = "Development Pods";
 			sourceTree = "<group>";
 		};
 		BF67AD4A67CF942AFBC0F53D4B4B23F5 /* Pods-DWNavigationTransition */ = {
@@ -153,7 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
-				BB95C826880E721EADF9D06715F8708E /* Development Pods */,
+				DC221CAF2EFC0305D2B14D0638585399 /* Development Pods */,
 				D89477F20FB1DE18A04690586D7808C4 /* Frameworks */,
 				8454B5957BB0A1377A1A0E2FD52588B4 /* Products */,
 				5D25340A8DC491088ECCF1A5E0846F76 /* Targets Support Files */,
@@ -167,6 +165,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		DC221CAF2EFC0305D2B14D0638585399 /* Development Pods */ = {
+			isa = PBXGroup;
+			children = (
+				7980833ADB10547D2804162683AED687 /* DWNavigationTransition */,
+			);
+			name = "Development Pods";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -177,37 +183,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3F2593635F8E5415FD4CDD83C7E4CC05 /* Headers */ = {
+		FD68AA8ACFAE917A7F382E25A78AB97D /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AE7CA1EC57458BD07AA90FC6807FAF72 /* DWTransitionFunction.h in Headers */,
-				2CF4A6B930D2AB5CD83FEED056C54824 /* UINavigationController+DWNavigationTransition.h in Headers */,
-				9B1A7A3822C4EE18006DAC4F /* UINavigationBar+DWNavigationTransition.h in Headers */,
-				72CB6A27CADFE31BE7E5117105D2266B /* UIViewController+DWNavigationTransition.h in Headers */,
+				B44D9E801C8927B913AD69B7C4681460 /* DWTransitionFunction.h in Headers */,
+				B39FE0081DD978CBAB6A9AE356DE661C /* UINavigationBar+DWNavigationTransition.h in Headers */,
+				9957F54A87BAD402ABA598FD296BD7C6 /* UINavigationController+DWNavigationTransition.h in Headers */,
+				8D15354C9F143F5CC1E3BC4482DE8ED6 /* UIView+DWNavigationTransition.h in Headers */,
+				936EC784E72449C91D4C9CAA3C5A75DB /* UIViewController+DWNavigationTransition.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		1845BDC0BE101A1635C431E15CC0008F /* DWNavigationTransition */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = ABBC75111C92002620CA44A8B6402A4B /* Build configuration list for PBXNativeTarget "DWNavigationTransition" */;
-			buildPhases = (
-				3F2593635F8E5415FD4CDD83C7E4CC05 /* Headers */,
-				CAF9200786C18243BBA681EC0DE0386D /* Sources */,
-				4A770C8D65DF17AD72ADEF56D33AA384 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = DWNavigationTransition;
-			productName = DWNavigationTransition;
-			productReference = 86728420B724AF19A3C529F2307B9FC5 /* libDWNavigationTransition.a */;
-			productType = "com.apple.product-type.library.static";
-		};
 		3F0717FFB4E45F5813C0B2A83FEE0867 /* Pods-DWNavigationTransition */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 790A2F0AC0348EFE5AD0D893AD160515 /* Build configuration list for PBXNativeTarget "Pods-DWNavigationTransition" */;
@@ -224,6 +214,23 @@
 			name = "Pods-DWNavigationTransition";
 			productName = "Pods-DWNavigationTransition";
 			productReference = 4E43EE9F338424EB5671511ABA135381 /* libPods-DWNavigationTransition.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		93231D3F32F41355F84AF7C602DE4720 /* DWNavigationTransition */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EDDA6CE2F70BB2D2108635223C83A39C /* Build configuration list for PBXNativeTarget "DWNavigationTransition" */;
+			buildPhases = (
+				FD68AA8ACFAE917A7F382E25A78AB97D /* Headers */,
+				4C8F670C79FABC1F8C7BC7B18823DC1C /* Sources */,
+				55E7FE10308931EFBDCA7BEA5332AAE0 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DWNavigationTransition;
+			productName = DWNavigationTransition;
+			productReference = 86728420B724AF19A3C529F2307B9FC5 /* libDWNavigationTransition.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -247,30 +254,31 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1845BDC0BE101A1635C431E15CC0008F /* DWNavigationTransition */,
+				93231D3F32F41355F84AF7C602DE4720 /* DWNavigationTransition */,
 				3F0717FFB4E45F5813C0B2A83FEE0867 /* Pods-DWNavigationTransition */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		4C8F670C79FABC1F8C7BC7B18823DC1C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				966D674736C65525070724D797C21194 /* DWNavigationTransition-dummy.m in Sources */,
+				1ADB7C64845DF9FC5E58BE80EFB2BDD7 /* DWTransitionFunction.m in Sources */,
+				F9094E31A59829783ED89F8B60F88D81 /* UINavigationBar+DWNavigationTransition.m in Sources */,
+				4469AD60B8C54F5FA2C072A2AFA8F645 /* UINavigationController+DWNavigationTransition.m in Sources */,
+				CBD66466B4372075E04E7BF4DBF492AC /* UIView+DWNavigationTransition.m in Sources */,
+				7147E447FFFF8B36EDFB37A27A0326E4 /* UIViewController+DWNavigationTransition.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		975A288A1F5CC34B0893C01CDF23BAFE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				DD8C777517056D21F6CE3A5C52DA0987 /* Pods-DWNavigationTransition-dummy.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		CAF9200786C18243BBA681EC0DE0386D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7C063361D8AFB20C30E531D5133F5B52 /* DWNavigationTransition-dummy.m in Sources */,
-				66DA8FDB5376561142BF6E0EBE968324 /* DWTransitionFunction.m in Sources */,
-				6A5CC082A715799643D39363A02FA31E /* UINavigationController+DWNavigationTransition.m in Sources */,
-				9B1A7A3922C4EE18006DAC4F /* UINavigationBar+DWNavigationTransition.m in Sources */,
-				9E856642452B9C4F3D76B17DCD12F943 /* UIViewController+DWNavigationTransition.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,7 +288,7 @@
 		5958DF3C4D80646DE4C15C99D5D837C9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = DWNavigationTransition;
-			target = 1845BDC0BE101A1635C431E15CC0008F /* DWNavigationTransition */;
+			target = 93231D3F32F41355F84AF7C602DE4720 /* DWNavigationTransition */;
 			targetProxy = 6E7EB42D84BF9AEC823F481EA3F74BA2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -433,9 +441,9 @@
 			};
 			name = Release;
 		};
-		6EF731E0118B04473CAC296DD52596CB /* Release */ = {
+		530A6AFC869A16FC19A51E4EEA1AFDE6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2F9871F8FF01E2C30CA8B78CF3F49439 /* DWNavigationTransition.xcconfig */;
+			baseConfigurationReference = F224D04940429C09FC00F7969DCED5CB /* DWNavigationTransition.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -457,9 +465,9 @@
 			};
 			name = Release;
 		};
-		C6E075962782CA4C92AF6DE430B48DA3 /* Debug */ = {
+		6325E020A91AEA86B375F3C7ABEB1ED6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2F9871F8FF01E2C30CA8B78CF3F49439 /* DWNavigationTransition.xcconfig */;
+			baseConfigurationReference = F224D04940429C09FC00F7969DCED5CB /* DWNavigationTransition.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -523,11 +531,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		ABBC75111C92002620CA44A8B6402A4B /* Build configuration list for PBXNativeTarget "DWNavigationTransition" */ = {
+		EDDA6CE2F70BB2D2108635223C83A39C /* Build configuration list for PBXNativeTarget "DWNavigationTransition" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C6E075962782CA4C92AF6DE430B48DA3 /* Debug */,
-				6EF731E0118B04473CAC296DD52596CB /* Release */,
+				6325E020A91AEA86B375F3C7ABEB1ED6 /* Debug */,
+				530A6AFC869A16FC19A51E4EEA1AFDE6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

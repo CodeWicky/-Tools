@@ -12,6 +12,7 @@
 #import "DWTransitionFunction.h"
 
 @implementation UINavigationController (DWNavigationTransition)
+@dynamic dw_backgroundViewHidden;
 
 +(void)load {
     static dispatch_once_t onceToken;
@@ -21,7 +22,7 @@
 }
 
 -(void)dw_pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
-    if (!self.viewControllers.lastObject) {
+    if (!self.viewControllers.lastObject || !animated) {
         [self dw_pushViewController:viewController animated:animated];
         return;
     }
@@ -33,13 +34,16 @@
         return;
     }
     
-    if (animated) {
-        [lastVC dw_addTransitionBarIfNeeded];
-        [self setNavigationBarHidden:YES];
-        return;
+    [lastVC dw_addTransitionBarIfNeeded];
+    if (lastVC.dw_transitionBar.superview) {
+        lastVC.navigationController.navigationBar.dw_backgroundView.hidden = YES;
     }
     
     [self dw_pushViewController:viewController animated:animated];
+}
+
+-(void)setDw_backgroundViewHidden:(BOOL)dw_backgroundViewHidden {
+    
 }
 
 @end

@@ -18,11 +18,7 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor yellowColor];
     
-<<<<<<< HEAD:DWNavigationTransition/DWNavigationTransition/DWNavigationTransition/ViewController.m
-    
-=======
 //    [self.navigationController setNavigationBarHidden:YES animated:YES];
->>>>>>> 34eb6eaf84deb776630d96824d2b7f3b2e34cc0d:DWNavigationTransition/DEMO/DWNavigationTransition/ViewController.m
 }
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
