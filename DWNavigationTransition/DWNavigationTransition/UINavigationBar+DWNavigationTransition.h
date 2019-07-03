@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic ,strong ,readonly) UIView * dw_backgroundView;
 
+@property (nonatomic ,assign) BOOL dw_isFakeBar;
+
 -(void)copyFromBar:(UINavigationBar *)bar;
 
 @end

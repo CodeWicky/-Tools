@@ -36,18 +36,11 @@ id DWGetAssociatedValue(id target,const void * key) {
     return objc_getAssociatedObject(target, key);
 }
 
-void  DWSetStrongAssociatedValue(id target,const void * key,id value) {
+void  DWSetAssociatedValue(id target,const void * key,id value) {
     if (NULL == key) {
         return;
     }
     objc_setAssociatedObject(target, key, value, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-void DWSetAssignAssociatedValue(id target,const void * key,id value) {
-    if (NULL == key) {
-        return;
-    }
-    objc_setAssociatedObject(target, key, value, OBJC_ASSOCIATION_ASSIGN);
 }
 
 

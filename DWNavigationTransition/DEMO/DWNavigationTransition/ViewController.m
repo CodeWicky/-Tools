@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "AViewController.h"
 
 @interface ViewController ()
 
@@ -22,7 +23,7 @@
 }
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    UIViewController * red = [UIViewController new];
+    AViewController * red = [AViewController new];
     red.view.backgroundColor = [UIColor redColor];
     [self.navigationController pushViewController:red animated:YES];
 }

@@ -6,7 +6,8 @@
 //
 
 #import "UIView+DWNavigationTransition.h"
-
+#import "UINavigationController+DWNavigationTransition.h"
+#import "UINavigationBar+DWNavigationTransition.h"
 #import "DWTransitionFunction.h"
 
 @implementation UIView (DWNavigationTransition)
@@ -21,8 +22,13 @@
 -(void)dw_setHidden:(BOOL)hidden {
     UIResponder *responder = (UIResponder *)self;
     while (responder) {
+        ///这里如果判断到是占位的bar则不做响应，减少运算量
+        if ([responder isKindOfClass:[UINavigationBar class]] && ((UINavigationBar *)responder).dw_isFakeBar) {
+            return;
+        }
+        ///这里如果判断到是Navigation上的navigationBar的话，则按照
         if ([responder isKindOfClass:[UINavigationController class]]) {
-//            [self dw_setHidden:((UINavigationController *)responder).km_backgroundViewHidden];
+            [self dw_setHidden:((UINavigationController *)responder).dw_backgroundViewHidden];
             return;
         }
         responder = responder.nextResponder;

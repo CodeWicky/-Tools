@@ -35,15 +35,22 @@
     }
     
     [lastVC dw_addTransitionBarIfNeeded];
+    
     if (lastVC.dw_transitionBar.superview) {
-        lastVC.navigationController.navigationBar.dw_backgroundView.hidden = YES;
+        lastVC.navigationController.dw_backgroundViewHidden = YES;
+        viewController.dw_transitioningViewController = lastVC;
     }
     
     [self dw_pushViewController:viewController animated:animated];
 }
 
 -(void)setDw_backgroundViewHidden:(BOOL)dw_backgroundViewHidden {
-    
+    DWQuickSetAssociatedValue(@selector(dw_backgroundViewHidden), @(dw_backgroundViewHidden));
+    self.navigationBar.dw_backgroundView.hidden = dw_backgroundViewHidden;
+}
+
+-(BOOL)dw_backgroundViewHidden {
+    return [DWQuickGetAssociatedValue() boolValue];
 }
 
 @end

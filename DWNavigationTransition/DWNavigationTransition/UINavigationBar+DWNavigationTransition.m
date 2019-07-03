@@ -40,9 +40,17 @@
     UIView * view = DWQuickGetAssociatedValue();
     if (!view) {
         view = [self valueForKey:@"_backgroundView"];
-        DWQuickSetStrongAssociatedValue(_cmd, view);
+        DWQuickSetAssociatedValue(_cmd, view);
     }
     return view;
+}
+
+-(void)setDw_isFakeBar:(BOOL)dw_isFakeBar {
+    DWQuickSetAssociatedValue(@selector(dw_isFakeBar), @(dw_isFakeBar));
+}
+
+-(BOOL)dw_isFakeBar {
+    return [DWQuickGetAssociatedValue() boolValue];
 }
 
 @end

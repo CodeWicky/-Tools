@@ -17,7 +17,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic ,strong) UINavigationBar * dw_statusStoreBar;
 
+@property (nonatomic ,strong) UIViewController * dw_transitioningViewController;
+
 -(void)dw_addTransitionBarIfNeeded;
+
+-(void)dw_removeTransitionBarIfNeeded;
+
+-(void)dw_resizeTransitionBarFrame;
 
 @end
 
