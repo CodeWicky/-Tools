@@ -145,7 +145,7 @@
     UINavigationBar * bar = DWQuickGetAssociatedValue();
     if (!bar) {
         bar = [[UINavigationBar alloc] init];
-        bar.dw_isFakeBar = YES;
+//        bar.dw_isFakeBar = YES;
         DWQuickSetAssociatedValue(_cmd, bar);
     }
     return bar;
@@ -159,7 +159,7 @@
     UINavigationBar * bar = DWQuickGetAssociatedValue();
     if (!bar) {
         bar = [[UINavigationBar alloc] init];
-        bar.dw_isFakeBar = YES;
+//        bar.dw_isFakeBar = YES;
         DWQuickSetAssociatedValue(_cmd, bar);
     }
     return bar;
