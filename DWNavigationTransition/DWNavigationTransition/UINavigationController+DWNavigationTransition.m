@@ -36,7 +36,7 @@
     }
     
     [fromVC dw_addTransitionBarIfNeeded];
-    [fromVC dw_configTransitionBarHiddenIfNeeded:YES];
+    [fromVC dw_configTransitionBarHiddenIfNeeded:NO];
     if (fromVC.dw_transitionBar.superview) {
         fromVC.navigationController.dw_backgroundViewHidden = YES;
         viewController.dw_transitioningViewController = fromVC;

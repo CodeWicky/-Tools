@@ -18,7 +18,23 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor yellowColor];
-//    [self.navigationController setNavigationBarHidden:YES animated:YES];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController.navigationBar setBackgroundImage:[self createImageWithColor:[UIColor colorWithWhite:1 alpha:0.7]] forBarMetrics:(UIBarMetricsDefault)];
+}
+
+-(UIImage*)createImageWithColor:(UIColor*)color
+{
+    CGRect rect=CGRectMake(0.0f,0.0f,1.0f,1.0f);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context=UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context,[color CGColor]);
+    CGContextFillRect(context,rect);
+    UIImage *theImage=UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return theImage;
 }
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {

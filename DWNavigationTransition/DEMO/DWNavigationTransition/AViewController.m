@@ -19,6 +19,23 @@
     // Do any additional setup after loading the view.
 }
 
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController.navigationBar setBackgroundImage:[self createImageWithColor:[UIColor colorWithRed:0 green:1 blue:0 alpha:0.3]] forBarMetrics:(UIBarMetricsDefault)];
+}
+
+-(UIImage*)createImageWithColor:(UIColor*)color
+{
+    CGRect rect=CGRectMake(0.0f,0.0f,1.0f,1.0f);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context=UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context,[color CGColor]);
+    CGContextFillRect(context,rect);
+    UIImage *theImage=UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return theImage;
+}
+
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [self.navigationController popViewControllerAnimated:YES];
 }
