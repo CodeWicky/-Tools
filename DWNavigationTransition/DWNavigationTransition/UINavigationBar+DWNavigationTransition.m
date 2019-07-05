@@ -53,4 +53,12 @@
     return [DWQuickGetAssociatedValue() boolValue];
 }
 
+-(void)setDw_isHiddenBackgroundViewForFakeBar:(BOOL)dw_isHiddenBackgroundViewForFakeBar {
+    DWQuickSetAssociatedValue(@selector(dw_isHiddenBackgroundViewForFakeBar), @(dw_isHiddenBackgroundViewForFakeBar));
+}
+
+-(BOOL)dw_isHiddenBackgroundViewForFakeBar {
+    return [DWQuickGetAssociatedValue() boolValue];
+}
+
 @end

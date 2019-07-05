@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic ,assign) BOOL dw_isFakeBar;
 
+@property (nonatomic ,assign) BOOL dw_isHiddenBackgroundViewForFakeBar;
+
 -(void)copyFromBar:(UINavigationBar *)bar;
 
 @end

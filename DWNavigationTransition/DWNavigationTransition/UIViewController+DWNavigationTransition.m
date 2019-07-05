@@ -33,7 +33,14 @@
     if (self.dw_userNavigationTransition) {
         UIViewController * toVC = [self.transitionCoordinator viewControllerForKey:UITransitionContextToViewControllerKey];
         if (toVC && [self isEqual:toVC] && [self isEqual:self.navigationController.viewControllers.lastObject]) {
-            [self dw_addTransitionBarIfNeeded];
+            if (self.dw_isPushTransition) {
+                [self dw_addTransitionBarIfNeeded];
+                self.dw_isPushTransition = NO;
+            } else if (self.dw_isPopTransition) {
+                [self dw_restoreTransitionBarIfNeeded];
+                [self dw_configTransitionBarHiddenIfNeeded:NO];
+                self.dw_isPopTransition = NO;
+            }
             if (self.dw_transitionBar.superview) {
                 [self.view bringSubviewToFront:self.dw_transitionBar];
             }
@@ -43,10 +50,12 @@
 }
 
 -(void)dw_viewDidAppear:(BOOL)animated {
-    [self dw_removeTransitionBarIfNeeded];
-    if (self.dw_transitioningViewController) {
-        self.navigationController.dw_backgroundViewHidden = NO;
-        [self.dw_transitioningViewController dw_removeTransitionBarIfNeeded];
+    if (self.dw_userNavigationTransition) {
+        [self dw_removeTransitionBarIfNeeded];
+        if (self.dw_transitioningViewController) {
+            self.navigationController.dw_backgroundViewHidden = NO;
+            [self.dw_transitioningViewController dw_removeTransitionBarIfNeeded];
+        }
     }
     [self dw_viewDidAppear:animated];
 }
@@ -59,7 +68,21 @@
     }
     [self dw_adjustScrollViewContentOffsetIfNeeded];
     [self.dw_transitionBar copyFromBar:self.navigationController.navigationBar];
-    self.dw_transitionBar.hidden = NO;
+    if (!self.navigationController.navigationBar.isHidden) {
+        [self dw_resizeTransitionBarFrame];
+        [self.view addSubview:self.dw_transitionBar];
+    } else {
+        [self.dw_transitionBar removeFromSuperview];
+    }
+}
+
+-(void)dw_restoreTransitionBarIfNeeded {
+    if (!self.isViewLoaded || !self.view.window || !self.dw_userNavigationTransition || !self.navigationController.navigationBar || self.navigationController.navigationBar.isHidden) {
+        [self.dw_transitionBar removeFromSuperview];
+        return;
+    }
+    [self dw_adjustScrollViewContentOffsetIfNeeded];
+    [self.dw_transitionBar copyFromBar:self.dw_statusStoreBar];
     if (!self.navigationController.navigationBar.isHidden) {
         [self dw_resizeTransitionBarFrame];
         [self.view addSubview:self.dw_transitionBar];
@@ -70,6 +93,13 @@
 
 -(void)dw_removeTransitionBarIfNeeded {
     [self.dw_transitionBar removeFromSuperview];
+}
+
+-(void)dw_configTransitionBarHiddenIfNeeded:(BOOL)hidden {
+    if (self.dw_transitionBar.superview) {
+        self.dw_transitionBar.dw_backgroundView.hidden = hidden;
+        self.dw_transitionBar.dw_isHiddenBackgroundViewForFakeBar = hidden;
+    }
 }
 
 #pragma mark --- tool method ---
@@ -122,6 +152,13 @@
 }
 
 #pragma mark --- setter/getter ---
+-(void)setDw_userNavigationTransition:(BOOL)dw_userNavigationTransition {
+    if ([self isKindOfClass:[UINavigationController class]] || [self isKindOfClass:[UITabBarController class]]) {
+        return ;
+    }
+    DWQuickSetAssociatedValue(@selector(dw_userNavigationTransition), @(dw_userNavigationTransition));
+}
+
 -(BOOL)dw_userNavigationTransition {
     if ([self isKindOfClass:[UINavigationController class]] || [self isKindOfClass:[UITabBarController class]]) {
         return NO;
@@ -134,32 +171,15 @@
     return [use boolValue];
 }
 
--(void)setDw_userNavigationTransition:(BOOL)dw_userNavigationTransition {
-    if ([self isKindOfClass:[UINavigationController class]] || [self isKindOfClass:[UITabBarController class]]) {
-        return ;
-    }
-    DWQuickSetAssociatedValue(@selector(dw_userNavigationTransition), @(dw_userNavigationTransition));
+-(void)setDw_transitionBar:(UINavigationBar *)dw_transitionBar {
+    DWQuickSetAssociatedValue(@selector(dw_transitionBar), dw_transitionBar);
 }
 
 -(UINavigationBar *)dw_transitionBar {
     UINavigationBar * bar = DWQuickGetAssociatedValue();
     if (!bar) {
         bar = [[UINavigationBar alloc] init];
-//        bar.dw_isFakeBar = YES;
-        DWQuickSetAssociatedValue(_cmd, bar);
-    }
-    return bar;
-}
-
--(void)setDw_transitionBar:(UINavigationBar *)dw_transitionBar {
-    DWQuickSetAssociatedValue(@selector(dw_transitionBar), dw_transitionBar);
-}
-
--(UINavigationBar *)dw_statusStoreBar {
-    UINavigationBar * bar = DWQuickGetAssociatedValue();
-    if (!bar) {
-        bar = [[UINavigationBar alloc] init];
-//        bar.dw_isFakeBar = YES;
+        bar.dw_isFakeBar = YES;
         DWQuickSetAssociatedValue(_cmd, bar);
     }
     return bar;
@@ -169,12 +189,38 @@
     DWQuickSetAssociatedValue(@selector(dw_transitionBar), dw_statusStoreBar);
 }
 
--(UIViewController *)dw_transitioningViewController {
-    return DWQuickGetAssociatedValue();
+-(UINavigationBar *)dw_statusStoreBar {
+    UINavigationBar * bar = DWQuickGetAssociatedValue();
+    if (!bar) {
+        bar = [[UINavigationBar alloc] init];
+        bar.dw_isFakeBar = YES;
+        DWQuickSetAssociatedValue(_cmd, bar);
+    }
+    return bar;
 }
 
 -(void)setDw_transitioningViewController:(UIViewController *)dw_transitioningViewController {
     DWQuickSetAssociatedValue(@selector(dw_transitioningViewController), dw_transitioningViewController);
+}
+
+-(UIViewController *)dw_transitioningViewController {
+    return DWQuickGetAssociatedValue();
+}
+
+-(void)setDw_isPushTransition:(BOOL)dw_isPushTransition {
+    DWQuickSetAssociatedValue(@selector(dw_isPushTransition), @(dw_isPushTransition));
+}
+
+-(BOOL)dw_isPushTransition {
+    return [DWQuickGetAssociatedValue() boolValue];
+}
+
+-(void)setDw_isPopTransition:(BOOL)dw_isPopTransition {
+    DWQuickSetAssociatedValue(@selector(dw_isPopTransition), @(dw_isPopTransition));
+}
+
+-(BOOL)dw_isPopTransition {
+    return [DWQuickGetAssociatedValue() boolValue];
 }
 
 @end

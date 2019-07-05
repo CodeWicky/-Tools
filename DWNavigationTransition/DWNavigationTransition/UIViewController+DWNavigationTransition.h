@@ -19,9 +19,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic ,strong) UIViewController * dw_transitioningViewController;
 
+@property (nonatomic ,assign) BOOL dw_isPushTransition;
+
+@property (nonatomic ,assign) BOOL dw_isPopTransition;
+
 -(void)dw_addTransitionBarIfNeeded;
 
 -(void)dw_removeTransitionBarIfNeeded;
+
+-(void)dw_configTransitionBarHiddenIfNeeded:(BOOL)hidden;
 
 -(void)dw_resizeTransitionBarFrame;
 
