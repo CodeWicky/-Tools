@@ -32,7 +32,6 @@
     self.barStyle = bar.barStyle;
     self.translucent = bar.translucent;
     [self setBackgroundImage:[bar backgroundImageForBarMetrics:(UIBarMetricsDefault)] forBarMetrics:(UIBarMetricsDefault)];
-    self.hidden = bar.isHidden;
 }
 
 #pragma mark --- setter/getter ---
@@ -50,14 +49,6 @@
 }
 
 -(BOOL)dw_isFakeBar {
-    return [DWQuickGetAssociatedValue() boolValue];
-}
-
--(void)setDw_isHiddenBackgroundViewForFakeBar:(BOOL)dw_isHiddenBackgroundViewForFakeBar {
-    DWQuickSetAssociatedValue(@selector(dw_isHiddenBackgroundViewForFakeBar), @(dw_isHiddenBackgroundViewForFakeBar));
-}
-
--(BOOL)dw_isHiddenBackgroundViewForFakeBar {
     return [DWQuickGetAssociatedValue() boolValue];
 }
 

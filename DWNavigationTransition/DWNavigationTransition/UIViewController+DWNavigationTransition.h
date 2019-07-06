@@ -27,8 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 -(void)dw_removeTransitionBarIfNeeded;
 
--(void)dw_configTransitionBarHiddenIfNeeded:(BOOL)hidden;
-
 -(void)dw_resizeTransitionBarFrame;
 
 @end

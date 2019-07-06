@@ -38,7 +38,6 @@
                 self.dw_isPushTransition = NO;
             } else if (self.dw_isPopTransition) {
                 [self dw_restoreTransitionBarIfNeeded];
-                [self dw_configTransitionBarHiddenIfNeeded:NO];
                 self.dw_isPopTransition = NO;
             }
             if (self.dw_transitionBar.superview) {
@@ -68,7 +67,7 @@
     }
     [self dw_adjustScrollViewContentOffsetIfNeeded];
     [self.dw_transitionBar copyFromBar:self.navigationController.navigationBar];
-    if (!self.navigationController.navigationBar.isHidden) {
+    if (!self.navigationController.isNavigationBarHidden && !self.navigationController.navigationBar.isHidden) {
         [self dw_resizeTransitionBarFrame];
         [self.view addSubview:self.dw_transitionBar];
     } else {
@@ -85,6 +84,7 @@
     [self.dw_transitionBar copyFromBar:self.dw_statusStoreBar];
     if (!self.navigationController.navigationBar.isHidden) {
         [self dw_resizeTransitionBarFrame];
+        [self.navigationController.navigationBar copyFromBar:self.dw_statusStoreBar];
         [self.view addSubview:self.dw_transitionBar];
     } else {
         [self.dw_transitionBar removeFromSuperview];
@@ -93,13 +93,6 @@
 
 -(void)dw_removeTransitionBarIfNeeded {
     [self.dw_transitionBar removeFromSuperview];
-}
-
--(void)dw_configTransitionBarHiddenIfNeeded:(BOOL)hidden {
-    if (self.dw_transitionBar.superview) {
-        self.dw_transitionBar.dw_backgroundView.hidden = hidden;
-        self.dw_transitionBar.dw_isHiddenBackgroundViewForFakeBar = hidden;
-    }
 }
 
 #pragma mark --- tool method ---

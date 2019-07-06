@@ -36,13 +36,12 @@
     }
     
     [fromVC dw_addTransitionBarIfNeeded];
-    [fromVC dw_configTransitionBarHiddenIfNeeded:NO];
     if (fromVC.dw_transitionBar.superview) {
         fromVC.navigationController.dw_backgroundViewHidden = YES;
         viewController.dw_transitioningViewController = fromVC;
         viewController.dw_isPushTransition = YES;
     }
-    
+
     [self dw_pushViewController:viewController animated:animated];
 }
 
@@ -59,7 +58,6 @@
     }
 
     [fromVC dw_addTransitionBarIfNeeded];
-    [fromVC dw_configTransitionBarHiddenIfNeeded:NO];
     if (fromVC.dw_transitionBar.superview) {
         fromVC.navigationController.dw_backgroundViewHidden = YES;
         toVC.dw_transitioningViewController = fromVC;

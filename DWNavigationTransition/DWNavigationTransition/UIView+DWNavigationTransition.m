@@ -24,10 +24,9 @@
     while (responder) {
         ///这里如果判断到是占位的bar则不做响应，减少运算量
         if ([responder isKindOfClass:[UINavigationBar class]] && ((UINavigationBar *)responder).dw_isFakeBar) {
-            [self dw_setHidden:((UINavigationBar *)responder).dw_isHiddenBackgroundViewForFakeBar];
             return;
         }
-        ///这里如果判断到是Navigation上的navigationBar的话，则按照
+        ///这里如果判断到是Navigation上的navigationBar的话，则按照导航显隐进行展示
         if ([responder isKindOfClass:[UINavigationController class]]) {
             [self dw_setHidden:((UINavigationController *)responder).dw_backgroundViewHidden];
             return;
