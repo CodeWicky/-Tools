@@ -10,6 +10,8 @@
 
 @interface AViewController ()
 
+@property (nonatomic ,weak) id<UIGestureRecognizerDelegate> oriPopDelegate;
+
 @end
 
 @implementation AViewController
@@ -25,6 +27,18 @@
     [self.navigationController.navigationBar setBackgroundImage:[self createImageWithColor:[UIColor colorWithRed:0 green:1 blue:0 alpha:0.3]] forBarMetrics:(UIBarMetricsDefault)];
 }
 
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    self.oriPopDelegate = self.navigationController.interactivePopGestureRecognizer.delegate;
+    self.navigationController.interactivePopGestureRecognizer.delegate = self;
+}
+
+-(void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    self.navigationController.interactivePopGestureRecognizer.delegate = self.oriPopDelegate;
+    self.oriPopDelegate = nil;
+}
+
 -(UIImage*)createImageWithColor:(UIColor*)color
 {
     CGRect rect=CGRectMake(0.0f,0.0f,1.0f,1.0f);
@@ -38,7 +52,7 @@
 }
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    [self.navigationController popViewControllerAnimated:YES];
+//    [self.navigationController popViewControllerAnimated:YES];
 }
 
 /*
