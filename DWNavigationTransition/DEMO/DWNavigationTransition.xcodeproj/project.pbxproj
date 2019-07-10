@@ -13,6 +13,7 @@
 		9B1A7A2622C478D5006DAC4F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B1A7A2522C478D5006DAC4F /* Assets.xcassets */; };
 		9B1A7A2922C478D5006DAC4F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B1A7A2722C478D5006DAC4F /* LaunchScreen.storyboard */; };
 		9B1A7A2C22C478D5006DAC4F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B1A7A2B22C478D5006DAC4F /* main.m */; };
+		9B3C13B522D5C23F00AED045 /* BViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B3C13B422D5C23F00AED045 /* BViewController.m */; };
 		9B6B2E1022CCA828000A5C6D /* AViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B6B2E0F22CCA828000A5C6D /* AViewController.m */; };
 		D6B433436282E27D8F1A0E6A /* libPods-DWNavigationTransition.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB1829B2DFB8B6B2C383DF6A /* libPods-DWNavigationTransition.a */; };
 /* End PBXBuildFile section */
@@ -30,6 +31,8 @@
 		9B1A7A2822C478D5006DAC4F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9B1A7A2A22C478D5006DAC4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9B1A7A2B22C478D5006DAC4F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		9B3C13B322D5C23F00AED045 /* BViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BViewController.h; sourceTree = "<group>"; };
+		9B3C13B422D5C23F00AED045 /* BViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BViewController.m; sourceTree = "<group>"; };
 		9B6B2E0E22CCA828000A5C6D /* AViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AViewController.h; sourceTree = "<group>"; };
 		9B6B2E0F22CCA828000A5C6D /* AViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AViewController.m; sourceTree = "<group>"; };
 		BB1829B2DFB8B6B2C383DF6A /* libPods-DWNavigationTransition.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DWNavigationTransition.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -83,6 +86,8 @@
 				9B1A7A2022C478D3006DAC4F /* ViewController.m */,
 				9B6B2E0E22CCA828000A5C6D /* AViewController.h */,
 				9B6B2E0F22CCA828000A5C6D /* AViewController.m */,
+				9B3C13B322D5C23F00AED045 /* BViewController.h */,
+				9B3C13B422D5C23F00AED045 /* BViewController.m */,
 				9B1A7A2222C478D3006DAC4F /* Main.storyboard */,
 				9B1A7A2522C478D5006DAC4F /* Assets.xcassets */,
 				9B1A7A2722C478D5006DAC4F /* LaunchScreen.storyboard */,
@@ -199,6 +204,7 @@
 				9B6B2E1022CCA828000A5C6D /* AViewController.m in Sources */,
 				9B1A7A2122C478D3006DAC4F /* ViewController.m in Sources */,
 				9B1A7A2C22C478D5006DAC4F /* main.m in Sources */,
+				9B3C13B522D5C23F00AED045 /* BViewController.m in Sources */,
 				9B1A7A1E22C478D3006DAC4F /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

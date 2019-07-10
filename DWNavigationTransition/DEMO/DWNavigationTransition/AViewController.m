@@ -7,6 +7,7 @@
 //
 
 #import "AViewController.h"
+#import "BViewController.h"
 
 @interface AViewController ()
 
@@ -52,7 +53,7 @@
 }
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-//    [self.navigationController popViewControllerAnimated:YES];
+    [self.navigationController pushViewController:[BViewController new] animated:YES];
 }
 
 /*
