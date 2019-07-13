@@ -9,6 +9,69 @@
 #import "DWTransition.h"
 #import <objc/runtime.h>
 
+@interface UINavigationController (DWTransition)
+
+@property (nonatomic ,strong) UIImage * dw_snapBeforePush;
+
+@end
+
+@implementation UINavigationController (DWTransition)
+
++(void)load {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        Method originalMethod = class_getInstanceMethod([self class], @selector(pushViewController:animated:));
+        Method swizzledMethod = class_getInstanceMethod([self class], @selector(dw_transition_pushViewController:animated:));
+        
+        BOOL didAddMethod =
+        class_addMethod([self class],
+                        @selector(pushViewController:animated:),
+                        method_getImplementation(swizzledMethod),
+                        method_getTypeEncoding(swizzledMethod));
+        
+        if (didAddMethod) {
+            class_replaceMethod([self class],
+                                @selector(dw_transition_pushViewController:animated:),
+                                method_getImplementation(originalMethod),
+                                method_getTypeEncoding(originalMethod));
+        } else {
+            method_exchangeImplementations(originalMethod, swizzledMethod);
+        }
+    });
+}
+
+#pragma mark --- override ---
+
+-(void)dw_transition_pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
+    if (self.viewControllers.count > 0) {
+        self.dw_snapBeforePush = [self snapWithView:self.view];
+    }
+    [self dw_transition_pushViewController:viewController animated:animated];
+}
+
+-(UIImage *)snapWithView:(UIView *)view {
+    CGFloat scale = [UIScreen mainScreen].scale;
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, NO, scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSaveGState(context);
+    [view.layer renderInContext:context];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
+#pragma mark --- setter/getter ---
+-(UIImage *)dw_snapBeforePush {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+-(void)setDw_snapBeforePush:(UIImage *)dw_snapBeforePush {
+    objc_setAssociatedObject(self, @selector(dw_snapBeforePush), dw_snapBeforePush, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+@end
+
+
 @interface DWTransition ()
 
 @property (nonatomic ,assign) DWTransitionType transitionType;
@@ -909,72 +972,6 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         }
             break;
     }
-}
-
-@end
-
-@implementation UINavigationController (DWTransition)
-
-
-+(void)load {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        Method originalMethod = class_getInstanceMethod([self class], @selector(pushViewController:animated:));
-        Method swizzledMethod = class_getInstanceMethod([self class], @selector(dw_transition_pushViewController:animated:));
-        
-        BOOL didAddMethod =
-        class_addMethod([self class],
-                        @selector(pushViewController:animated:),
-                        method_getImplementation(swizzledMethod),
-                        method_getTypeEncoding(swizzledMethod));
-        
-        if (didAddMethod) {
-            class_replaceMethod([self class],
-                                @selector(dw_transition_pushViewController:animated:),
-                                method_getImplementation(originalMethod),
-                                method_getTypeEncoding(originalMethod));
-        } else {
-            method_exchangeImplementations(originalMethod, swizzledMethod);
-        }
-    });
-}
-
-#pragma mark --- override ---
-
--(void)dw_transition_pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
-    if (self.viewControllers.count > 0) {
-        self.dw_snapBeforePush = [self snapWithView:self.view];
-    }
-    [self dw_transition_pushViewController:viewController animated:animated];
-}
-
--(UIImage *)snapWithView:(UIView *)view {
-    CGFloat scale = [UIScreen mainScreen].scale;
-    UIGraphicsBeginImageContextWithOptions(view.bounds.size, NO, scale);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSaveGState(context);
-    [view.layer renderInContext:context];
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
-}
-
-#pragma mark --- setter/getter ---
--(UIView *)dw_navigationTransitionView {
-    UIView * view = objc_getAssociatedObject(self, _cmd);
-    if (!view) {
-        view = [self valueForKey:@"navigationTransitionView"];
-        objc_setAssociatedObject(self, _cmd, view, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    return view;
-}
-
--(UIImage *)dw_snapBeforePush {
-    return objc_getAssociatedObject(self, _cmd);
-}
-
--(void)setDw_snapBeforePush:(UIImage *)dw_snapBeforePush {
-    objc_setAssociatedObject(self, @selector(dw_snapBeforePush), dw_snapBeforePush, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end
