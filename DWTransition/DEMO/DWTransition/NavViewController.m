@@ -7,8 +7,9 @@
 //
 
 #import "NavViewController.h"
+#import "DWTransition.h"
 
-@interface NavViewController ()
+@interface NavViewController ()<UINavigationControllerDelegate>
 
 @end
 
@@ -16,7 +17,16 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    self.delegate = self;
+    self.modalPresentationStyle = UIModalPresentationCustom;
+}
+
+-(id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC {
+    if (operation == UINavigationControllerOperationPush) {
+        return [DWTransition transitionWithType:(DWTransitionPushType)];
+    } else {
+        return [DWTransition transitionWithType:(DWTransitionPopType)];
+    }
 }
 
 /*
