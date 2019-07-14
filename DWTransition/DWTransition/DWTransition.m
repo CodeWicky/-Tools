@@ -9,6 +9,33 @@
 #import "DWTransition.h"
 #import <objc/runtime.h>
 
+@interface UIImage (DWTransition)
+
++(UIImage *)dw_transition_imageWithView:(UIView *)view;
+
+@end
+
+@implementation UIImage (DWTransition)
+
++(UIImage *)dw_transition_imageWithView:(UIView *)view {
+    if (!view) {
+        return nil;
+    }
+    if (CGRectEqualToRect(view.bounds, CGRectZero)) {
+        return nil;
+    }
+    CGFloat scale = [UIScreen mainScreen].scale;
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, NO, scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSaveGState(context);
+    [view.layer renderInContext:context];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
+@end
+
 @interface UINavigationController (DWTransition)
 
 @property (nonatomic ,strong) UIImage * dw_snapBeforePush;
@@ -44,20 +71,9 @@
 
 -(void)dw_transition_pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
     if (self.viewControllers.count > 0) {
-        self.dw_snapBeforePush = [self snapWithView:self.view];
+        self.dw_snapBeforePush = [UIImage dw_transition_imageWithView:self.view];
     }
     [self dw_transition_pushViewController:viewController animated:animated];
-}
-
--(UIImage *)snapWithView:(UIView *)view {
-    CGFloat scale = [UIScreen mainScreen].scale;
-    UIGraphicsBeginImageContextWithOptions(view.bounds.size, NO, scale);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSaveGState(context);
-    [view.layer renderInContext:context];
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
 }
 
 #pragma mark --- setter/getter ---
@@ -276,7 +292,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         if (middleCtn.subviews.count > 0) {
             ///将截图添加到临时imageView中，并插入在fromView和toView之间
             middleImageView = [[UIImageView alloc] initWithFrame:containerView.bounds];
-            middleImageView.image = [self snapWithView:middleCtn];
+            middleImageView.image = [UIImage dw_transition_imageWithView:middleCtn];
             [containerView insertSubview:middleImageView belowSubview:toView];
             
             [middleCtn.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -593,7 +609,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     
     ///将截图添加到临时imageView中，并插入在fromView和toView之间
     UIImageView * middleImageView = [[UIImageView alloc] initWithFrame:containerView.bounds];
-    middleImageView.image = [self snapWithView:middleCtn];
+    middleImageView.image = [UIImage dw_transition_imageWithView:middleCtn];
     [containerView insertSubview:middleImageView belowSubview:fromView];
     
     switch (self.transitionType & DWTransitionAnimationTypeMask) {
@@ -921,17 +937,6 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         }
             break;
     }
-}
-
--(UIImage *)snapWithView:(UIView *)view {
-    CGFloat scale = [UIScreen mainScreen].scale;
-    UIGraphicsBeginImageContextWithOptions(view.bounds.size, NO, scale);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSaveGState(context);
-    [view.layer renderInContext:context];
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
 }
 
 #pragma mark --- transition delegate ---
