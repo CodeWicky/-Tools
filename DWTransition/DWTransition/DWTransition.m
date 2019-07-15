@@ -155,7 +155,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             toView.frame = toStart;
             fromView.frame = fromStart;
             toVC.navigationController.navigationBar.transform = CGAffineTransformMakeTranslation(- toEnd.size.width, 0);
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
                 fromView.frame = fromEnd;
                 toVC.navigationController.navigationBar.transform = CGAffineTransformMakeTranslation(0, 0);
@@ -172,7 +172,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             toView.frame = toStart;
             fromView.frame = fromStart;
             toVC.navigationController.navigationBar.transform = CGAffineTransformMakeTranslation(0, - toEnd.size.height);
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
                 fromView.frame = fromEnd;
                 toVC.navigationController.navigationBar.transform = CGAffineTransformMakeTranslation(0, 0);
@@ -189,7 +189,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             toView.frame = toStart;
             fromView.frame = fromStart;
             toVC.navigationController.navigationBar.transform = CGAffineTransformMakeTranslation(0, toEnd.size.height);
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
                 fromView.frame = fromEnd;
                 toVC.navigationController.navigationBar.transform = CGAffineTransformMakeTranslation(0, 0);
@@ -204,7 +204,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             toView.frame = toStart;
             fromView.frame = fromStart;
             toView.transform = CGAffineTransformMakeScale(1.0 / toView.bounds.size.width, 1.0 / toView.bounds.size.height);
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.transform = CGAffineTransformIdentity;
             } completion:^(BOOL finished) {
                 [fromView removeFromSuperview];
@@ -217,7 +217,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             toView.frame = toStart;
             fromView.frame = fromStart;
             toView.alpha = 0;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.alpha = 1;
             } completion:^(BOOL finished) {
                 [fromView removeFromSuperview];
@@ -242,7 +242,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             fromView.frame = fromStart;
             ///给navigationBar做transform，模拟系统push时navigationBar效果
             toVC.navigationController.navigationBar.transform = CGAffineTransformMakeTranslation(toEnd.size.width, 0);
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
                 fromView.frame = fromEnd;
                 toVC.navigationController.navigationBar.transform = CGAffineTransformMakeTranslation(0, 0);
@@ -280,7 +280,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         middleCtn.backgroundColor = [UIColor clearColor];
         while (index > 0) {
             UIViewController * tmp = toVC.navigationController.viewControllers[index];
-            if ([tmp conformsToProtocol:@protocol(DWTransitionProtocol)] && [tmp respondsToSelector:@selector(pushAnimationType)] && (((id<DWTransitionProtocol>)tmp).pushAnimationType & DWTransitionTypeMask) == DWTransitionTransparentPushType) {
+            if ([tmp conformsToProtocol:@protocol(DWTransitionProtocol)] && [tmp respondsToSelector:@selector(dw_pushAnimationType)] && (((id<DWTransitionProtocol>)tmp).dw_pushAnimationType & DWTransitionTypeMask) == DWTransitionTransparentPushType) {
                 ///如果当前是transparentPush进来的，要将上一个视图补进来
                 -- index;
                 [middleCtn insertSubview:toVC.navigationController.viewControllers[index].view atIndex:0];
@@ -321,7 +321,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width * 2, 0);
             }
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
                 middleImageView.frame = toEnd;
                 fromView.frame = fromEnd;
@@ -345,7 +345,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(fromEnd.size.width,fromEnd.size.height);
             }
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
                 middleImageView.frame = toEnd;
                 fromView.frame = fromEnd;
@@ -369,7 +369,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(fromEnd.size.width,-fromEnd.size.height);
             }
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
                 middleImageView.frame = toEnd;
                 fromView.frame = fromEnd;
@@ -391,7 +391,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(fromEnd.size.width,fromEnd.size.height);
             }
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 fromView.transform = CGAffineTransformMakeScale(1.0 / fromView.bounds.size.width, 1.0 / fromView.bounds.size.height);
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
@@ -411,7 +411,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(fromEnd.size.width,fromEnd.size.height);
             }
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 fromView.alpha = 0;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
             } completion:^(BOOL finished) {
@@ -439,7 +439,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             toView.frame = toStart;
             middleImageView.frame = toStart;
             fromView.frame = fromStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
                 middleImageView.frame = toEnd;
                 fromView.frame = fromEnd;
@@ -479,7 +479,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             toStart.origin.x = - toStart.size.width;
             toView.frame = toStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
             } completion:^(BOOL finished) {
                 BOOL cancelled = [transitionContext transitionWasCancelled];
@@ -494,7 +494,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             toStart.origin.y = - toStart.size.height;
             toView.frame = toStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
             } completion:^(BOOL finished) {
                 BOOL cancelled = [transitionContext transitionWasCancelled];
@@ -509,7 +509,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             toStart.origin.y = toStart.size.height;
             toView.frame = toStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
             } completion:^(BOOL finished) {
                 BOOL cancelled = [transitionContext transitionWasCancelled];
@@ -524,7 +524,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             toView.frame = toStart;
             toView.transform = CGAffineTransformMakeScale(1.0 / toView.bounds.size.width, 1.0 / toView.bounds.size.height);
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.transform = CGAffineTransformIdentity;
             } completion:^(BOOL finished) {
                 BOOL cancelled = [transitionContext transitionWasCancelled];
@@ -539,7 +539,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             toView.frame = toStart;
             toView.alpha = 0;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.alpha = 1;
             } completion:^(BOOL finished) {
                 BOOL cancelled = [transitionContext transitionWasCancelled];
@@ -564,7 +564,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             toStart.origin.x = toStart.size.width;
             toView.frame = toStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
             } completion:^(BOOL finished) {
                 BOOL cancelled = [transitionContext transitionWasCancelled];
@@ -616,6 +616,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         case DWTransitionAnimationNoneType:
         {
             ///no animation,nothing to do.
+            [toView setNeedsLayout];
             [transitionContext completeTransition:YES];
             [middleImageView removeFromSuperview];
         }
@@ -629,7 +630,9 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width, 0);
             }
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
+                ///这里要手动触发setNeedsLayout，因为系统Pop时toView会有动画，所以toVC会走 -viewWillLayoutSubviews 方法。手动调用过后，可保持与系统行为一致。
+                [toView setNeedsLayout];
                 fromView.frame = fromEnd;
                 middleImageView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
@@ -651,7 +654,8 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width, 0);
             }
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
+                [toView setNeedsLayout];
                 fromView.frame = fromEnd;
                 middleImageView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
@@ -672,7 +676,8 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width, 0);
             }
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
+                [toView setNeedsLayout];
                 fromView.frame = fromEnd;
                 middleImageView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
@@ -692,7 +697,8 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width, 0);
             }
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
+                [toView setNeedsLayout];
                 fromView.transform = CGAffineTransformMakeScale(1.0 / fromView.bounds.size.width, 1.0 / fromView.bounds.size.height);
                 middleImageView.transform = CGAffineTransformMakeScale(1.0 / middleImageView.bounds.size.width, 1.0 / middleImageView.bounds.size.height);
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
@@ -712,7 +718,8 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width,0);
             }
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
+                [toView setNeedsLayout];
                 fromView.alpha = 0;
                 middleImageView.alpha = 0;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
@@ -743,7 +750,8 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             if (fromVC.hidesBottomBarWhenPushed) {
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation( fromEnd.size.width, 0);
             }
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
+                [toView setNeedsLayout];
                 fromView.frame = fromEnd;
                 middleImageView.frame = fromEnd;
                 toVC.tabBarController.tabBar.transform = CGAffineTransformMakeTranslation(0,0);
@@ -777,7 +785,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             toStart.origin.x = - toEnd.size.width;
             toView.frame = toStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -788,7 +796,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             toStart.origin.x = toEnd.size.width;
             toView.frame = toStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -799,7 +807,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             toStart.origin.y = -toEnd.size.height;
             toView.frame = toStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -810,7 +818,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             toView.frame = toStart;
             toView.transform = CGAffineTransformMakeScale(1.0 / toEnd.size.width, 1.0 / toEnd.size.height);
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.transform = CGAffineTransformIdentity;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -821,7 +829,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             toView.frame = toStart;
             toView.alpha = 0;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.alpha = 1;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -841,7 +849,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             toStart.origin.y = toEnd.size.height;
             toView.frame = toStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 toView.frame = toEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -867,7 +875,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             fromEnd.origin.x = - fromStart.size.width;
             fromView.frame = fromStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 fromView.frame = fromEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -878,7 +886,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             fromEnd.origin.x = fromStart.size.width;
             fromView.frame = fromStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 fromView.frame = fromEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -889,7 +897,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             fromEnd.origin.y = - fromStart.size.height;
             fromView.frame = fromStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 fromView.frame = fromEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -899,7 +907,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         case DWTransitionAnimationZoomInType:
         {
             fromView.frame = fromStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 fromView.transform = CGAffineTransformMakeScale(1.0 / fromStart.size.width, 1.0 / fromStart.size.height);
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -909,7 +917,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         case DWTransitionAnimationFadeInType:
         {
             fromView.frame = fromStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 fromView.alpha = 0;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
@@ -929,7 +937,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         {
             fromEnd.origin.y = fromStart.size.height;
             fromView.frame = fromStart;
-            [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+            [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
                 fromView.frame = fromEnd;
             } completion:^(BOOL finished) {
                 [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
