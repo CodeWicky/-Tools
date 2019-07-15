@@ -14,13 +14,13 @@
 + (void)load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        DWQuickSwizzleMethod(layoutSubviews, dw_layoutSubviews);
+        DWQuickSwizzleMethod(layoutSubviews, dw_navigationTransition_layoutSubviews);
     });
 }
 #endif
 
--(void)dw_layoutSubviews {
-    [self dw_layoutSubviews];
+-(void)dw_navigationTransition_layoutSubviews {
+    [self dw_navigationTransition_layoutSubviews];
     CGRect frame = self.dw_backgroundView.frame;
     frame.size.height = self.frame.size.height + fabs(frame.origin.y);
     self.dw_backgroundView.frame = frame;

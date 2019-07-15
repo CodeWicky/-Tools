@@ -17,14 +17,14 @@
 +(void)load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        DWQuickSwizzleMethod(viewWillAppear:, dw_viewWillAppear:);
-        DWQuickSwizzleMethod(viewWillLayoutSubviews, dw_viewWillLayoutSubviews);
-        DWQuickSwizzleMethod(viewDidAppear:, dw_viewDidAppear:);
+        DWQuickSwizzleMethod(viewWillAppear:, dw_navigationTransition_viewWillAppear:);
+        DWQuickSwizzleMethod(viewWillLayoutSubviews, dw_navigationTransition_viewWillLayoutSubviews);
+        DWQuickSwizzleMethod(viewDidAppear:, dw_navigationTransition_viewDidAppear:);
     });
 }
 
--(void)dw_viewWillAppear:(BOOL)animated {
-    [self dw_viewWillAppear:animated];
+-(void)dw_navigationTransition_viewWillAppear:(BOOL)animated {
+    [self dw_navigationTransition_viewWillAppear:animated];
     if (self.dw_userNavigationTransition) {
         UIViewController *toVC = [self.transitionCoordinator viewControllerForKey:UITransitionContextToViewControllerKey];
         if (toVC && [self isEqual:toVC] && [self isEqual:self.navigationController.viewControllers.lastObject]) {
@@ -40,7 +40,7 @@
     }
 }
 
--(void)dw_viewWillLayoutSubviews {
+-(void)dw_navigationTransition_viewWillLayoutSubviews {
     if (self.dw_userNavigationTransition) {
         UIViewController * toVC = [self.transitionCoordinator viewControllerForKey:UITransitionContextToViewControllerKey];
         if (toVC && [self isEqual:toVC] && [self isEqual:self.navigationController.viewControllers.lastObject]) {
@@ -58,10 +58,10 @@
             }
         }
     }
-    [self dw_viewWillLayoutSubviews];
+    [self dw_navigationTransition_viewWillLayoutSubviews];
 }
 
--(void)dw_viewDidAppear:(BOOL)animated {
+-(void)dw_navigationTransition_viewDidAppear:(BOOL)animated {
     if (self.dw_userNavigationTransition) {
         [self dw_restoreScrollViewContentInsetAdjustmentBehaviorIfNeeded];
         [self dw_removeTransitionBarIfNeeded];
@@ -70,7 +70,7 @@
             [self.dw_transitioningViewController dw_removeTransitionBarIfNeeded];
         }
     }
-    [self dw_viewDidAppear:animated];
+    [self dw_navigationTransition_viewDidAppear:animated];
 }
 
 #pragma mark --- interface method ---

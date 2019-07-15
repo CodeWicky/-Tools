@@ -17,24 +17,24 @@
 +(void)load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        DWQuickSwizzleMethod(pushViewController:animated:, dw_pushViewController:animated:);
-        DWQuickSwizzleMethod(popViewControllerAnimated:, dw_popViewControllerAnimated:);
-        DWQuickSwizzleMethod(popToViewController:animated:, dw_popToViewController:animated:);
-        DWQuickSwizzleMethod(popToRootViewControllerAnimated:, dw_popToRootViewControllerAnimated:);
-        DWQuickSwizzleMethod(setViewControllers:animated:, dw_setViewControllers:animated:);
+        DWQuickSwizzleMethod(pushViewController:animated:, dw_navigationTransition_pushViewController:animated:);
+        DWQuickSwizzleMethod(popViewControllerAnimated:, dw_navigationTransition_popViewControllerAnimated:);
+        DWQuickSwizzleMethod(popToViewController:animated:, dw_navigationTransition_popToViewController:animated:);
+        DWQuickSwizzleMethod(popToRootViewControllerAnimated:, dw_navigationTransition_popToRootViewControllerAnimated:);
+        DWQuickSwizzleMethod(setViewControllers:animated:, dw_navigationTransition_setViewControllers:animated:);
     });
 }
 
--(void)dw_pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
+-(void)dw_navigationTransition_pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
     if (!self.viewControllers.lastObject || !animated) {
-        [self dw_pushViewController:viewController animated:animated];
+        [self dw_navigationTransition_pushViewController:viewController animated:animated];
         return;
     }
     UIViewController * fromVC = self.viewControllers.lastObject;
     [fromVC.dw_statusStoreBar copyFromBar:self.navigationBar];
     BOOL needTransition = fromVC.dw_userNavigationTransition || viewController.dw_userNavigationTransition;
     if (!needTransition) {
-        [self dw_pushViewController:viewController animated:animated];
+        [self dw_navigationTransition_pushViewController:viewController animated:animated];
         return;
     }
     
@@ -48,19 +48,19 @@
         viewController.dw_isPushTransition = YES;
     }
 
-    [self dw_pushViewController:viewController animated:animated];
+    [self dw_navigationTransition_pushViewController:viewController animated:animated];
 }
 
--(UIViewController *)dw_popViewControllerAnimated:(BOOL)animated {
+-(UIViewController *)dw_navigationTransition_popViewControllerAnimated:(BOOL)animated {
     if (self.viewControllers.count < 2 || !animated) {
-        return [self dw_popViewControllerAnimated:animated];
+        return [self dw_navigationTransition_popViewControllerAnimated:animated];
     }
 
     UIViewController * fromVC = self.viewControllers.lastObject;
     UIViewController * toVC = self.viewControllers[self.viewControllers.count - 2];
     BOOL needTransition = fromVC.dw_userNavigationTransition || toVC.dw_userNavigationTransition;
     if (!needTransition) {
-        return [self dw_popViewControllerAnimated:animated];
+        return [self dw_navigationTransition_popViewControllerAnimated:animated];
     }
 
     [fromVC dw_addTransitionBarIfNeeded];
@@ -73,18 +73,18 @@
         toVC.dw_isPopTransition = YES;
     }
     
-    return [self dw_popViewControllerAnimated:animated];
+    return [self dw_navigationTransition_popViewControllerAnimated:animated];
 }
 
--(NSArray<UIViewController *> *)dw_popToViewController:(UIViewController *)viewController animated:(BOOL)animated {
+-(NSArray<UIViewController *> *)dw_navigationTransition_popToViewController:(UIViewController *)viewController animated:(BOOL)animated {
     if (self.viewControllers.count < 2 || !animated || ![self.viewControllers containsObject:viewController]) {
-        return [self dw_popToViewController:viewController animated:animated];
+        return [self dw_navigationTransition_popToViewController:viewController animated:animated];
     }
     UIViewController * fromVC = self.viewControllers.lastObject;
     UIViewController * toVC = viewController;
     BOOL needTransition = fromVC.dw_userNavigationTransition || toVC.dw_userNavigationTransition;
     if (!needTransition) {
-        return [self dw_popToViewController:viewController animated:animated];
+        return [self dw_navigationTransition_popToViewController:viewController animated:animated];
     }
     
     [fromVC dw_addTransitionBarIfNeeded];
@@ -97,18 +97,18 @@
         toVC.dw_isPopTransition = YES;
     }
     
-    return [self dw_popToViewController:viewController animated:animated];
+    return [self dw_navigationTransition_popToViewController:viewController animated:animated];
 }
 
--(NSArray<UIViewController *> *)dw_popToRootViewControllerAnimated:(BOOL)animated {
+-(NSArray<UIViewController *> *)dw_navigationTransition_popToRootViewControllerAnimated:(BOOL)animated {
     if (self.viewControllers.count < 2 || !animated) {
-        return [self dw_popToRootViewControllerAnimated:animated];
+        return [self dw_navigationTransition_popToRootViewControllerAnimated:animated];
     }
     UIViewController * fromVC = self.viewControllers.lastObject;
     UIViewController * toVC = self.viewControllers.firstObject;
     BOOL needTransition = fromVC.dw_userNavigationTransition || toVC.dw_userNavigationTransition;
     if (!needTransition) {
-        return [self dw_popToRootViewControllerAnimated:animated];
+        return [self dw_navigationTransition_popToRootViewControllerAnimated:animated];
     }
     
     [fromVC dw_addTransitionBarIfNeeded];
@@ -121,15 +121,15 @@
         toVC.dw_isPopTransition = YES;
     }
     
-    return [self dw_popToRootViewControllerAnimated:animated];
+    return [self dw_navigationTransition_popToRootViewControllerAnimated:animated];
 }
 
--(void)dw_setViewControllers:(NSArray<UIViewController *> *)viewControllers animated:(BOOL)animated {
+-(void)dw_navigationTransition_setViewControllers:(NSArray<UIViewController *> *)viewControllers animated:(BOOL)animated {
     UIViewController * fromVC = self.viewControllers.lastObject;
     UIViewController * toVC = viewControllers.lastObject;
     BOOL needTransition = fromVC.dw_userNavigationTransition || toVC.dw_userNavigationTransition;
     if (!needTransition) {
-        [self dw_setViewControllers:viewControllers animated:animated];
+        [self dw_navigationTransition_setViewControllers:viewControllers animated:animated];
         return;
     }
     
@@ -140,7 +140,7 @@
         toVC.dw_isPopTransition = YES;
     }
     
-    [self dw_setViewControllers:viewControllers animated:animated];
+    [self dw_navigationTransition_setViewControllers:viewControllers animated:animated];
 }
 
 -(void)setDw_backgroundViewHidden:(BOOL)dw_backgroundViewHidden {
