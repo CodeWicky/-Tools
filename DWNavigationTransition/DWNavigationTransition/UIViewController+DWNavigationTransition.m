@@ -65,10 +65,11 @@
     if (self.dw_userNavigationTransition) {
         [self dw_restoreScrollViewContentInsetAdjustmentBehaviorIfNeeded];
         [self dw_removeTransitionBarIfNeeded];
-        if (self.dw_transitioningViewController) {
-            self.navigationController.dw_backgroundViewHidden = NO;
-            [self.dw_transitioningViewController dw_removeTransitionBarIfNeeded];
-        }
+    }
+    if (self.dw_transitioningViewController) {
+        self.navigationController.dw_backgroundViewHidden = NO;
+        [self.dw_transitioningViewController dw_removeTransitionBarIfNeeded];
+        self.dw_transitioningViewController = nil;
     }
     [self dw_navigationTransition_viewDidAppear:animated];
 }

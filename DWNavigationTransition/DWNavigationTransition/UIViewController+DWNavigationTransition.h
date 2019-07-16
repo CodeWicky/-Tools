@@ -7,8 +7,6 @@
 
 #import <UIKit/UIKit.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
 @interface UIViewController (DWNavigationTransition)
 
 @property (nonatomic ,assign) BOOL dw_userNavigationTransition;
@@ -30,5 +28,3 @@ NS_ASSUME_NONNULL_BEGIN
 -(void)dw_resizeTransitionBarFrame;
 
 @end
-
-NS_ASSUME_NONNULL_END

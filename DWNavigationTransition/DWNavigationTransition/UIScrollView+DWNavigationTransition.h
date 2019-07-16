@@ -7,8 +7,6 @@
 
 #import <UIKit/UIKit.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
 @interface UIScrollView (DWNavigationTransition)
 
 #ifdef __IPHONE_11_0
@@ -17,5 +15,3 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 
 @end
-
-NS_ASSUME_NONNULL_END
