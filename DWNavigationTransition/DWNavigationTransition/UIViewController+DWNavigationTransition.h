@@ -11,6 +11,8 @@
 
 @property (nonatomic ,assign) BOOL dw_userNavigationTransition;
 
+@property (nonatomic ,assign) BOOL dw_inTransition;
+
 @property (nonatomic ,strong) UINavigationBar * dw_transitionBar;
 
 @property (nonatomic ,strong) UINavigationBar * dw_statusStoreBar;

@@ -67,9 +67,12 @@
         [self dw_removeTransitionBarIfNeeded];
     }
     if (self.dw_transitioningViewController) {
-        self.navigationController.dw_backgroundViewHidden = NO;
         [self.dw_transitioningViewController dw_removeTransitionBarIfNeeded];
         self.dw_transitioningViewController = nil;
+    }
+    if (self.dw_inTransition) {
+        self.navigationController.dw_backgroundViewHidden = NO;
+        self.dw_inTransition = NO;
     }
     [self dw_navigationTransition_viewDidAppear:animated];
 }
@@ -215,6 +218,14 @@
         DWQuickSetAssociatedValue(_cmd, use);
     }
     return [use boolValue];
+}
+
+-(void)setDw_inTransition:(BOOL)dw_inTransition {
+    DWQuickSetAssociatedValue(@selector(dw_inTransition), @(dw_inTransition));
+}
+
+-(BOOL)dw_inTransition {
+    return [DWQuickGetAssociatedValue() boolValue];
 }
 
 -(void)setDw_transitionBar:(UINavigationBar *)dw_transitionBar {
