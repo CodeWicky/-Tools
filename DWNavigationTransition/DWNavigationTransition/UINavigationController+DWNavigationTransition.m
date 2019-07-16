@@ -38,9 +38,9 @@
         return;
     }
     
+    fromVC.navigationController.dw_backgroundViewHidden = YES;
     [fromVC dw_addTransitionBarIfNeeded];
     if (fromVC.dw_transitionBar.superview) {
-        fromVC.navigationController.dw_backgroundViewHidden = YES;
         viewController.dw_transitioningViewController = fromVC;
     }
     
@@ -63,9 +63,9 @@
         return [self dw_navigationTransition_popViewControllerAnimated:animated];
     }
 
+    fromVC.navigationController.dw_backgroundViewHidden = YES;
     [fromVC dw_addTransitionBarIfNeeded];
     if (fromVC.dw_transitionBar.superview) {
-        fromVC.navigationController.dw_backgroundViewHidden = YES;
         toVC.dw_transitioningViewController = fromVC;
     }
     
@@ -87,9 +87,9 @@
         return [self dw_navigationTransition_popToViewController:viewController animated:animated];
     }
     
+    fromVC.navigationController.dw_backgroundViewHidden = YES;
     [fromVC dw_addTransitionBarIfNeeded];
     if (fromVC.dw_transitionBar.superview) {
-        fromVC.navigationController.dw_backgroundViewHidden = YES;
         toVC.dw_transitioningViewController = fromVC;
     }
     
@@ -111,9 +111,9 @@
         return [self dw_navigationTransition_popToRootViewControllerAnimated:animated];
     }
     
+    fromVC.navigationController.dw_backgroundViewHidden = YES;
     [fromVC dw_addTransitionBarIfNeeded];
     if (fromVC.dw_transitionBar.superview) {
-        fromVC.navigationController.dw_backgroundViewHidden = YES;
         toVC.dw_transitioningViewController = fromVC;
     }
     
@@ -133,11 +133,10 @@
         return;
     }
     
+    fromVC.navigationController.dw_backgroundViewHidden = YES;
     [fromVC dw_addTransitionBarIfNeeded];
     if (fromVC.dw_transitionBar.superview) {
-        fromVC.navigationController.dw_backgroundViewHidden = YES;
         toVC.dw_transitioningViewController = fromVC;
-        
     }
     
     if (toVC.dw_userNavigationTransition) {
