@@ -10,6 +10,8 @@
 
 @interface UINavigationController (DWNavigationTransition)
 
+@property (nonatomic ,assign ,readonly) BOOL dw_useNavigationTransition;
+
 @property (nonatomic ,assign) BOOL dw_backgroundViewHidden;
 
 @end

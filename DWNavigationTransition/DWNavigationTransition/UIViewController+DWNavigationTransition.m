@@ -12,7 +12,7 @@
 #import "DWTransitionFunction.h"
 
 @implementation UIViewController (DWNavigationTransition)
-@dynamic dw_userNavigationTransition,dw_transitionBar,dw_statusStoreBar,dw_transitioningViewController;
+@dynamic dw_useNavigationTransition,dw_transitionBar,dw_statusStoreBar,dw_transitioningViewController;
 
 +(void)load {
     static dispatch_once_t onceToken;
@@ -25,7 +25,7 @@
 
 -(void)dw_navigationTransition_viewWillAppear:(BOOL)animated {
     [self dw_navigationTransition_viewWillAppear:animated];
-    if (self.dw_userNavigationTransition) {
+    if (self.dw_useNavigationTransition) {
         UIViewController *toVC = [self.transitionCoordinator viewControllerForKey:UITransitionContextToViewControllerKey];
         if (toVC && [self isEqual:toVC] && [self isEqual:self.navigationController.viewControllers.lastObject]) {
             ///调整contentInset，方便layout时计算
@@ -41,7 +41,7 @@
 }
 
 -(void)dw_navigationTransition_viewWillLayoutSubviews {
-    if (self.dw_userNavigationTransition) {
+    if (self.dw_useNavigationTransition) {
         UIViewController * toVC = [self.transitionCoordinator viewControllerForKey:UITransitionContextToViewControllerKey];
         if (toVC && [self isEqual:toVC] && [self isEqual:self.navigationController.viewControllers.lastObject]) {
             if (self.dw_isPushTransition) {
@@ -62,7 +62,7 @@
 }
 
 -(void)dw_navigationTransition_viewDidAppear:(BOOL)animated {
-    if (self.dw_userNavigationTransition) {
+    if (self.dw_useNavigationTransition) {
         [self dw_restoreScrollViewContentInsetAdjustmentBehaviorIfNeeded];
         [self dw_removeTransitionBarIfNeeded];
     }
@@ -79,7 +79,7 @@
 
 #pragma mark --- interface method ---
 -(void)dw_addTransitionBarIfNeeded {
-    if (!self.isViewLoaded || !self.view.window || !self.dw_userNavigationTransition || !self.navigationController.navigationBar || self.navigationController.navigationBar.isHidden) {
+    if (!self.isViewLoaded || !self.view.window || !self.dw_useNavigationTransition || !self.navigationController.navigationBar || self.navigationController.navigationBar.isHidden) {
         [self.dw_transitionBar removeFromSuperview];
         return;
     }
@@ -96,7 +96,7 @@
 }
 
 -(void)dw_restoreTransitionBarIfNeeded {
-    if (!self.isViewLoaded || !self.view.window || !self.dw_userNavigationTransition || !self.navigationController.navigationBar || self.navigationController.navigationBar.isHidden) {
+    if (!self.isViewLoaded || !self.view.window || !self.dw_useNavigationTransition || !self.navigationController.navigationBar || self.navigationController.navigationBar.isHidden) {
         [self.dw_transitionBar removeFromSuperview];
         return;
     }
@@ -201,17 +201,14 @@
 
 
 #pragma mark --- setter/getter ---
--(void)setDw_userNavigationTransition:(BOOL)dw_userNavigationTransition {
+-(void)setDw_useNavigationTransition:(BOOL)dw_useNavigationTransition {
     if ([self isKindOfClass:[UINavigationController class]] || [self isKindOfClass:[UITabBarController class]]) {
         return ;
     }
-    DWQuickSetAssociatedValue(@selector(dw_userNavigationTransition), @(dw_userNavigationTransition));
+    DWQuickSetAssociatedValue(@selector(dw_useNavigationTransition), @(dw_useNavigationTransition));
 }
 
--(BOOL)dw_userNavigationTransition {
-    if ([self isKindOfClass:[UINavigationController class]] || [self isKindOfClass:[UITabBarController class]]) {
-        return NO;
-    }
+-(BOOL)dw_useNavigationTransition {
     NSNumber * use = DWQuickGetAssociatedValue();
     if (!use) {
         use = @(YES);

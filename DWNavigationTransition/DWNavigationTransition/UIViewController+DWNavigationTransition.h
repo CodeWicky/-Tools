@@ -9,7 +9,7 @@
 
 @interface UIViewController (DWNavigationTransition)
 
-@property (nonatomic ,assign) BOOL dw_userNavigationTransition;
+@property (nonatomic ,assign) BOOL dw_useNavigationTransition;
 
 @property (nonatomic ,assign) BOOL dw_inTransition;
 

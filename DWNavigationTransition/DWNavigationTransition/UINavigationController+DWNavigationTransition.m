@@ -12,7 +12,7 @@
 #import "DWTransitionFunction.h"
 
 @implementation UINavigationController (DWNavigationTransition)
-@dynamic dw_backgroundViewHidden;
+@dynamic dw_useNavigationTransition,dw_backgroundViewHidden;
 
 +(void)load {
     static dispatch_once_t onceToken;
@@ -32,7 +32,7 @@
     }
     UIViewController * fromVC = self.viewControllers.lastObject;
     [fromVC.dw_statusStoreBar copyFromBar:self.navigationBar];
-    BOOL needTransition = fromVC.dw_userNavigationTransition || viewController.dw_userNavigationTransition;
+    BOOL needTransition = fromVC.dw_useNavigationTransition || viewController.dw_useNavigationTransition;
     if (!needTransition) {
         [self dw_navigationTransition_pushViewController:viewController animated:animated];
         return;
@@ -40,12 +40,13 @@
     
     fromVC.navigationController.dw_backgroundViewHidden = YES;
     viewController.dw_inTransition = YES;
+    
     [fromVC dw_addTransitionBarIfNeeded];
     if (fromVC.dw_transitionBar.superview) {
         viewController.dw_transitioningViewController = fromVC;
     }
     
-    if (viewController.dw_userNavigationTransition) {
+    if (viewController.dw_useNavigationTransition) {
         viewController.dw_isPushTransition = YES;
     }
 
@@ -59,19 +60,20 @@
 
     UIViewController * fromVC = self.viewControllers.lastObject;
     UIViewController * toVC = self.viewControllers[self.viewControllers.count - 2];
-    BOOL needTransition = fromVC.dw_userNavigationTransition || toVC.dw_userNavigationTransition;
+    BOOL needTransition = fromVC.dw_useNavigationTransition || toVC.dw_useNavigationTransition;
     if (!needTransition) {
         return [self dw_navigationTransition_popViewControllerAnimated:animated];
     }
 
     fromVC.navigationController.dw_backgroundViewHidden = YES;
     toVC.dw_inTransition = YES;
+    
     [fromVC dw_addTransitionBarIfNeeded];
     if (fromVC.dw_transitionBar.superview) {
         toVC.dw_transitioningViewController = fromVC;
     }
     
-    if (toVC.dw_userNavigationTransition) {
+    if (toVC.dw_useNavigationTransition) {
         toVC.dw_isPopTransition = YES;
     }
     
@@ -84,19 +86,20 @@
     }
     UIViewController * fromVC = self.viewControllers.lastObject;
     UIViewController * toVC = viewController;
-    BOOL needTransition = fromVC.dw_userNavigationTransition || toVC.dw_userNavigationTransition;
+    BOOL needTransition = fromVC.dw_useNavigationTransition || toVC.dw_useNavigationTransition;
     if (!needTransition) {
         return [self dw_navigationTransition_popToViewController:viewController animated:animated];
     }
     
     fromVC.navigationController.dw_backgroundViewHidden = YES;
     toVC.dw_inTransition = YES;
+    
     [fromVC dw_addTransitionBarIfNeeded];
     if (fromVC.dw_transitionBar.superview) {
         toVC.dw_transitioningViewController = fromVC;
     }
     
-    if (toVC.dw_userNavigationTransition) {
+    if (toVC.dw_useNavigationTransition) {
         toVC.dw_isPopTransition = YES;
     }
     
@@ -109,19 +112,20 @@
     }
     UIViewController * fromVC = self.viewControllers.lastObject;
     UIViewController * toVC = self.viewControllers.firstObject;
-    BOOL needTransition = fromVC.dw_userNavigationTransition || toVC.dw_userNavigationTransition;
+    BOOL needTransition = fromVC.dw_useNavigationTransition || toVC.dw_useNavigationTransition;
     if (!needTransition) {
         return [self dw_navigationTransition_popToRootViewControllerAnimated:animated];
     }
     
     fromVC.navigationController.dw_backgroundViewHidden = YES;
     toVC.dw_inTransition = YES;
+    
     [fromVC dw_addTransitionBarIfNeeded];
     if (fromVC.dw_transitionBar.superview) {
         toVC.dw_transitioningViewController = fromVC;
     }
     
-    if (toVC.dw_userNavigationTransition) {
+    if (toVC.dw_useNavigationTransition) {
         toVC.dw_isPopTransition = YES;
     }
     
@@ -131,7 +135,7 @@
 -(void)dw_navigationTransition_setViewControllers:(NSArray<UIViewController *> *)viewControllers animated:(BOOL)animated {
     UIViewController * fromVC = self.viewControllers.lastObject;
     UIViewController * toVC = viewControllers.lastObject;
-    BOOL needTransition = fromVC.dw_userNavigationTransition || toVC.dw_userNavigationTransition;
+    BOOL needTransition = fromVC.dw_useNavigationTransition || toVC.dw_useNavigationTransition;
     if (!needTransition) {
         [self dw_navigationTransition_setViewControllers:viewControllers animated:animated];
         return;
@@ -139,16 +143,22 @@
     
     fromVC.navigationController.dw_backgroundViewHidden = YES;
     toVC.dw_inTransition = YES;
+    
     [fromVC dw_addTransitionBarIfNeeded];
     if (fromVC.dw_transitionBar.superview) {
         toVC.dw_transitioningViewController = fromVC;
     }
     
-    if (toVC.dw_userNavigationTransition) {
+    if (toVC.dw_useNavigationTransition) {
         toVC.dw_isPopTransition = YES;
     }
     
     [self dw_navigationTransition_setViewControllers:viewControllers animated:animated];
+}
+
+#pragma mark --- setter/getter ---
+-(BOOL)dw_useNavigationTransition {
+    return self.topViewController.dw_useNavigationTransition;
 }
 
 -(void)setDw_backgroundViewHidden:(BOOL)dw_backgroundViewHidden {
