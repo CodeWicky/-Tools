@@ -64,6 +64,9 @@ typedef void(^DWCustomTransitionHandler)(DWTransition * transition,id <UIViewCon
 ///DWTransition can provide an easy to customsize push/present transition.
 @interface DWTransition : NSObject<UIViewControllerAnimatedTransitioning>
 
+///The transition type for animation.
+@property (nonatomic ,assign ,readonly) DWTransitionType transitionType;
+
 ///Initialize with DWTransitionAnimationCustomType and provide customTransition in order to customsize the transition as you want.
 @property (nonatomic ,copy) DWCustomTransitionHandler customTransition;
 

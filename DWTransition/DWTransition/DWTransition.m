@@ -87,13 +87,6 @@
 
 @end
 
-
-@interface DWTransition ()
-
-@property (nonatomic ,assign) DWTransitionType transitionType;
-
-@end
-
 @implementation DWTransition
 
 static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTransparentTempView";
@@ -108,14 +101,19 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
 }
 
 +(instancetype)transitionWithType:(DWTransitionType)type duration:(CGFloat)duration customTransition:(DWCustomTransitionHandler)customTransition {
-    DWTransition * tran = [DWTransition new];
-    tran.transitionType = type;
-    tran.transitionDuration = duration;
-    tran.customTransition = customTransition;
-    return tran;
+    return [[self alloc] initWithType:type duration:duration customTransition:customTransition];
 }
 
 #pragma mark --- tool method ---
+-(instancetype)initWithType:(DWTransitionType)type duration:(CGFloat)duration customTransition:(DWCustomTransitionHandler)customTransition {
+    if (self = [super init]) {
+        _transitionType = type;
+        _transitionDuration = duration;
+        _customTransition = customTransition;
+    }
+    return self;
+}
+
 -(void)pushAnimationWithTransition:(id <UIViewControllerContextTransitioning>)transitionContext {
     UIViewController * fromVC = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
@@ -135,7 +133,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     CGRect toEnd = [transitionContext finalFrameForViewController:toVC];
     ///同上
     CGRect toStart = toEnd;
-    
+    CGFloat offsetFactor = 0.7;
     ///直接隐藏tabBar，tabBar动画交给截图去做，另外如果是Push时隐藏的，Pop时会自动回复，十分惊喜
     if (toVC.hidesBottomBarWhenPushed) {
         toVC.tabBarController.tabBar.hidden = YES;
@@ -151,7 +149,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         case DWTransitionAnimationMoveInFromLeftType:
         {
             toStart.origin.x = - toStart.size.width;
-            fromEnd.origin.x = fromEnd.size.width * 0.5;
+            fromEnd.origin.x = fromEnd.size.width * offsetFactor;
             toView.frame = toStart;
             fromView.frame = fromStart;
             toVC.navigationController.navigationBar.transform = CGAffineTransformMakeTranslation(- toEnd.size.width, 0);
@@ -168,7 +166,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         case DWTransitionAnimationMoveInFromTopType:
         {
             toStart.origin.y = - toStart.size.height;
-            fromEnd.origin.y = fromEnd.size.height * 0.5;
+            fromEnd.origin.y = fromEnd.size.height * offsetFactor;
             toView.frame = toStart;
             fromView.frame = fromStart;
             toVC.navigationController.navigationBar.transform = CGAffineTransformMakeTranslation(0, - toEnd.size.height);
@@ -185,7 +183,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         case DWTransitionAnimationMoveInFromBottomType:
         {
             toStart.origin.y = toStart.size.height;
-            fromEnd.origin.y = - fromEnd.size.height * 0.5;
+            fromEnd.origin.y = - fromEnd.size.height * offsetFactor;
             toView.frame = toStart;
             fromView.frame = fromStart;
             toVC.navigationController.navigationBar.transform = CGAffineTransformMakeTranslation(0, toEnd.size.height);
@@ -237,7 +235,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
         default:
         {
             toStart.origin.x = toStart.size.width;
-            fromEnd.origin.x = - fromEnd.size.width * 0.5;
+            fromEnd.origin.x = - fromEnd.size.width * offsetFactor;
             toView.frame = toStart;
             fromView.frame = fromStart;
             ///给navigationBar做transform，模拟系统push时navigationBar效果
@@ -269,7 +267,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     CGRect fromEnd = fromStart;
     CGRect toEnd = [transitionContext finalFrameForViewController:toVC];
     CGRect toStart = toEnd;
-    
+    CGFloat offsetFactor = 0.7;
     ///这里由于Pop回去是要展示之前的控制器的，若之前的是transParentPush进来的，转场图层中存在transparentPush进来时手动添加的fromView，他们位于toView之下。这里应该一起做动画，由于可能会有很多个图层，所以我们添加临时中间图层显示截图做动画即可。动画完成后要移除临时视图。（用这种看堆栈而不用直接找container.subviews的方式是应为如果是transparentPush->Push->transparentPush这样的形式，在pop回到第一层的时候，container中并没有先前的视图。）
     NSInteger index = [toVC.navigationController.viewControllers indexOfObject:toVC];
     UIImageView * middleImageView = nil;
@@ -312,7 +310,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationMoveInFromLeftType:
         {
-            toStart.origin.x = toStart.size.width * 0.5;
+            toStart.origin.x = toStart.size.width * offsetFactor;
             fromEnd.origin.x = - fromEnd.size.width;
             toView.frame = toStart;
             middleImageView.frame = toStart;
@@ -337,7 +335,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationMoveInFromTopType:
         {
-            toStart.origin.y = toStart.size.height * 0.5;
+            toStart.origin.y = toStart.size.height * offsetFactor;
             fromEnd.origin.y = - fromEnd.size.height;
             toView.frame = toStart;
             middleImageView.frame = toStart;
@@ -361,7 +359,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         case DWTransitionAnimationMoveInFromBottomType:
         {
-            toStart.origin.y = - toStart.size.height * 0.5;
+            toStart.origin.y = - toStart.size.height * offsetFactor;
             fromEnd.origin.y = fromEnd.size.height;
             toView.frame = toStart;
             middleImageView.frame = toStart;
@@ -434,7 +432,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             break;
         default:
         {
-            toStart.origin.x = - toStart.size.width * 0.5;
+            toStart.origin.x = - toStart.size.width * offsetFactor;
             fromEnd.origin.x = fromEnd.size.width;
             toView.frame = toStart;
             middleImageView.frame = toStart;

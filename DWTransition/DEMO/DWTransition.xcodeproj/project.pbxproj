@@ -15,6 +15,7 @@
 		9BCDC36D22DA18C40047F8E3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BCDC36C22DA18C40047F8E3 /* main.m */; };
 		9BCDC37622DA19110047F8E3 /* DWTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BCDC37522DA19110047F8E3 /* DWTransition.m */; };
 		9BCDC37922DA19240047F8E3 /* NavViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BCDC37822DA19240047F8E3 /* NavViewController.m */; };
+		9BEFBDB522E5938200A5FA7F /* DWTransitionPopInteraction.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BEFBDB422E5938200A5FA7F /* DWTransitionPopInteraction.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,8 @@
 		9BCDC37522DA19110047F8E3 /* DWTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWTransition.m; sourceTree = "<group>"; };
 		9BCDC37722DA19240047F8E3 /* NavViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NavViewController.h; sourceTree = "<group>"; };
 		9BCDC37822DA19240047F8E3 /* NavViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NavViewController.m; sourceTree = "<group>"; };
+		9BEFBDB322E5938200A5FA7F /* DWTransitionPopInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DWTransitionPopInteraction.h; sourceTree = "<group>"; };
+		9BEFBDB422E5938200A5FA7F /* DWTransitionPopInteraction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DWTransitionPopInteraction.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +88,8 @@
 			children = (
 				9BCDC37422DA19110047F8E3 /* DWTransition.h */,
 				9BCDC37522DA19110047F8E3 /* DWTransition.m */,
+				9BEFBDB322E5938200A5FA7F /* DWTransitionPopInteraction.h */,
+				9BEFBDB422E5938200A5FA7F /* DWTransitionPopInteraction.m */,
 			);
 			name = DWTransition;
 			path = ../../DWTransition;
@@ -160,6 +165,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9BEFBDB522E5938200A5FA7F /* DWTransitionPopInteraction.m in Sources */,
 				9BCDC36222DA18C20047F8E3 /* ViewController.m in Sources */,
 				9BCDC36D22DA18C40047F8E3 /* main.m in Sources */,
 				9BCDC35F22DA18C20047F8E3 /* AppDelegate.m in Sources */,
