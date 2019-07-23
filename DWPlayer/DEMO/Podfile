@@ -1,0 +1,3 @@
+target 'DWPlayer' do
+pod 'DWPlayer', :path => '../'
+end
