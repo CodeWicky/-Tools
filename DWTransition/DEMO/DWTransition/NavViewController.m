@@ -25,11 +25,14 @@
 }
 
 -(id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC {
-    if (operation == UINavigationControllerOperationPush) {
-        return [DWTransition transitionWithType:(DWTransitionPushType)];
-    } else {
-        return [DWTransition transitionWithType:(DWTransitionPopType | DWTransitionAnimationMoveInFromBottomType)];
+    if ([toVC conformsToProtocol:@protocol(DWTransitionProtocol)] && [toVC respondsToSelector:@selector(dw_pushAnimationType)]) {
+        if (operation == UINavigationControllerOperationPush) {
+            return [DWTransition transitionWithType:((id<DWTransitionProtocol>)toVC).dw_pushAnimationType];
+        } else {
+            return [DWTransition transitionWithType:(DWTransitionTransparentPopType | DWTransitionAnimationMoveInFromRightType)];
+        }
     }
+    return nil;
 }
 
 -(id<UIViewControllerInteractiveTransitioning>)navigationController:(UINavigationController *)navigationController interactionControllerForAnimationController:(id<UIViewControllerAnimatedTransitioning>)animationController {

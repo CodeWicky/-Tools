@@ -16,6 +16,7 @@
 		9BCDC37622DA19110047F8E3 /* DWTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BCDC37522DA19110047F8E3 /* DWTransition.m */; };
 		9BCDC37922DA19240047F8E3 /* NavViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BCDC37822DA19240047F8E3 /* NavViewController.m */; };
 		9BEFBDB522E5938200A5FA7F /* DWTransitionPopInteraction.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BEFBDB422E5938200A5FA7F /* DWTransitionPopInteraction.m */; };
+		9BF1904C22E711A2004507DF /* AlphaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF1904B22E711A2004507DF /* AlphaViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,8 @@
 		9BCDC37822DA19240047F8E3 /* NavViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NavViewController.m; sourceTree = "<group>"; };
 		9BEFBDB322E5938200A5FA7F /* DWTransitionPopInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DWTransitionPopInteraction.h; sourceTree = "<group>"; };
 		9BEFBDB422E5938200A5FA7F /* DWTransitionPopInteraction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DWTransitionPopInteraction.m; sourceTree = "<group>"; };
+		9BF1904A22E711A2004507DF /* AlphaViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlphaViewController.h; sourceTree = "<group>"; };
+		9BF1904B22E711A2004507DF /* AlphaViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlphaViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +75,8 @@
 				9BCDC35E22DA18C20047F8E3 /* AppDelegate.m */,
 				9BCDC36022DA18C20047F8E3 /* ViewController.h */,
 				9BCDC36122DA18C20047F8E3 /* ViewController.m */,
+				9BF1904A22E711A2004507DF /* AlphaViewController.h */,
+				9BF1904B22E711A2004507DF /* AlphaViewController.m */,
 				9BCDC36322DA18C20047F8E3 /* Main.storyboard */,
 				9BCDC36622DA18C40047F8E3 /* Assets.xcassets */,
 				9BCDC36822DA18C40047F8E3 /* LaunchScreen.storyboard */,
@@ -169,6 +174,7 @@
 				9BCDC36222DA18C20047F8E3 /* ViewController.m in Sources */,
 				9BCDC36D22DA18C40047F8E3 /* main.m in Sources */,
 				9BCDC35F22DA18C20047F8E3 /* AppDelegate.m in Sources */,
+				9BF1904C22E711A2004507DF /* AlphaViewController.m in Sources */,
 				9BCDC37622DA19110047F8E3 /* DWTransition.m in Sources */,
 				9BCDC37922DA19240047F8E3 /* NavViewController.m in Sources */,
 			);

@@ -133,7 +133,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     CGRect toEnd = [transitionContext finalFrameForViewController:toVC];
     ///同上
     CGRect toStart = toEnd;
-    CGFloat offsetFactor = 0.7;
+    CGFloat offsetFactor = 0.3;
     ///直接隐藏tabBar，tabBar动画交给截图去做，另外如果是Push时隐藏的，Pop时会自动回复，十分惊喜
     if (toVC.hidesBottomBarWhenPushed) {
         toVC.tabBarController.tabBar.hidden = YES;
@@ -267,7 +267,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     CGRect fromEnd = fromStart;
     CGRect toEnd = [transitionContext finalFrameForViewController:toVC];
     CGRect toStart = toEnd;
-    CGFloat offsetFactor = 0.7;
+    CGFloat offsetFactor = 0.3;
     ///这里由于Pop回去是要展示之前的控制器的，若之前的是transParentPush进来的，转场图层中存在transparentPush进来时手动添加的fromView，他们位于toView之下。这里应该一起做动画，由于可能会有很多个图层，所以我们添加临时中间图层显示截图做动画即可。动画完成后要移除临时视图。（用这种看堆栈而不用直接找container.subviews的方式是应为如果是transparentPush->Push->transparentPush这样的形式，在pop回到第一层的时候，container中并没有先前的视图。）
     NSInteger index = [toVC.navigationController.viewControllers indexOfObject:toVC];
     UIImageView * middleImageView = nil;
@@ -586,6 +586,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     CGRect fromEnd = fromStart;
     
     ///这里如果是transparentPop，有可能因为transparentPush的时候手动insert的Push的fromView而导致containerView中初始状态就多了很多其他的view。且Pop具有以此Pop多个控制器的方法，如PopToRoot。故先查找toView在container中的层级，然后把toView之后fromView之前的view全部从container中移除，并将他们绘制成一个图片，加载在一个在toView与fromView之间临时的imageView上。然后imageView跟随fromView一起做动画。并且在pop完成时，手动移除临时imageView即可。
+    BOOL toViewInContainer = NO;
     NSInteger index = [containerView.subviews indexOfObject:toView];
     if (index == NSNotFound) {
         ///如果视图层级中没有，则添加在底部，并且之上所有视图均为需要移除视图
@@ -594,6 +595,7 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     } else {
         ///如果有，则其角标之后一个即为需要移除视图
         ++ index;
+        toViewInContainer = YES;
     }
     
     ///添加临时图层，用来盛放即将移除的视图，然后对此时图做截图
@@ -606,10 +608,13 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
     }
     
     ///将截图添加到临时imageView中，并插入在fromView和toView之间
-    UIImageView * middleImageView = [[UIImageView alloc] initWithFrame:containerView.bounds];
-    middleImageView.image = [UIImage dw_transition_imageWithView:middleCtn];
-    [containerView insertSubview:middleImageView belowSubview:fromView];
-    
+    UIImageView * middleImageView = nil;
+    if (middleCtn.subviews.count) {
+        middleImageView = [[UIImageView alloc] initWithFrame:containerView.bounds];
+        middleImageView.image = [UIImage dw_transition_imageWithView:middleCtn];
+        [containerView insertSubview:middleImageView belowSubview:fromView];
+    }
+
     switch (self.transitionType & DWTransitionAnimationTypeMask) {
         case DWTransitionAnimationNoneType:
         {
@@ -637,9 +642,16 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             } completion:^(BOOL finished) {
                 BOOL cancelled = [transitionContext transitionWasCancelled];
                 [transitionContext completeTransition:!cancelled];
-                if (!cancelled) {
-                    ///并在动画完成时，移除临时图层
-                    [middleImageView removeFromSuperview];
+                ///动画完成时，移除临时图层
+                [middleImageView removeFromSuperview];
+                if (cancelled) {
+                    ///如果取消了，要恢复之前的图层
+                    if (toViewInContainer) {
+                        ///如果之前图层树中包含toView则把toView添加
+                        [containerView insertSubview:toView belowSubview:fromView];
+                    }
+                    ///将临时层的视图移回来
+                    [self moveSubviewsOfView:middleCtn toView:containerView belowView:fromView];
                 }
             }];
         }
@@ -660,8 +672,12 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             } completion:^(BOOL finished) {
                 BOOL cancelled = [transitionContext transitionWasCancelled];
                 [transitionContext completeTransition:!cancelled];
-                if (!cancelled) {
-                    [middleImageView removeFromSuperview];
+                [middleImageView removeFromSuperview];
+                if (cancelled) {
+                    if (toViewInContainer) {
+                        [containerView insertSubview:toView belowSubview:fromView];
+                    }
+                    [self moveSubviewsOfView:middleCtn toView:containerView belowView:fromView];
                 }
             }];
         }
@@ -682,8 +698,12 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             } completion:^(BOOL finished) {
                 BOOL cancelled = [transitionContext transitionWasCancelled];
                 [transitionContext completeTransition:!cancelled];
-                if (!cancelled) {
-                    [middleImageView removeFromSuperview];
+                [middleImageView removeFromSuperview];
+                if (cancelled) {
+                    if (toViewInContainer) {
+                        [containerView insertSubview:toView belowSubview:fromView];
+                    }
+                    [self moveSubviewsOfView:middleCtn toView:containerView belowView:fromView];
                 }
             }];
         }
@@ -703,8 +723,12 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             } completion:^(BOOL finished) {
                 BOOL cancelled = [transitionContext transitionWasCancelled];
                 [transitionContext completeTransition:!cancelled];
-                if (!cancelled) {
-                    [middleImageView removeFromSuperview];
+                [middleImageView removeFromSuperview];
+                if (cancelled) {
+                    if (toViewInContainer) {
+                        [containerView insertSubview:toView belowSubview:fromView];
+                    }
+                    [self moveSubviewsOfView:middleCtn toView:containerView belowView:fromView];
                 }
             }];
         }
@@ -724,8 +748,12 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             } completion:^(BOOL finished) {
                 BOOL cancelled = [transitionContext transitionWasCancelled];
                 [transitionContext completeTransition:!cancelled];
-                if (!cancelled) {
-                    [middleImageView removeFromSuperview];
+                [middleImageView removeFromSuperview];
+                if (cancelled) {
+                    if (toViewInContainer) {
+                        [containerView insertSubview:toView belowSubview:fromView];
+                    }
+                    [self moveSubviewsOfView:middleCtn toView:containerView belowView:fromView];
                 }
             }];
         }
@@ -756,8 +784,12 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             } completion:^(BOOL finished) {
                 BOOL cancelled = [transitionContext transitionWasCancelled];
                 [transitionContext completeTransition:!cancelled];
-                if (!cancelled) {
-                    [middleImageView removeFromSuperview];
+                [middleImageView removeFromSuperview];
+                if (cancelled) {
+                    if (toViewInContainer) {
+                        [containerView insertSubview:toView belowSubview:fromView];
+                    }
+                    [self moveSubviewsOfView:middleCtn toView:containerView belowView:fromView];
                 }
             }];
         }
@@ -942,6 +974,13 @@ static NSString * const kDWTransitionTransparentTempView = @"DWTransitionTranspa
             }];
         }
             break;
+    }
+}
+
+#pragma mark --- tool method ---
+-(void)moveSubviewsOfView:(UIView *)from toView:(UIView *)to belowView:(UIView *)below {
+    for (UIView * sub in from.subviews) {
+        [to insertSubview:sub belowSubview:below];
     }
 }
 
