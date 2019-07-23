@@ -9,5 +9,8 @@
 #ifndef DWPlayer_h
 #define DWPlayer_h
 
+#import "DWPlayerManager.h"
+#import "DWPlayerView.h"
+#import "DWPlayerViewController.h"
 
 #endif /* DWPlayer_h */

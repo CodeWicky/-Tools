@@ -6,20 +6,16 @@
 	objectVersion = 50;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		1C2DFFF2C4B54A30D817B1691965A10F /* DWPlayer */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = A192B4A6FDF1B0DDE0834486EFACB00F /* Build configuration list for PBXAggregateTarget "DWPlayer" */;
-			buildPhases = (
-			);
-			dependencies = (
-			);
-			name = DWPlayer;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
+		091AE16F0CEBBE15F4648647E25383E9 /* DWPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA78069BC3484BA6B9FAC105C074313A /* DWPlayerViewController.m */; };
+		5AD8E182D1F90B7D10F3DCC2747A7F06 /* DWPlayerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = ED105AFF25C209BAE66DD493C8916659 /* DWPlayerManager.m */; };
+		79570D681B25739890F0C7FE4CA998AA /* DWPlayerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 646AA0BD01705CC651586176E87D9427 /* DWPlayerManager.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		962EA0B61ED50E7769F6CAEE55D718F0 /* DWPlayer-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 27BD9D9D6CA0C85FA265D8CEE6A9BE42 /* DWPlayer-dummy.m */; };
 		9CEC8B7868F5546CF1B17C75482DEA13 /* Pods-DWPlayer-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D1BA9C5F185A436DE8776F00A5DD376 /* Pods-DWPlayer-dummy.m */; };
+		A0172CDF14CAAB2D18510C49274BEAB9 /* DWPlayerView.h in Headers */ = {isa = PBXBuildFile; fileRef = D8F0D289A30A73A4375D2B48488090AF /* DWPlayerView.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		BE60AFC6C447B254E2518F875D762187 /* DWPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 762EFD07B92A3A2C9287C1404FBE087D /* DWPlayerView.m */; };
+		DD3B7D8983A604AD3844232E35F4FA92 /* DWPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9445BD85F7CC03085ADEDF2C6BCD666D /* DWPlayer.h */; settings = {ATTRIBUTES = (Project, ); }; };
+		DE884E04DA5350F4175CC103F158B0AE /* DWPlayerViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = FCF50BF2BD156DC17BAFC81ED8039D22 /* DWPlayerViewController.h */; settings = {ATTRIBUTES = (Project, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,20 +30,36 @@
 
 /* Begin PBXFileReference section */
 		1C650F1AC555393E6F84D65E90F1711E /* Pods-DWPlayer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DWPlayer.release.xcconfig"; sourceTree = "<group>"; };
-		1FB64FB0EE145E42AF262775FD123C77 /* DWPlayer.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = DWPlayer.xcconfig; sourceTree = "<group>"; };
+		27BD9D9D6CA0C85FA265D8CEE6A9BE42 /* DWPlayer-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "DWPlayer-dummy.m"; sourceTree = "<group>"; };
+		2FE4CF7D9DD77BE16049A6784A3CE8EA /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+		57227DA1FF6898D9D0DA08B3158CBD19 /* libDWPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libDWPlayer.a; path = libDWPlayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D1BA9C5F185A436DE8776F00A5DD376 /* Pods-DWPlayer-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-DWPlayer-dummy.m"; sourceTree = "<group>"; };
+		5D8632400D17268D685963D950C4BB65 /* DWPlayer-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DWPlayer-prefix.pch"; sourceTree = "<group>"; };
+		646AA0BD01705CC651586176E87D9427 /* DWPlayerManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DWPlayerManager.h; path = DWPlayer/DWPlayerManager.h; sourceTree = "<group>"; };
 		67CA3BF0CB4755D4671EFB65457A09CC /* Pods-DWPlayer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DWPlayer.debug.xcconfig"; sourceTree = "<group>"; };
+		70F23415696B0B00D964FA31975A32C0 /* DWPlayer.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = DWPlayer.xcconfig; sourceTree = "<group>"; };
+		762EFD07B92A3A2C9287C1404FBE087D /* DWPlayerView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = DWPlayerView.m; path = DWPlayer/DWPlayerView.m; sourceTree = "<group>"; };
+		77DD33C8C840700F0FCB168018003C7A /* DWPlayer.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = DWPlayer.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		8C2C8B813E81A6E98AC6D58B48D35F11 /* Pods-DWPlayer-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-DWPlayer-acknowledgements.markdown"; sourceTree = "<group>"; };
-		9699E95E14A6DE1C50E8A2F1B1A72D87 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE; sourceTree = "<group>"; };
-		9ACCF5DF3A0FCC098ABF04D5C227B8FA /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+		9445BD85F7CC03085ADEDF2C6BCD666D /* DWPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DWPlayer.h; path = DWPlayer/DWPlayer.h; sourceTree = "<group>"; };
 		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		B073754AA84327AA273B0FDD287B3D81 /* DWPlayer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DWPlayer.h; path = DWPlayer/DWPlayer.h; sourceTree = "<group>"; };
+		9F46543EA49BC875B66D0E81C1B7FF57 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE; sourceTree = "<group>"; };
 		B5519902F5DA84C392A52F7965FB8A88 /* Pods-DWPlayer-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-DWPlayer-acknowledgements.plist"; sourceTree = "<group>"; };
 		BBC50044EFCD4DAFA38D97ED527B907F /* libPods-DWPlayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-DWPlayer.a"; path = "libPods-DWPlayer.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D5C67F3D9C2FCCEFD0BE87C682903368 /* DWPlayer.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = DWPlayer.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		CA78069BC3484BA6B9FAC105C074313A /* DWPlayerViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = DWPlayerViewController.m; path = DWPlayer/DWPlayerViewController.m; sourceTree = "<group>"; };
+		D8F0D289A30A73A4375D2B48488090AF /* DWPlayerView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DWPlayerView.h; path = DWPlayer/DWPlayerView.h; sourceTree = "<group>"; };
+		ED105AFF25C209BAE66DD493C8916659 /* DWPlayerManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = DWPlayerManager.m; path = DWPlayer/DWPlayerManager.m; sourceTree = "<group>"; };
+		FCF50BF2BD156DC17BAFC81ED8039D22 /* DWPlayerViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DWPlayerViewController.h; path = DWPlayer/DWPlayerViewController.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		015153E5D2176E4EB3C9219980C0494F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		30F7F7077CC070EFCBA9CE43A79CBB1A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -58,20 +70,56 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0C80282EFF4046777A7D12ABB1369206 /* Products */ = {
+		1E569D9C141E729A0178E59CF500EFC7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				57227DA1FF6898D9D0DA08B3158CBD19 /* libDWPlayer.a */,
 				BBC50044EFCD4DAFA38D97ED527B907F /* libPods-DWPlayer.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		1CAF638F427010743C83CC17F3C89B07 /* DWPlayer */ = {
+		1F8D9400C213075D546E3CB7265D791F /* Pod */ = {
 			isa = PBXGroup;
 			children = (
-				B073754AA84327AA273B0FDD287B3D81 /* DWPlayer.h */,
-				87609D048EBE06068A0B794C8B900F72 /* Pod */,
-				CD7298933F4764771E9D4FAD28255151 /* Support Files */,
+				77DD33C8C840700F0FCB168018003C7A /* DWPlayer.podspec */,
+				9F46543EA49BC875B66D0E81C1B7FF57 /* LICENSE */,
+				2FE4CF7D9DD77BE16049A6784A3CE8EA /* README.md */,
+			);
+			name = Pod;
+			sourceTree = "<group>";
+		};
+		2C2BAFDE2926ADACCC15CBCA3F269B17 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				70F23415696B0B00D964FA31975A32C0 /* DWPlayer.xcconfig */,
+				27BD9D9D6CA0C85FA265D8CEE6A9BE42 /* DWPlayer-dummy.m */,
+				5D8632400D17268D685963D950C4BB65 /* DWPlayer-prefix.pch */,
+			);
+			name = "Support Files";
+			path = "DEMO/Pods/Target Support Files/DWPlayer";
+			sourceTree = "<group>";
+		};
+		5846900C0CB6809E2BFC8474F1F93E78 /* Development Pods */ = {
+			isa = PBXGroup;
+			children = (
+				78413D66F183FF104A9A9D8BB7BFFC62 /* DWPlayer */,
+			);
+			name = "Development Pods";
+			sourceTree = "<group>";
+		};
+		78413D66F183FF104A9A9D8BB7BFFC62 /* DWPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				9445BD85F7CC03085ADEDF2C6BCD666D /* DWPlayer.h */,
+				646AA0BD01705CC651586176E87D9427 /* DWPlayerManager.h */,
+				ED105AFF25C209BAE66DD493C8916659 /* DWPlayerManager.m */,
+				D8F0D289A30A73A4375D2B48488090AF /* DWPlayerView.h */,
+				762EFD07B92A3A2C9287C1404FBE087D /* DWPlayerView.m */,
+				FCF50BF2BD156DC17BAFC81ED8039D22 /* DWPlayerViewController.h */,
+				CA78069BC3484BA6B9FAC105C074313A /* DWPlayerViewController.m */,
+				1F8D9400C213075D546E3CB7265D791F /* Pod */,
+				2C2BAFDE2926ADACCC15CBCA3F269B17 /* Support Files */,
 			);
 			name = DWPlayer;
 			path = ../..;
@@ -83,16 +131,6 @@
 				8F3DC67E19017EDADF7AA6FF5CB6BA4F /* Pods-DWPlayer */,
 			);
 			name = "Targets Support Files";
-			sourceTree = "<group>";
-		};
-		87609D048EBE06068A0B794C8B900F72 /* Pod */ = {
-			isa = PBXGroup;
-			children = (
-				D5C67F3D9C2FCCEFD0BE87C682903368 /* DWPlayer.podspec */,
-				9699E95E14A6DE1C50E8A2F1B1A72D87 /* LICENSE */,
-				9ACCF5DF3A0FCC098ABF04D5C227B8FA /* README.md */,
-			);
-			name = Pod;
 			sourceTree = "<group>";
 		};
 		8F3DC67E19017EDADF7AA6FF5CB6BA4F /* Pods-DWPlayer */ = {
@@ -108,30 +146,13 @@
 			path = "Target Support Files/Pods-DWPlayer";
 			sourceTree = "<group>";
 		};
-		CA4F6D5E1B14DC0F9BD2BE2FE9487537 /* Development Pods */ = {
-			isa = PBXGroup;
-			children = (
-				1CAF638F427010743C83CC17F3C89B07 /* DWPlayer */,
-			);
-			name = "Development Pods";
-			sourceTree = "<group>";
-		};
-		CD7298933F4764771E9D4FAD28255151 /* Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				1FB64FB0EE145E42AF262775FD123C77 /* DWPlayer.xcconfig */,
-			);
-			name = "Support Files";
-			path = "DEMO/Pods/Target Support Files/DWPlayer";
-			sourceTree = "<group>";
-		};
 		CF1408CF629C7361332E53B88F7BD30C = {
 			isa = PBXGroup;
 			children = (
 				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
-				CA4F6D5E1B14DC0F9BD2BE2FE9487537 /* Development Pods */,
+				5846900C0CB6809E2BFC8474F1F93E78 /* Development Pods */,
 				D89477F20FB1DE18A04690586D7808C4 /* Frameworks */,
-				0C80282EFF4046777A7D12ABB1369206 /* Products */,
+				1E569D9C141E729A0178E59CF500EFC7 /* Products */,
 				78CE541EC5F9C934D176A90CF35252D4 /* Targets Support Files */,
 			);
 			sourceTree = "<group>";
@@ -153,9 +174,37 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3DB157E2586A64E07E68BF2FC54C0EDD /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD3B7D8983A604AD3844232E35F4FA92 /* DWPlayer.h in Headers */,
+				79570D681B25739890F0C7FE4CA998AA /* DWPlayerManager.h in Headers */,
+				A0172CDF14CAAB2D18510C49274BEAB9 /* DWPlayerView.h in Headers */,
+				DE884E04DA5350F4175CC103F158B0AE /* DWPlayerViewController.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		1C2DFFF2C4B54A30D817B1691965A10F /* DWPlayer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9D591F25C4BACFCDF5102C5880A6C1D0 /* Build configuration list for PBXNativeTarget "DWPlayer" */;
+			buildPhases = (
+				3DB157E2586A64E07E68BF2FC54C0EDD /* Headers */,
+				A22B53F3437143492CAF1A731AFF38EB /* Sources */,
+				015153E5D2176E4EB3C9219980C0494F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DWPlayer;
+			productName = DWPlayer;
+			productReference = 57227DA1FF6898D9D0DA08B3158CBD19 /* libDWPlayer.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		6366F498F198308DEC5685B994B8CE8A /* Pods-DWPlayer */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2E29CD6D894DFFA05D86448E46307A93 /* Build configuration list for PBXNativeTarget "Pods-DWPlayer" */;
@@ -191,7 +240,7 @@
 				en,
 			);
 			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
-			productRefGroup = 0C80282EFF4046777A7D12ABB1369206 /* Products */;
+			productRefGroup = 1E569D9C141E729A0178E59CF500EFC7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -207,6 +256,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				9CEC8B7868F5546CF1B17C75482DEA13 /* Pods-DWPlayer-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A22B53F3437143492CAF1A731AFF38EB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				962EA0B61ED50E7769F6CAEE55D718F0 /* DWPlayer-dummy.m in Sources */,
+				5AD8E182D1F90B7D10F3DCC2747A7F06 /* DWPlayerManager.m in Sources */,
+				BE60AFC6C447B254E2518F875D762187 /* DWPlayerView.m in Sources */,
+				091AE16F0CEBBE15F4648647E25383E9 /* DWPlayerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -346,18 +406,25 @@
 			};
 			name = Release;
 		};
-		6E9B1DFB21CBCC8D93F75E2579FB469E /* Debug */ = {
+		3D6F4445086300B0447B35E40DCBB1C4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1FB64FB0EE145E42AF262775FD123C77 /* DWPlayer.xcconfig */;
+			baseConfigurationReference = 70F23415696B0B00D964FA31975A32C0 /* DWPlayer.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/DWPlayer/DWPlayer-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = DWPlayer;
+				PRODUCT_NAME = DWPlayer;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -384,18 +451,25 @@
 			};
 			name = Debug;
 		};
-		E910C58096024CA53777251C4BF5B8C4 /* Release */ = {
+		CE0D6DE8096B23600495E8D69D87D8CC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1FB64FB0EE145E42AF262775FD123C77 /* DWPlayer.xcconfig */;
+			baseConfigurationReference = 70F23415696B0B00D964FA31975A32C0 /* DWPlayer.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/DWPlayer/DWPlayer-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = DWPlayer;
+				PRODUCT_NAME = DWPlayer;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -445,11 +519,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A192B4A6FDF1B0DDE0834486EFACB00F /* Build configuration list for PBXAggregateTarget "DWPlayer" */ = {
+		9D591F25C4BACFCDF5102C5880A6C1D0 /* Build configuration list for PBXNativeTarget "DWPlayer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				6E9B1DFB21CBCC8D93F75E2579FB469E /* Debug */,
-				E910C58096024CA53777251C4BF5B8C4 /* Release */,
+				3D6F4445086300B0447B35E40DCBB1C4 /* Debug */,
+				CE0D6DE8096B23600495E8D69D87D8CC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

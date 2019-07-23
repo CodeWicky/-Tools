@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1C2DFFF2C4B54A30D817B1691965A10F"
-               BuildableName = "DWPlayer"
+               BuildableName = "libDWPlayer.a"
                BlueprintName = "DWPlayer"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>

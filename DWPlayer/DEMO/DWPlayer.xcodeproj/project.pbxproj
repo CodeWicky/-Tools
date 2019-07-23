@@ -14,7 +14,7 @@
 		9B73C5DA22E7523D00CEC24E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B73C5D922E7523D00CEC24E /* Assets.xcassets */; };
 		9B73C5DD22E7523D00CEC24E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B73C5DB22E7523D00CEC24E /* LaunchScreen.storyboard */; };
 		9B73C5E022E7523D00CEC24E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B73C5DF22E7523D00CEC24E /* main.m */; };
-		9B73C5E922E7539600CEC24E /* DWPlayerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B73C5E822E7539600CEC24E /* DWPlayerManager.m */; };
+		9B73C5F122E762F400CEC24E /* video4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 9B73C5ED22E7611000CEC24E /* video4.mp4 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,8 +30,7 @@
 		9B73C5DC22E7523D00CEC24E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9B73C5DE22E7523D00CEC24E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9B73C5DF22E7523D00CEC24E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		9B73C5E722E7539600CEC24E /* DWPlayerManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DWPlayerManager.h; sourceTree = "<group>"; };
-		9B73C5E822E7539600CEC24E /* DWPlayerManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DWPlayerManager.m; sourceTree = "<group>"; };
+		9B73C5ED22E7611000CEC24E /* video4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = video4.mp4; sourceTree = "<group>"; };
 		EFC1E48180DAAC94BED2D6FB /* Pods-DWPlayer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DWPlayer.release.xcconfig"; path = "Target Support Files/Pods-DWPlayer/Pods-DWPlayer.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -68,6 +67,7 @@
 		9B73C5CF22E7523B00CEC24E /* DWPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				9B73C5ED22E7611000CEC24E /* video4.mp4 */,
 				9B73C5D022E7523B00CEC24E /* AppDelegate.h */,
 				9B73C5D122E7523B00CEC24E /* AppDelegate.m */,
 				9B73C5D322E7523B00CEC24E /* ViewController.h */,
@@ -77,8 +77,6 @@
 				9B73C5DB22E7523D00CEC24E /* LaunchScreen.storyboard */,
 				9B73C5DE22E7523D00CEC24E /* Info.plist */,
 				9B73C5DF22E7523D00CEC24E /* main.m */,
-				9B73C5E722E7539600CEC24E /* DWPlayerManager.h */,
-				9B73C5E822E7539600CEC24E /* DWPlayerManager.m */,
 			);
 			path = DWPlayer;
 			sourceTree = "<group>";
@@ -158,6 +156,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B73C5F122E762F400CEC24E /* video4.mp4 in Resources */,
 				9B73C5DD22E7523D00CEC24E /* LaunchScreen.storyboard in Resources */,
 				9B73C5DA22E7523D00CEC24E /* Assets.xcassets in Resources */,
 				9B73C5D822E7523B00CEC24E /* Main.storyboard in Resources */,
@@ -199,7 +198,6 @@
 				9B73C5D522E7523B00CEC24E /* ViewController.m in Sources */,
 				9B73C5E022E7523D00CEC24E /* main.m in Sources */,
 				9B73C5D222E7523B00CEC24E /* AppDelegate.m in Sources */,
-				9B73C5E922E7539600CEC24E /* DWPlayerManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
