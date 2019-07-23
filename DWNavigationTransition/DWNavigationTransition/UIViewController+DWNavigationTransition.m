@@ -66,14 +66,34 @@
         [self dw_restoreScrollViewContentInsetAdjustmentBehaviorIfNeeded];
         [self dw_removeTransitionBarIfNeeded];
     }
-    if (self.dw_transitioningViewController) {
-        [self.dw_transitioningViewController dw_removeTransitionBarIfNeeded];
-        self.dw_transitioningViewController = nil;
+    
+    ///didAppear中需要做两件事，1是移除两个临时添加的bar，另一个是恢复系统的bar。根据是否被取消，此处对应的操作不同。
+    if (self.transitionCoordinator.isCancelled) {
+        ///如果被取消了，则didAppear的是fromVC，此时我们应该移除toVC中临时加的bar
+        UIViewController * toVC = [self.transitionCoordinator viewControllerForKey:UITransitionContextToViewControllerKey];
+        [toVC dw_removeTransitionBarIfNeeded];
+        
+        ///inTransition标志位会记录在toVC中，所以根据该标志会恢复系统导航
+        if (toVC.dw_inTransition) {
+            toVC.navigationController.dw_backgroundViewHidden = NO;
+            toVC.dw_inTransition = NO;
+        }
+        
+    } else {
+        
+        ///正常情况下，toVC会didAppear。我们此时应该移除fromVC中的临时bar
+        if (self.dw_transitioningViewController) {
+            [self.dw_transitioningViewController dw_removeTransitionBarIfNeeded];
+            self.dw_transitioningViewController = nil;
+        }
+        
+        if (self.dw_inTransition) {
+            self.navigationController.dw_backgroundViewHidden = NO;
+            self.dw_inTransition = NO;
+        }
     }
-    if (self.dw_inTransition) {
-        self.navigationController.dw_backgroundViewHidden = NO;
-        self.dw_inTransition = NO;
-    }
+    
+    
     [self dw_navigationTransition_viewDidAppear:animated];
 }
 
