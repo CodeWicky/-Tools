@@ -31,7 +31,7 @@ typedef void(^ExceptionHandlerType)(NSException * exc);
 ///自定义崩溃如何处理
 +(void)configToCollectCrashWithSavePath:(NSString *)savePath handler:(ExceptionHandlerType)handler;
 
-///已默认行为（保存崩溃日志至指定路径）处理崩溃，当savePath为空时默认为Documents文件夹
+///已默认行为（保存崩溃日志至指定路径）处理崩溃，当savePath为空时默认为Cache/DWLogger文件夹
 +(void)collectCrashInDefaultWithSavePath:(NSString *)savePath;
 
 ///收集crash的默认行为
