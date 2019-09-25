@@ -37,9 +37,9 @@
  3.实例本身会持有target以防任务执行之前target被释放
  4.commit方法应配合+dw_TransactionWith...方法使用
 */
-+(instancetype)dw_TransactionWithCompletion:(dispatch_block_t)completion;
-+(instancetype)dw_TransactionWithTarget:(id)target selector:(SEL)selector;
-+(instancetype)dw_TransactionWithTarget:(id)target selector:(SEL)selector withObject:(id)object;
++(instancetype)transactionWithCompletion:(dispatch_block_t)completion;
++(instancetype)transactionWithTarget:(id)target selector:(SEL)selector;
++(instancetype)transactionWithTarget:(id)target selector:(SEL)selector withObject:(id)object;
 -(void)commit;
 
 @end
@@ -56,12 +56,12 @@
  4.实例本身会持有target以防任务执行之前target被释放
  5.run/cancel/cancelWithHandler方法应配合+dw_Wait...方法使用
  */
-+(instancetype)dw_WaitUtil:(NSTimeInterval)timeout completion:(dispatch_block_t)completion;
-+(instancetype)dw_WaitWithCompletion:(dispatch_block_t)completion;
-+(instancetype)dw_WaitUtil:(NSTimeInterval)timeout target:(id)target selector:(SEL)selector;
-+(instancetype)dw_WaitUtil:(NSTimeInterval)timeout target:(id)target selector:(SEL)selector object:(id)object;
-+(instancetype)dw_WaitWithTarget:(id)target selector:(SEL)selector;
-+(instancetype)dw_WaitWithTarget:(id)target selector:(SEL)selector object:(id)object;
++(instancetype)waitUtil:(NSTimeInterval)timeout completion:(dispatch_block_t)completion;
++(instancetype)waitWithCompletion:(dispatch_block_t)completion;
++(instancetype)waitUtil:(NSTimeInterval)timeout target:(id)target selector:(SEL)selector;
++(instancetype)waitUtil:(NSTimeInterval)timeout target:(id)target selector:(SEL)selector object:(id)object;
++(instancetype)waitWithTarget:(id)target selector:(SEL)selector;
++(instancetype)waitWithTarget:(id)target selector:(SEL)selector object:(id)object;
 -(void)run;
 -(void)cancel;
 -(void)cancelWithHandler:(dispatch_block_t)handler;
@@ -88,7 +88,7 @@
  2.计数器为0时自身的持有，此时若实例引用计数为零，在下一次runloop时实例将被释放。
  3. -addMissionCompletionHandler 可添加完成时的回调动作。
  */
-+(instancetype)dw_ConfigWithMissionCompletionHandler:(dispatch_block_t)completion;
++(instancetype)configWithMissionCompletionHandler:(dispatch_block_t)completion;
 -(void)addMissionCompletionHandler:(dispatch_block_t)completion;
 -(void)startAnMission;
 -(void)finishAnMission;

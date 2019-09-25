@@ -63,7 +63,7 @@ static inline void DWTransactionCallBack(CFRunLoopObserverRef observer, CFRunLoo
     }];
 }
 
-+(instancetype)dw_TransactionWithCompletion:(dispatch_block_t)completion {
++(instancetype)transactionWithCompletion:(dispatch_block_t)completion {
     if (!completion) {
         return nil;
     }
@@ -80,11 +80,11 @@ static inline void DWTransactionCallBack(CFRunLoopObserverRef observer, CFRunLoo
     }
 }
 
-+(instancetype)dw_TransactionWithTarget:(id)target selector:(SEL)selector {
-    return [self dw_TransactionWithTarget:target selector:selector withObject:nil];
++(instancetype)transactionWithTarget:(id)target selector:(SEL)selector {
+    return [self transactionWithTarget:target selector:selector withObject:nil];
 }
 
-+(instancetype)dw_TransactionWithTarget:(id)target selector:(SEL)selector withObject:(id)object {
++(instancetype)transactionWithTarget:(id)target selector:(SEL)selector withObject:(id)object {
     if (!target || !selector) {
         return nil;
     }
@@ -132,7 +132,7 @@ static inline void freeTransaction(DWTransaction * trans) {
 
 @implementation DWTransaction (Wait)
 
-+(instancetype)dw_WaitUtil:(NSTimeInterval)timeout completion:(dispatch_block_t)completion {
++(instancetype)waitUtil:(NSTimeInterval)timeout completion:(dispatch_block_t)completion {
     if (!completion) {
         return nil;
     }
@@ -157,15 +157,15 @@ static inline void freeTransaction(DWTransaction * trans) {
     self.op = op;
 }
 
-+(instancetype)dw_WaitWithCompletion:(dispatch_block_t)completion {
-    return [self dw_WaitUtil:-1 completion:completion];
++(instancetype)waitWithCompletion:(dispatch_block_t)completion {
+    return [self waitUtil:-1 completion:completion];
 }
 
-+(instancetype)dw_WaitUtil:(NSTimeInterval)timeout target:(id)target selector:(SEL)selector {
-    return [self dw_WaitUtil:timeout target:target selector:selector object:nil];
++(instancetype)waitUtil:(NSTimeInterval)timeout target:(id)target selector:(SEL)selector {
+    return [self waitUtil:timeout target:target selector:selector object:nil];
 }
 
-+(instancetype)dw_WaitUtil:(NSTimeInterval)timeout target:(id)target selector:(SEL)selector object:(id)object {
++(instancetype)waitUtil:(NSTimeInterval)timeout target:(id)target selector:(SEL)selector object:(id)object {
     if (!target || !selector) {
         return nil;
     }
@@ -175,19 +175,19 @@ static inline void freeTransaction(DWTransaction * trans) {
         [target performSelector:selector withObject:object];
 #pragma clang diagnostic pop
     };
-    DWTransaction * transaction = [DWTransaction dw_WaitUtil:timeout completion:ab];
+    DWTransaction * transaction = [DWTransaction waitUtil:timeout completion:ab];
     transaction.target = target;
     transaction.selector = selector;
     transaction.object = object;
     return transaction;
 }
 
-+(instancetype)dw_WaitWithTarget:(id)target selector:(SEL)selector {
-    return [self dw_WaitUtil:-1 target:target selector:selector];
++(instancetype)waitWithTarget:(id)target selector:(SEL)selector {
+    return [self waitUtil:-1 target:target selector:selector];
 }
 
-+(instancetype)dw_WaitWithTarget:(id)target selector:(SEL)selector object:(id)object {
-    return [self dw_WaitUtil:-1 target:target selector:selector object:object];
++(instancetype)waitWithTarget:(id)target selector:(SEL)selector object:(id)object {
+    return [self waitUtil:-1 target:target selector:selector object:object];
 }
 
 -(void)run {
@@ -219,7 +219,7 @@ static inline void freeTransaction(DWTransaction * trans) {
 
 @implementation DWTransaction (MissionComlpetion)
 
-+(instancetype)dw_ConfigWithMissionCompletionHandler:(dispatch_block_t)completion {
++(instancetype)configWithMissionCompletionHandler:(dispatch_block_t)completion {
     DWTransaction * t = [DWTransaction new];
     if (completion) {
         [t.completionHandlerContainer addObject:completion];
