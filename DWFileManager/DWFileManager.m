@@ -12,61 +12,61 @@
 
 @implementation DWFileManager
 
-+(NSString *)dw_HomeDir {
++(NSString *)homeDir {
     return NSHomeDirectory();
 }
 
-+(NSString *)dw_DocumentsDir {
++(NSString *)documentsDir {
     return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
 }
 
-+(NSString *)dw_LibraryDir {
++(NSString *)libraryDir {
     return [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) firstObject];
 }
 
-+(NSString *)dw_PreferencesDir {
-    return [[self dw_LibraryDir] stringByAppendingPathComponent:@"Preferences"];
++(NSString *)preferencesDir {
+    return [[self libraryDir] stringByAppendingPathComponent:@"Preferences"];
 }
 
-+(NSString *)dw_CachesDir {
++(NSString *)cachesDir {
     return [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
 }
 
-+(NSString *)dw_TmpDir {
++(NSString *)tmpDir {
     return NSTemporaryDirectory();
 }
 
-+(NSDictionary *)dw_AttributesOfItemAtPath:(NSString *)path error:(NSError *__autoreleasing *)error {
++(NSDictionary *)attributesOfItemAtPath:(NSString *)path error:(NSError *__autoreleasing *)error {
     return [DefaultFileManager attributesOfItemAtPath:path error:error];
 }
 
-+(NSDictionary *)dw_AttributesOfItemAtPath:(NSString *)path {
-    return [self dw_AttributesOfItemAtPath:path error:nil];
++(NSDictionary *)attributesOfItemAtPath:(NSString *)path {
+    return [self attributesOfItemAtPath:path error:nil];
 }
 
-+(id)dw_AttributeOfItemAtPath:(NSString *)path forKey:(NSString *)key error:(NSError *__autoreleasing *)error {
-    return [[self dw_AttributesOfItemAtPath:path error:error] objectForKey:key];
++(id)attributeOfItemAtPath:(NSString *)path forKey:(NSString *)key error:(NSError *__autoreleasing *)error {
+    return [[self attributesOfItemAtPath:path error:error] objectForKey:key];
 }
 
-+(id)dw_AttributeOfItemAtPath:(NSString *)path forKey:(NSString *)key {
-    return [self dw_AttributeOfItemAtPath:path forKey:key error:nil];
++(id)attributeOfItemAtPath:(NSString *)path forKey:(NSString *)key {
+    return [self attributeOfItemAtPath:path forKey:key error:nil];
 }
 
-+(BOOL)dw_IsDirectoryAtPath:(NSString *)path {
++(BOOL)isDirectoryAtPath:(NSString *)path {
     BOOL isDir = NO;
     BOOL exist = [DefaultFileManager fileExistsAtPath:path isDirectory:&isDir];
     return (exist && isDir);
 }
 
-+(BOOL)dw_IsFileAtPath:(NSString *)path {
++(BOOL)isFileAtPath:(NSString *)path {
     BOOL isDir = NO;
     BOOL exist = [DefaultFileManager fileExistsAtPath:path isDirectory:&isDir];
     return (exist && !isDir);
 }
 
-+(NSArray<DWFileManagerFile *> *)dw_ListFilesInDirectoryAtPath:(NSString *)path deep:(BOOL)deep {
++(NSArray<DWFileManagerFile *> *)listFilesInDirectoryAtPath:(NSString *)path deep:(BOOL)deep {
     if (deep) {///深遍历
-        return [self dw_ListFilesInDirectoryAtPath:path depth:1];
+        return [self listFilesInDirectoryAtPath:path depth:1];
     } else {///浅遍历
         NSMutableArray * arr = [NSMutableArray array];
         NSArray * files = [DefaultFileManager contentsOfDirectoryAtPath:path error:nil];
@@ -75,7 +75,7 @@
             DWFileManagerFile * fileIns = [DWFileManagerFile new];
             fileIns.fileName = file;
             fileIns.path = path;
-            if ([self dw_IsDirectoryAtPath:fullName]) {
+            if ([self isDirectoryAtPath:fullName]) {
                 fileIns.isFolder = YES;
             }
             [arr addObject:fileIns];
@@ -85,7 +85,7 @@
 }
 
 ///递归调用，深层遍历
-+(NSArray<DWFileManagerFile *> *)dw_ListFilesInDirectoryAtPath:(NSString *)path depth:(NSUInteger)depth {
++(NSArray<DWFileManagerFile *> *)listFilesInDirectoryAtPath:(NSString *)path depth:(NSUInteger)depth {
     NSMutableArray * arr = [NSMutableArray array];
     NSArray * files = [DefaultFileManager contentsOfDirectoryAtPath:path error:nil];
     for (NSString * file in files) {
@@ -94,79 +94,79 @@
         fileIns.fileName = file;
         fileIns.path = path;
         fileIns.depth = depth;
-        if ([self dw_IsDirectoryAtPath:fullName]) {
+        if ([self isDirectoryAtPath:fullName]) {
             fileIns.isFolder = YES;
             fileIns.showContent = YES;
-            fileIns.files = [self dw_ListFilesInDirectoryAtPath:fullName depth:depth + 1];
+            fileIns.files = [self listFilesInDirectoryAtPath:fullName depth:depth + 1];
         }
         [arr addObject:fileIns];
     }
     return arr;
 }
 
-+(BOOL)dw_CreateDirectoryAtPath:(NSString *)path {
-    return [self dw_CreateDirectoryAtPath:path error:nil];
++(BOOL)createDirectoryAtPath:(NSString *)path {
+    return [self createDirectoryAtPath:path error:nil];
 }
 
-+(BOOL)dw_CreateDirectoryAtPath:(NSString *)path error:(NSError *__autoreleasing *)error {
++(BOOL)createDirectoryAtPath:(NSString *)path error:(NSError *__autoreleasing *)error {
     return [DefaultFileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:error];
 }
 
-+(BOOL)dw_IsDirectoryIsEmptyAtPath:(NSString *)path {
-    if (![self dw_IsDirectoryAtPath:path]) {
++(BOOL)isDirectoryIsEmptyAtPath:(NSString *)path {
+    if (![self isDirectoryAtPath:path]) {
         return NO;
     }
-    return ([self dw_ListFilesInDirectoryAtPath:path deep:NO].count == 0);
+    return ([self listFilesInDirectoryAtPath:path deep:NO].count == 0);
 }
 
-+(BOOL)dw_RemoveItemAtPath:(NSString *)path {
++(BOOL)removeItemAtPath:(NSString *)path {
     return [DefaultFileManager removeItemAtPath:path error:nil];
 }
 
-+(BOOL)dw_ClearDirectoryAtPath:(NSString *)path {
-    NSArray *subFiles = [self dw_ListFilesInDirectoryAtPath:path deep:NO];
++(BOOL)clearDirectoryAtPath:(NSString *)path {
+    NSArray *subFiles = [self listFilesInDirectoryAtPath:path deep:NO];
     BOOL isSuccess = YES;
     for (DWFileManagerFile *file in subFiles) {
         NSString *absolutePath = [path stringByAppendingPathComponent:file.fileName];
-        isSuccess &= [self dw_RemoveItemAtPath:absolutePath];
+        isSuccess &= [self removeItemAtPath:absolutePath];
     }
     return isSuccess;
 }
 
-+(BOOL)dw_ClearCache {
-    return [self dw_ClearDirectoryAtPath:[self dw_CachesDir]];
++(BOOL)clearCache {
+    return [self clearDirectoryAtPath:[self cachesDir]];
 }
 
-+(BOOL)dw_ClearTmp {
-    return [self dw_ClearDirectoryAtPath:[self dw_TmpDir]];
++(BOOL)clearTmp {
+    return [self clearDirectoryAtPath:[self tmpDir]];
 }
 
-+(BOOL)dw_CreateFileAtPath:(NSString *)path content:(NSObject *)content overwrite:(BOOL)overwrite error:(NSError *__autoreleasing *)error {
-    if ([self dw_IsFileAtPath:path] && !overwrite) {
++(BOOL)createFileAtPath:(NSString *)path content:(NSObject *)content overwrite:(BOOL)overwrite error:(NSError *__autoreleasing *)error {
+    if ([self isFileAtPath:path] && !overwrite) {
         safeLinkError(error, [NSError errorWithDomain:@"Write File Error!" code:10001 userInfo:@{@"reason":@"attemp to write a file which is already exist."}]);
         return NO;
     }
     
-    if (![self dw_CreateDirectoryAtPath:[self dw_DirectoryPathAtPath:path] error:error]) {
+    if (![self createDirectoryAtPath:[self directoryPathAtPath:path] error:error]) {
         return NO;
     }
     BOOL isSuccess = [DefaultFileManager createFileAtPath:path contents:nil attributes:nil];
     if (content) {
-        [self dw_WriteFileAtPath:path content:content error:error];
+        [self writeFileAtPath:path content:content error:error];
     }
     return isSuccess;
 }
 
-+(BOOL)dw_CreateFileAtPath:(NSString *)path {
-    return [self dw_CreateFileAtPath:path content:nil overwrite:NO error:nil];
++(BOOL)createFileAtPath:(NSString *)path {
+    return [self createFileAtPath:path content:nil overwrite:NO error:nil];
 }
 
-+(BOOL)dw_WriteFileAtPath:(NSString *)path content:(NSObject *)content error:(NSError *__autoreleasing *)error {
++(BOOL)writeFileAtPath:(NSString *)path content:(NSObject *)content error:(NSError *__autoreleasing *)error {
     if (!content) {
         [NSException raise:@"非法的文件内容" format:@"文件内容不能为nil"];
         return NO;
     }
-    if ([self dw_IsFileAtPath:path]) {
+    if ([self isFileAtPath:path]) {
         if ([content isKindOfClass:[NSMutableArray class]]) {
             [(NSMutableArray *)content writeToFile:path atomically:YES];
         }else if ([content isKindOfClass:[NSArray class]]) {
@@ -200,36 +200,45 @@
     return YES;
 }
 
-+(BOOL)dw_CopyItemAtPath:(NSString *)path toPath:(NSString *)toPath overwrite:(BOOL)overwrite error:(NSError *__autoreleasing *)error {
-    if (![self dw_IsFileAtPath:path]) {
++(BOOL)copyItemAtPath:(NSString *)path toPath:(NSString *)toPath overwrite:(BOOL)overwrite error:(NSError *__autoreleasing *)error {
+    
+    if (![DefaultFileManager fileExistsAtPath:path isDirectory:nil]) {
         safeLinkError(error, [NSError errorWithDomain:@"Read File Error!" code:10002 userInfo:@{@"reason":[NSString stringWithFormat:@"file not exist at %@.",path]}]);
         return NO;
     }
-    if ([self dw_IsFileAtPath:toPath] && !overwrite) {
+    
+    if ([DefaultFileManager fileExistsAtPath:toPath isDirectory:nil] && !overwrite) {
         safeLinkError(error, [NSError errorWithDomain:@"Write File Error!" code:10001 userInfo:@{@"reason":@"attemp to write a file which is already exist."}]);
         return NO;
     }
-    if (![self dw_CreateDirectoryAtPath:toPath]) {
+    if (![self createDirectoryAtPath:[toPath stringByDeletingLastPathComponent]]) {
         safeLinkError(error, [NSError errorWithDomain:@"Write File Error!" code:10001 userInfo:@{@"reason":[NSString stringWithFormat:@"can not create folder at %@.",toPath]}]);
         return NO;
     }
     return [DefaultFileManager copyItemAtPath:path toPath:toPath error:error];
 }
 
-+(BOOL)dw_MoveItemAtPath:(NSString *)path toPath:(NSString *)toPath overwrite:(BOOL)overwrite error:(NSError *__autoreleasing *)error {
-    BOOL isSuccess = [self dw_CopyItemAtPath:path toPath:toPath overwrite:overwrite error:error];
-    if (!isSuccess) {
++(BOOL)moveItemAtPath:(NSString *)path toPath:(NSString *)toPath overwrite:(BOOL)overwrite error:(NSError *__autoreleasing *)error {
+    
+    if (![DefaultFileManager fileExistsAtPath:path isDirectory:nil]) {
+        safeLinkError(error, [NSError errorWithDomain:@"Read File Error!" code:10002 userInfo:@{@"reason":[NSString stringWithFormat:@"file not exist at %@.",path]}]);
         return NO;
     }
-    isSuccess = [self dw_RemoveItemAtPath:path];
-    if (!isSuccess) {
-        safeLinkError(error, [NSError errorWithDomain:@"Remove File Error!" code:10003 userInfo:@{@"reason":[NSString stringWithFormat:@"can not remove file at %@.",path]}]);
+    
+    if ([DefaultFileManager fileExistsAtPath:toPath isDirectory:nil] && !overwrite) {
+        safeLinkError(error, [NSError errorWithDomain:@"Write File Error!" code:10001 userInfo:@{@"reason":@"attemp to write a file which is already exist."}]);
         return NO;
     }
-    return YES;
+    
+    if (![self createDirectoryAtPath:[toPath stringByDeletingLastPathComponent]]) {
+        safeLinkError(error, [NSError errorWithDomain:@"Write File Error!" code:10001 userInfo:@{@"reason":[NSString stringWithFormat:@"can not create folder at %@.",toPath]}]);
+        return NO;
+    }
+    
+    return [DefaultFileManager moveItemAtPath:path toPath:toPath error:error];
 }
 
-+(NSString *)dw_FileNameAtPath:(NSString *)path extention:(BOOL)extention {
++(NSString *)fileNameAtPath:(NSString *)path extention:(BOOL)extention {
     path = [path lastPathComponent];
     if (!extention) {
         path = [path stringByDeletingPathExtension];
@@ -237,17 +246,17 @@
     return path;
 }
 
-+(NSString *)dw_DirectoryPathAtPath:(NSString *)path {
++(NSString *)directoryPathAtPath:(NSString *)path {
     return [path stringByDeletingLastPathComponent];
 }
 
-+(NSString *)dw_ExtentionAtPath:(NSString *)path {
++(NSString *)extentionAtPath:(NSString *)path {
     return [path pathExtension];
 }
 
-+ (NSNumber *)dw_SizeOfDirectoryAtPath:(NSString *)path {
-    if ([self dw_IsDirectoryAtPath:path]) {
-        NSArray *subPaths = [self dw_ListFilesInDirectoryAtPath:path deep:YES];
++ (NSNumber *)sizeOfDirectoryAtPath:(NSString *)path {
+    if ([self isDirectoryAtPath:path]) {
+        NSArray *subPaths = [self listFilesInDirectoryAtPath:path deep:YES];
         NSEnumerator *contentsEnumurator = [subPaths objectEnumerator];
         NSString *file;
         unsigned long long int folderSize = 0;
@@ -260,40 +269,40 @@
     return nil;
 }
 
-+(NSNumber *)dw_SizeOfFileAtPath:(NSString *)path {
-    if (![self dw_IsFileAtPath:path]) {
++(NSNumber *)sizeOfFileAtPath:(NSString *)path {
+    if (![self isFileAtPath:path]) {
         return nil;
     }
-    return (NSNumber *)[self dw_AttributeOfItemAtPath:path forKey:NSFileSize];
+    return (NSNumber *)[self attributeOfItemAtPath:path forKey:NSFileSize];
 }
 
-+(NSDate *)dw_CreationDateOfItemAtPath:(NSString *)path {
-    if (![self dw_IsFileAtPath:path] && ![self dw_IsDirectoryAtPath:path]) {
++(NSDate *)creationDateOfItemAtPath:(NSString *)path {
+    if (![self isFileAtPath:path] && ![self isDirectoryAtPath:path]) {
         return nil;
     }
-    return (NSDate *)[self dw_AttributeOfItemAtPath:path forKey:NSFileCreationDate error:nil];
+    return (NSDate *)[self attributeOfItemAtPath:path forKey:NSFileCreationDate error:nil];
 }
 
-+(NSDate *)dw_ModificationDateOfItemAtPath:(NSString *)path {
-    if (![self dw_IsFileAtPath:path] && ![self dw_IsDirectoryAtPath:path]) {
++(NSDate *)modificationDateOfItemAtPath:(NSString *)path {
+    if (![self isFileAtPath:path] && ![self isDirectoryAtPath:path]) {
         return nil;
     }
-    return (NSDate *)[self dw_AttributeOfItemAtPath:path forKey:NSFileModificationDate error:nil];
+    return (NSDate *)[self attributeOfItemAtPath:path forKey:NSFileModificationDate error:nil];
 }
 
-+(BOOL)dw_IsExecutableItemAtPath:(NSString *)path {
++(BOOL)isExecutableItemAtPath:(NSString *)path {
     return [DefaultFileManager isExecutableFileAtPath:path];
 }
 
-+(BOOL)dw_IsReadableItemAtPath:(NSString *)path {
++(BOOL)isReadableItemAtPath:(NSString *)path {
     return [DefaultFileManager isReadableFileAtPath:path];
 }
 
-+(BOOL)dw_IsWritableItemAtPath:(NSString *)path {
++(BOOL)isWritableItemAtPath:(NSString *)path {
     return [DefaultFileManager isWritableFileAtPath:path];
 }
 
-+(NSString *)dw_MimeTypeForFile:(NSString *)fileName {
++(NSString *)mimeTypeForFile:(NSString *)fileName {
     if (![fileName pathExtension]) {
         return nil;
     }
@@ -306,6 +315,7 @@
     return fileType;
 }
 
+#pragma mark --- tool method & function ---
 static NSDictionary * fileType4ExtensionMap() {
     static NSDictionary * map = nil;
     static dispatch_once_t onceToken;
@@ -515,7 +525,7 @@ static NSDictionary * fileType4ExtensionMap() {
     return map;
 }
 
-static inline void safeLinkError(NSError * __autoreleasing * error ,NSError * error2Link) {
+NS_INLINE void safeLinkError(NSError * __autoreleasing * error ,NSError * error2Link) {
     if (error != NULL) {
         *error = error2Link;
     }
@@ -555,4 +565,3 @@ static inline void safeLinkError(NSError * __autoreleasing * error ,NSError * er
 }
 
 @end
-
