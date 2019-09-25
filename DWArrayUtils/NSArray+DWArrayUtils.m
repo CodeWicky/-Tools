@@ -10,7 +10,7 @@
 
 @implementation NSArray (DWArrayFilterUtils)
 
--(NSArray *)dw_FilteredArrayUsingFilter:(DWFilter)filter {
+-(NSArray *)dw_filteredArrayUsingFilter:(DWFilter)filter {
     NSMutableArray * array = [NSMutableArray array];
     filterArr(self,array,filter);
     return array.copy;
@@ -29,7 +29,7 @@ static inline void filterArr (NSArray * oriArr,NSMutableArray * desArr,DWFilter 
 
 @implementation NSMutableArray (DWArrayFilterUtils)
 
--(void)dw_FilterUsingFilter:(DWFilter)filter {
+-(void)dw_filterUsingFilter:(DWFilter)filter {
     NSArray * array = [NSArray arrayWithArray:self];
     [self removeAllObjects];
     filterArr(array, self, filter);
@@ -39,7 +39,7 @@ static inline void filterArr (NSArray * oriArr,NSMutableArray * desArr,DWFilter 
 
 @implementation NSArray (DWArrayCollectionUtils)
 
--(NSArray *)dw_ComplementaryArrayWithArr:(NSArray *)arr usingEqualBlock:(BOOL (^)(id,id))block
+-(NSArray *)dw_complementaryArrayWithArr:(NSArray *)arr usingEqualBlock:(BOOL (^)(id,id))block
 {
     NSMutableArray * array = [NSMutableArray array];
     [self enumerateObjectsUsingBlock:^(id  _Nonnull obj1, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -57,12 +57,12 @@ static inline void filterArr (NSArray * oriArr,NSMutableArray * desArr,DWFilter 
     return array.copy;
 }
 
--(NSArray *)dw_ComplementaryArrayFromArr:(NSArray *)arr usingEqualBlock:(BOOL (^)(id,id))block
+-(NSArray *)dw_complementaryArrayFromArr:(NSArray *)arr usingEqualBlock:(BOOL (^)(id,id))block
 {
-    return [arr dw_ComplementaryArrayWithArr:self usingEqualBlock:block];
+    return [arr dw_complementaryArrayWithArr:self usingEqualBlock:block];
 }
 
--(NSArray *)dw_SplitArrayByCapacity:(NSUInteger)capacity
+-(NSArray *)dw_splitArrayByCapacity:(NSUInteger)capacity
 {
     if (capacity == 0) {
         return nil;
@@ -84,7 +84,7 @@ static inline void filterArr (NSArray * oriArr,NSMutableArray * desArr,DWFilter 
 
 @implementation NSArray (DWArraySortUtils)
 
--(NSArray *)dw_SortedArrayInHeapUsingComparator:(DWComparator)comparator {
+-(NSArray *)dw_sortedArrayInHeapUsingComparator:(DWComparator)comparator {
     NSMutableArray * array = [NSMutableArray arrayWithArray:self];
     sortHeap(array, comparator);
     return array.copy;
@@ -144,7 +144,7 @@ static inline void sortHeap (NSMutableArray * arr,DWComparator comparator) {
 
 @implementation NSMutableArray (DWArraySortUtils)
 
--(void)dw_SortInHeapUsingComparator:(DWComparator)comparator {
+-(void)dw_sortInHeapUsingComparator:(DWComparator)comparator {
     sortHeap(self, comparator);
 }
 
@@ -152,7 +152,7 @@ static inline void sortHeap (NSMutableArray * arr,DWComparator comparator) {
 
 @implementation NSArray (DWArrayKeyPathUtils)
 
--(id)dw_GetObjectWithKeyPath:(NSString *)path action:(DWArrayKeyPathActionType)action {
+-(id)dw_getObjectWithKeyPath:(NSString *)path action:(DWArrayKeyPathActionType)action {
     if (action == DWArrayKeyPathActionTypeUnionInArray || action == DWArrayKeyPathActionTypeDistinctUnionInArray) {
         BOOL isArray = YES;
         for (id obj in self) {
@@ -203,7 +203,7 @@ static inline NSString * StringFromAction(DWArrayKeyPathActionType action) {
 
 @implementation NSArray (DWArraySearchUtils)
 
--(void)dw_BinarySearchWithCondition:(DWSearchCondition)condition {
+-(void)dw_binarySearchWithCondition:(DWSearchCondition)condition {
     if (!condition || self.count == 0) {
         return;
     }

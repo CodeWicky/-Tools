@@ -27,13 +27,13 @@ typedef BOOL(^DWFilter)(id obj, NSUInteger idx,NSUInteger count,BOOL * stop);
  count  目标数组中当前容量
  stop   是否停止过滤，直接返回当前已过滤的目标数组
  */
--(NSArray *)dw_FilteredArrayUsingFilter:(DWFilter)filter;
+-(NSArray *)dw_filteredArrayUsingFilter:(DWFilter)filter;
 
 @end
 
 @interface NSMutableArray (DWArrayFilterUtils)
 
--(void)dw_FilterUsingFilter:(DWFilter)filter;
+-(void)dw_filterUsingFilter:(DWFilter)filter;
 
 @end
 
@@ -51,13 +51,13 @@ typedef BOOL(^DWFilter)(id obj, NSUInteger idx,NSUInteger count,BOOL * stop);
  return [obj1 isEqualToString:obj2];
  则若两字符串相同，则排除，返回不相同字符串的数组
  */
--(NSArray *)dw_ComplementaryArrayWithArr:(NSArray *)arr usingEqualBlock:(BOOL(^)(id obj1,id obj2))block;
+-(NSArray *)dw_complementaryArrayWithArr:(NSArray *)arr usingEqualBlock:(BOOL(^)(id obj1,id obj2))block;
 
 ///获取arr中相对于自身的补集
--(NSArray *)dw_ComplementaryArrayFromArr:(NSArray *)arr usingEqualBlock:(BOOL(^)(id obj1,id obj2))block;
+-(NSArray *)dw_complementaryArrayFromArr:(NSArray *)arr usingEqualBlock:(BOOL(^)(id obj1,id obj2))block;
 
 ///将数组按数量分为多个数组
--(NSArray *)dw_SplitArrayByCapacity:(NSUInteger)capacity;
+-(NSArray *)dw_splitArrayByCapacity:(NSUInteger)capacity;
 
 @end
 
@@ -69,19 +69,25 @@ typedef NSComparisonResult(^DWComparator)(id obj1,id obj2);
 
 ///数字升序排列
 #define DWComparatorNumberAscending \
+(^(id obj1,id obj2) {\
 if ([obj1 floatValue] < [obj2 floatValue]) {\
 return NSOrderedAscending;\
 } else {\
-    return NSOrderedDescending;\
+return NSOrderedDescending;\
 }\
+})
+
 
 ///数字降序排列
 #define DWComparatorNumberDescending \
+(^(id obj1,id obj2) {\
 if ([obj1 floatValue] < [obj2 floatValue]) {\
-return NSOrderedDescending;\
+    return NSOrderedDescending;\
 } else {\
-return NSOrderedAscending;\
+    return NSOrderedAscending;\
 }\
+})
+
 
 /**
  处理数组排序相关
@@ -94,7 +100,7 @@ return NSOrderedAscending;\
  @param comparator 比较器，见系统比较器用法
  @return 排序后数组
  */
--(NSArray *)dw_SortedArrayInHeapUsingComparator:(DWComparator)comparator;
+-(NSArray *)dw_sortedArrayInHeapUsingComparator:(DWComparator)comparator;
 
 @end
 
@@ -106,7 +112,7 @@ return NSOrderedAscending;\
 
  @param comparator 比较器，见系统比较器用法
  */
--(void)dw_SortInHeapUsingComparator:(DWComparator)comparator;
+-(void)dw_sortInHeapUsingComparator:(DWComparator)comparator;
 
 @end
 
@@ -133,7 +139,7 @@ typedef NS_ENUM(NSUInteger, DWArrayKeyPathActionType) {
  
  注：path可为nil，则返回array自身的相应动作值
  */
--(id)dw_GetObjectWithKeyPath:(NSString *)path action:(DWArrayKeyPathActionType)action;
+-(id)dw_getObjectWithKeyPath:(NSString *)path action:(DWArrayKeyPathActionType)action;
 
 @end
 
@@ -158,7 +164,7 @@ typedef NSComparisonResult(^DWSearchCondition)(id obj,NSUInteger currentIdx,BOOL
             if ([obj isEqualToNumber:@2]) {
                 idx = currentIdx;
                 return NSOrderedSame;
-            } else if (obj.integerValue > 2) {
+            } else if ([obj integerValue] > 2) {
                 return NSOrderedAscending;
             } else {
                 return NSOrderedDescending;
@@ -178,7 +184,7 @@ typedef NSComparisonResult(^DWSearchCondition)(id obj,NSUInteger currentIdx,BOOL
  当未查找到所需元素时，返回NSOrderedDescending以检测角标较大的一侧
  4.任何时候，可以通过修改stop为YES以停止查找过程
  */
--(void)dw_BinarySearchWithCondition:(DWSearchCondition)condition;
+-(void)dw_binarySearchWithCondition:(DWSearchCondition)condition;
 
 @end
 
