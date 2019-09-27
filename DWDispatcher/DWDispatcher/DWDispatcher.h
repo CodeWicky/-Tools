@@ -16,6 +16,8 @@ typedef void(^DWDispatcherHandler)(NSArray * items);
 
 @property (nonatomic ,assign ,readonly) NSTimeInterval timeInterval;
 
+@property (nonatomic ,assign ,readonly) BOOL onService;
+
 +(instancetype)dispatcherWithTimeInterval:(NSTimeInterval)timeInterval handler:(DWDispatcherHandler)handler;
 
 -(void)dispatchObject:(id)object;
