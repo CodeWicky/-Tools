@@ -31,7 +31,7 @@
 #pragma mark --- setter/getter ---
 -(DWDispatcher *)dispatcher {
     if (!_dispatcher) {
-        _dispatcher = [DWDispatcher dispatcherWithTimeInterval:1 handler:^(NSArray * _Nonnull items) {
+        _dispatcher = [DWDispatcher dispatcherWithTimeInterval:0.5 idleTimesToHangUp:20 handler:^(NSArray * _Nonnull items) {
             NSLog(@"%@",items);
         }];
     }

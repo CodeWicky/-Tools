@@ -28,8 +28,8 @@
 @implementation DWDispatcher
 
 #pragma mark --- interface method ---
-+(instancetype)dispatcherWithTimeInterval:(NSTimeInterval)timeInterval handler:(DWDispatcherHandler)handler {
-    return [[DWDispatcher alloc] initWithTimeInterval:timeInterval handler:handler];
++(instancetype)dispatcherWithTimeInterval:(NSTimeInterval)timeInterval idleTimesToHangUp:(NSInteger)idleTimes handler:(DWDispatcherHandler)handler {
+    return [[DWDispatcher alloc] initWithTimeInterval:timeInterval idleTimesToHangUp:idleTimes handler:handler];
 }
 
 -(void)dispatchObject:(id)object {
@@ -40,10 +40,15 @@
 }
 
 #pragma mark --- tool method ---
--(instancetype)initWithTimeInterval:(NSTimeInterval)timeInterval handler:(DWDispatcherHandler)handler {
+-(instancetype)initWithTimeInterval:(NSTimeInterval)timeInterval idleTimesToHangUp:(NSInteger)idleTimesToHangUp handler:(DWDispatcherHandler)handler {
     if (self = [super init]) {
         _timeInterval = timeInterval;
         _handler = handler;
+        if (idleTimesToHangUp < 0) {
+            _idleTimesToHangUp = 0;
+        } else {
+            _idleTimesToHangUp = idleTimesToHangUp;
+        }
     }
     return self;
 }
@@ -85,7 +90,7 @@
         NSLog(@"Pop!!!!");
         self.handler(items);
     }
-    if (CACurrentMediaTime() - self.lastPushTs > self.timeInterval * 10) {
+    if (self.idleTimesToHangUp > 0 && CACurrentMediaTime() - self.lastPushTs > self.timeInterval * self.idleTimesToHangUp) {
         NSLog(@"Hang up!!!!");
         [self.dispatchTimer invalidate];
         self.dispatchTimer = nil;

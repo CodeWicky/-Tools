@@ -18,7 +18,9 @@ typedef void(^DWDispatcherHandler)(NSArray * items);
 
 @property (nonatomic ,assign ,readonly) BOOL onService;
 
-+(instancetype)dispatcherWithTimeInterval:(NSTimeInterval)timeInterval handler:(DWDispatcherHandler)handler;
+@property (nonatomic ,assign ,readonly) NSInteger idleTimesToHangUp;
+
++(instancetype)dispatcherWithTimeInterval:(NSTimeInterval)timeInterval idleTimesToHangUp:(NSInteger)idleTimes handler:(DWDispatcherHandler)handler;
 
 -(void)dispatchObject:(id)object;
 
