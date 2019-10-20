@@ -9,7 +9,6 @@
 #import "DWPlayerManager.h"
 
 static void *DWPlayerManagerPlayerItemObservationContext = &DWPlayerManagerPlayerItemObservationContext;
-static void *DWPlayerManagerPlayerObservationContext = &DWPlayerManagerPlayerObservationContext;
 
 @interface DWPlayerManager ()
 
@@ -328,7 +327,6 @@ static void *DWPlayerManagerPlayerObservationContext = &DWPlayerManagerPlayerObs
     [item removeObserver:self forKeyPath:@"playbackBufferEmpty"];
     [item removeObserver:self forKeyPath:@"playbackLikelyToKeepUp"];
     [item removeObserver:self forKeyPath:@"loadedTimeRanges"];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:item];
 }
 
 -(void)seekToTimeCallback:(CMTime)time {
@@ -347,6 +345,12 @@ static void *DWPlayerManagerPlayerObservationContext = &DWPlayerManagerPlayerObs
         _statusBeforeSeeking = DWPlayerUnknown;
     }
     return self;
+}
+
+
+-(void)dealloc {
+    [self removeTimeObserverForPlayer];
+    [self removeObserverForPlayerItem:self.currentPlayerItem];
 }
 
 #pragma mark --- setter/getter ---
