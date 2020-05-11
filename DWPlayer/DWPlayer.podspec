@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name = 'DWPlayer'
-s.version = '0.0.0.1'
+s.version = '0.0.0.2'
 s.license = { :type => 'MIT', :file => 'LICENSE' }
 s.summary = '基于AVFoundation的视频播放组件。Component to play video based on AVFoundation.'
 s.homepage = 'https://github.com/CodeWicky/-Tools/tree/master/DWPlayer'

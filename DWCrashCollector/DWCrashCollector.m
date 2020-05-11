@@ -5,13 +5,12 @@
 //  Created by Wicky on 2017/10/12.
 //  Copyright © 2017年 Wicky. All rights reserved.
 //
-#import <UIKit/UIKit.h>
-
 #import "DWCrashCollector.h"
-#import "UIDevice+DWDeviceUtils.h"
-#import "DWFileManager.h"
 #include <libkern/OSAtomic.h>
 #include <execinfo.h>
+#import <UIKit/UIKit.h>
+#import <DWKit/UIDevice+DWDeviceUtils.h>
+#import <DWKit/DWFileManager.h>
 
 volatile int32_t UncaughtExceptionCount = 0;
 
@@ -27,7 +26,7 @@ static dispatch_queue_t serialQ = nil;
 
 +(void)collectCrashInDefaultWithSavePath:(NSString *)savePath {
     if (!savePath.length) {
-        savePath = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:@"DWLogger"];
+        savePath = [[DWFileManager cachesDir] stringByAppendingPathComponent:@"DWCrashCollector"];
     }
     [self configToCollectCrashWithSavePath:savePath handler:[self defaultHandler]];
 }
@@ -48,22 +47,22 @@ static dispatch_queue_t serialQ = nil;
         [formatter setDateFormat:@"yyyyMMdd-HHmmss"];
         NSDate * date = [NSDate date];
         NSString * folderName = [formatter stringFromDate:date];
-        [DWFileManager dw_CreateDirectoryAtPath:[NSString stringWithFormat:@"%@/Crash",sP]];
+        [DWFileManager createDirectoryAtPath:[NSString stringWithFormat:@"%@/Crash",sP]];
         [weakSelf configLastCrashWithName:folderName reason:exception.reason];
         NSString * path = [sP stringByAppendingPathComponent:[NSString stringWithFormat:@"Crash/%@",folderName]];
         NSString * crashFilePath = [path stringByAppendingPathComponent:@"CrashLog.crash"];
-        [DWFileManager dw_CreateFileAtPath:crashFilePath];
+        [DWFileManager createFileAtPath:crashFilePath];
         [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
         NSString * timeStr = [formatter stringFromDate:date];
         NSString * crashStr = @"";
-        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Name: %@\n",[UIDevice dw_ProjectDisplayName]]];
-        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Bundle ID: %@\n",[UIDevice dw_ProjectBundleId]]];
-        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Version: %@\n",[UIDevice dw_ProjectVersion]]];
-        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Build: %@\n",[UIDevice dw_ProjectBuildNo]]];
+        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Name: %@\n",[UIDevice dw_projectDisplayName]]];
+        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Bundle ID: %@\n",[UIDevice dw_projectBundleId]]];
+        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Version: %@\n",[UIDevice dw_projectVersion]]];
+        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Project Build: %@\n",[UIDevice dw_projectBuildNo]]];
         crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Crash Time: %@\n",timeStr]];
-        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device Model: %@\n",[UIDevice dw_DeviceDetailModel]]];
-        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device System: %@\n",[UIDevice dw_DeviceSystemVersion]]];
-        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device CPU Arch: %@\n",[UIDevice dw_DeviceCPUType]]];
+        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device Model: %@\n",[UIDevice dw_deviceDetailModel]]];
+        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device System: %@\n",[UIDevice dw_deviceSystemVersion]]];
+        crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Device CPU Arch: %@\n",[UIDevice dw_deviceCPUType]]];
         crashStr = [crashStr stringByAppendingString:[NSString stringWithFormat:@"Crash Detail:\n%@\n%@.\n%@",exception.name,exception.reason,[NSThread callStackSymbols]]];
         writeDataString2File(crashStr, crashFilePath);
         saveCrashImage2Path(path);
@@ -230,7 +229,7 @@ static inline NSString * crashConfigPath() {
     return [sP stringByAppendingPathComponent:@"Crash/CrashConfig.plist"];
 }
 
-#pragma mark --- over write ---
+#pragma mark --- override ---
 -(instancetype)init {
     return nil;
 }

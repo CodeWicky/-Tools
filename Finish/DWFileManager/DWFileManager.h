@@ -21,42 +21,42 @@
 
 #pragma mark --- 沙盒相关 ---
 ///沙盒的主目录路径
-+(NSString *)dw_HomeDir;
++(NSString *)homeDir;
 
 ///沙盒中Documents的目录路径
-+(NSString *)dw_DocumentsDir;
++(NSString *)documentsDir;
 
 ///沙盒中Library的目录路径
-+(NSString *)dw_LibraryDir;
++(NSString *)libraryDir;
 
 ///沙盒中Libarary/Preferences的目录路径
-+(NSString *)dw_PreferencesDir;
++(NSString *)preferencesDir;
 
 ///沙盒中Library/Caches的目录路径
-+(NSString *)dw_CachesDir;
++(NSString *)cachesDir;
 
 ///沙盒中tmp的目录路径
-+(NSString *)dw_TmpDir;
++(NSString *)tmpDir;
 
 #pragma mark --- 获取文件属性 ---
 ///根据key获取文件某个属性
-+(id)dw_AttributeOfItemAtPath:(NSString *)path forKey:(NSString *)key;
++(id)attributeOfItemAtPath:(NSString *)path forKey:(NSString *)key;
 
 ///根据key获取文件某个属性(错误信息error)
-+(id)dw_AttributeOfItemAtPath:(NSString *)path forKey:(NSString *)key error:(NSError **)error;
++(id)attributeOfItemAtPath:(NSString *)path forKey:(NSString *)key error:(NSError **)error;
 
 ///获取文件属性集合
-+(NSDictionary *)dw_AttributesOfItemAtPath:(NSString *)path;
++(NSDictionary *)attributesOfItemAtPath:(NSString *)path;
 
 ///获取文件属性集合(错误信息error)
-+(NSDictionary *)dw_AttributesOfItemAtPath:(NSString *)path error:(NSError **)error;
++(NSDictionary *)attributesOfItemAtPath:(NSString *)path error:(NSError **)error;
 
 #pragma mark --- 存在性 ---
 ///文件夹存在
-+(BOOL)dw_IsDirectoryAtPath:(NSString *)path;
++(BOOL)isDirectoryAtPath:(NSString *)path;
 
 ///文件存在
-+(BOOL)dw_IsFileAtPath:(NSString *)path;
++(BOOL)isFileAtPath:(NSString *)path;
 
 #pragma mark --- 遍历文件夹 ---
 /**
@@ -70,30 +70,30 @@
  1. 浅遍历：返回当前目录下的所有文件和文件夹
  2. 深遍历：返回当前目录下及子目录下的所有文件和文件夹
  */
-+(NSArray *)dw_ListFilesInDirectoryAtPath:(NSString *)path deep:(BOOL)deep;
++(NSArray *)listFilesInDirectoryAtPath:(NSString *)path deep:(BOOL)deep;
 
 #pragma mark --- 文件夹操作 ---
 
 ///创建文件夹
-+(BOOL)dw_CreateDirectoryAtPath:(NSString *)path;
++(BOOL)createDirectoryAtPath:(NSString *)path;
 
 ///创建文件夹并返回错误信息
-+(BOOL)dw_CreateDirectoryAtPath:(NSString *)path error:(NSError **)error;
++(BOOL)createDirectoryAtPath:(NSString *)path error:(NSError **)error;
 
 ///判断文件夹是否为空
-+(BOOL)dw_IsDirectoryIsEmptyAtPath:(NSString *)path;
++(BOOL)isDirectoryIsEmptyAtPath:(NSString *)path;
 
 ///删除对应路径的文件或文件夹
-+(BOOL)dw_RemoveItemAtPath:(NSString *)path;
++(BOOL)removeItemAtPath:(NSString *)path;
 
 ///清空文件夹
-+(BOOL)dw_ClearDirectoryAtPath:(NSString *)path;
++(BOOL)clearDirectoryAtPath:(NSString *)path;
 
 ///清除cache文件夹
-+(BOOL)dw_ClearCache;
++(BOOL)clearCache;
 
 ///清除Tmp
-+(BOOL)dw_ClearTmp;
++(BOOL)clearTmp;
 
 #pragma mark --- 文件操作 ---
 
@@ -106,53 +106,53 @@
  @param error 错误信息
  @return 是否成功
  */
-+(BOOL)dw_CreateFileAtPath:(NSString *)path content:(NSObject *)content overwrite:(BOOL)overwrite error:(NSError **)error;
++(BOOL)createFileAtPath:(NSString *)path content:(NSObject *)content overwrite:(BOOL)overwrite error:(NSError **)error;
 
 ///创建文件
-+(BOOL)dw_CreateFileAtPath:(NSString *)path;
++(BOOL)createFileAtPath:(NSString *)path;
 
 ///写数据至文件
-+(BOOL)dw_WriteFileAtPath:(NSString *)path content:(NSObject *)content error:(NSError *__autoreleasing *)error;
++(BOOL)writeFileAtPath:(NSString *)path content:(NSObject *)content error:(NSError *__autoreleasing *)error;
 
 ///复制文件，是否覆盖(错误信息error)
-+(BOOL)dw_CopyItemAtPath:(NSString *)path toPath:(NSString *)toPath overwrite:(BOOL)overwrite error:(NSError **)error;
++(BOOL)copyItemAtPath:(NSString *)path toPath:(NSString *)toPath overwrite:(BOOL)overwrite error:(NSError **)error;
 
 ///移动文件，是否覆盖(错误信息error)
-+(BOOL)dw_MoveItemAtPath:(NSString *)path toPath:(NSString *)toPath overwrite:(BOOL)overwrite error:(NSError **)error;
++(BOOL)moveItemAtPath:(NSString *)path toPath:(NSString *)toPath overwrite:(BOOL)overwrite error:(NSError **)error;
 
 ///获取文件名(是否包含后缀)
-+(NSString *)dw_FileNameAtPath:(NSString *)path extention:(BOOL)extention;
++(NSString *)fileNameAtPath:(NSString *)path extention:(BOOL)extention;
 
 ///获取文件夹路径
-+(NSString *)dw_DirectoryPathAtPath:(NSString *)path;
++(NSString *)directoryPathAtPath:(NSString *)path;
 
 ///获取后缀名
-+(NSString *)dw_ExtentionAtPath:(NSString *)path;
++(NSString *)extentionAtPath:(NSString *)path;
 
 #pragma mark --- 统计操作 ---
 ///统计文件夹大小
-+(NSNumber *)dw_SizeOfDirectoryAtPath:(NSString *)path;
++(NSNumber *)sizeOfDirectoryAtPath:(NSString *)path;
 
-///统计问价大小
-+(NSNumber *)dw_SizeOfFileAtPath:(NSString *)path;
+///统计文件大小
++(NSNumber *)sizeOfFileAtPath:(NSString *)path;
 
 ///获取创建文件时间
-+(NSDate *)dw_CreationDateOfItemAtPath:(NSString *)path;
++(NSDate *)creationDateOfItemAtPath:(NSString *)path;
 
 ///获取文件修改时间
-+(NSDate *)dw_ModificationDateOfItemAtPath:(NSString *)path;
++(NSDate *)modificationDateOfItemAtPath:(NSString *)path;
 
 ///判断目录是否可以执行
-+(BOOL)dw_IsExecutableItemAtPath:(NSString *)path;
++(BOOL)isExecutableItemAtPath:(NSString *)path;
 
 ///判断目录是否可读
-+(BOOL)dw_IsReadableItemAtPath:(NSString *)path;
++(BOOL)isReadableItemAtPath:(NSString *)path;
 
 ///判断目录是否可写
-+(BOOL)dw_IsWritableItemAtPath:(NSString *)path;
++(BOOL)isWritableItemAtPath:(NSString *)path;
 
 ///返回文件mimeType
-+(NSString *)dw_MimeTypeForFile:(NSString *)fileName;
++(NSString *)mimeTypeForFile:(NSString *)fileName;
 
 @end
 
